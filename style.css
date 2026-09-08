@@ -5,28 +5,22 @@
 }
 
 body {
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-family: 'Inter', sans-serif;
   background: linear-gradient(135deg, #4c1d95, #7c3aed);
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
   padding: 24px;
 }
 
-.login-wrap {
+.login-card {
   width: 100%;
   max-width: 380px;
-}
-
-.login-card {
   background: #ffffff;
   border-radius: 16px;
   padding: 40px 32px;
   box-shadow: 0 20px 50px rgba(76, 29, 149, 0.35);
 }
-
-
 
 h1 {
   font-size: 22px;
