@@ -81,3 +81,6 @@ button {
 button:hover {
   background: #6d28d9;
 }
+
+.error-msg.success { color: #16a34a; }
+.error-msg.failed { color: #dc2626; }
