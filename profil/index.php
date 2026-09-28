@@ -50,13 +50,13 @@ $profil = $_SESSION['profil'];
         rel="stylesheet"
     >
 
-    <link rel="stylesheet" href="profil.css">
+    <link rel="stylesheet" href="index.css">
 </head>
 
 <body>
     <div class="profile-container">
         <div class="profile-header">
-            <h1>Kelola Informasi Akun dan Data Usaha Anda.</h1>
+            <h1 style="color: white; font-size: 32px;">Kelola Informasi Akun dan Data Usaha Anda.</h1>
         </div>
 
         <div class="profile-card">
@@ -265,6 +265,6 @@ $profil = $_SESSION['profil'];
         </div>
     </div>
 
-    <script src="profil.js"></script>
+    <script src="index.js"></script>
 </body>
 </html>
