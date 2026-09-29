@@ -105,7 +105,7 @@ $stats = [
             <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
                 <div class="px-4 sm:px-5 py-3.5 sm:py-4 border-b border-gray-100 flex items-center justify-between">
                     <h3 class="font-semibold text-navy-900 text-sm">Transaksi Terakhir</h3>
-                    <a href="transaksi.php" class="text-xs font-semibold text-navy-700 hover:text-navy-950 transition">Lihat semua →</a>
+                    <a href="transaksi.php" class="text-xs font-semibold text-navy-700 hover:text-navy-950 transition">Lihat semua</a>
                 </div>
                 <div class="overflow-x-auto w-full">
                     <table class="w-full text-xs sm:text-sm min-w-[500px]">
