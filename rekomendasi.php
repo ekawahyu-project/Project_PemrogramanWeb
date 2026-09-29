@@ -105,7 +105,7 @@ $unsoldProd = array_filter($_SESSION['produk'], fn($p) => !in_array($p['id'], $s
                     <!-- Produk Terlaris -->
                     <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
                         <div class="px-5 py-4 border-b border-gray-100">
-                            <h3 class="font-semibold text-navy-900 text-sm">🏆 Produk Terlaris</h3>
+                            <h3 class="font-bold text-navy-900 text-sm">Produk Terlaris</h3>
                         </div>
                         <?php if (empty($produkStats)): ?>
                         <p class="text-gray-400 text-xs text-center py-5">Belum ada data penjualan terhubung ke produk.</p>
@@ -133,7 +133,7 @@ $unsoldProd = array_filter($_SESSION['produk'], fn($p) => !in_array($p['id'], $s
                     <!-- Perlu Restock -->
                     <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
                         <div class="px-5 py-4 border-b border-gray-100">
-                            <h3 class="font-semibold text-navy-900 text-sm">📦 Perlu Restock</h3>
+                            <h3 class="font-bold text-navy-900 text-sm">Perlu Restock</h3>
                         </div>
                         <?php if (empty($lowStock)): ?>
                         <p class="text-gray-400 text-xs text-center py-5">Semua stok aman.</p>
@@ -156,7 +156,7 @@ $unsoldProd = array_filter($_SESSION['produk'], fn($p) => !in_array($p['id'], $s
                     <?php if (!empty($unsoldProd)): ?>
                     <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
                         <div class="px-5 py-4 border-b border-gray-100">
-                            <h3 class="font-semibold text-navy-900 text-sm">💤 Belum Terjual</h3>
+                            <h3 class="font-bold text-navy-900 text-sm">Belum Terjual</h3>
                         </div>
                         <div class="divide-y divide-gray-50">
                             <?php foreach ($unsoldProd as $p): ?>
@@ -175,7 +175,7 @@ $unsoldProd = array_filter($_SESSION['produk'], fn($p) => !in_array($p['id'], $s
                     <!-- CREATE & UPDATE: Form catatan -->
                     <div class="bg-white rounded-xl border <?= $editCat ? 'border-navy-200' : 'border-gray-100' ?> shadow-sm p-5">
                         <h3 class="font-semibold text-navy-900 text-sm mb-4">
-                            <?= $editCat ? '✏️ Edit Catatan' : '+ Tambah Catatan Tindak Lanjut' ?>
+                            <?= $editCat ? 'Edit Catatan' : '+ Tambah Catatan Tindak Lanjut' ?>
                         </h3>
                         <form method="POST" action="rekomendasi.php" class="space-y-3">
                             <input type="hidden" name="action" value="<?= $editCat ? 'update' : 'tambah' ?>">

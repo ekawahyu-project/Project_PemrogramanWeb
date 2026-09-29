@@ -100,7 +100,7 @@ if ($editId) {
             <!-- Form Tambah / Edit (CREATE & UPDATE) -->
             <div class="bg-white rounded-xl border <?= $editPrd ? 'border-navy-200' : 'border-gray-100' ?> shadow-sm p-5">
                 <h3 class="font-semibold text-navy-900 text-sm mb-4">
-                    <?= $editPrd ? '✏️ Edit Produk' : '+ Tambah Produk' ?>
+                    <?= $editPrd ? 'Edit Produk' : '+ Tambah Produk' ?>
                 </h3>
                 <form method="POST" action="produk.php" class="grid grid-cols-2 gap-4">
                     <input type="hidden" name="action" value="<?= $editPrd ? 'update' : 'tambah' ?>">

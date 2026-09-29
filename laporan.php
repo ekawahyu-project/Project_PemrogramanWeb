@@ -148,7 +148,7 @@ $totalLaba = $totalMasuk - $totalKeluar;
             <!-- CREATE & UPDATE: Form Simpan Laporan -->
             <div class="bg-white rounded-xl border <?= $editLap ? 'border-navy-200' : 'border-gray-100' ?> shadow-sm p-5">
                 <h3 class="font-semibold text-navy-900 text-sm mb-4">
-                    <?= $editLap ? '✏️ Edit Laporan Tersimpan' : '+ Simpan Laporan Periode' ?>
+                    <?= $editLap ? 'Edit Laporan Tersimpan' : '+ Simpan Laporan Periode' ?>
                 </h3>
                 <form method="POST" action="laporan.php" class="grid grid-cols-2 gap-4">
                     <input type="hidden" name="action" value="<?= $editLap ? 'update' : 'simpan' ?>">
