@@ -244,24 +244,31 @@ $totalLaba = $totalMasuk - $totalKeluar;
                 <?php endif; ?>
             </div>
         </div>
-    </main>
 
-    <script>
-    new Chart(document.getElementById('chartBulanan'), {
-        type: 'bar',
-        data: {
-            labels: <?= json_encode(array_values($labels)) ?>,
-            datasets: [
-                { label: 'Pemasukan',   data: <?= json_encode(array_column(array_values($bulanData), 'pemasukan')) ?>,   backgroundColor: 'rgba(22,163,74,0.75)',  borderRadius: 4 },
-                { label: 'Pengeluaran', data: <?= json_encode(array_column(array_values($bulanData), 'pengeluaran')) ?>, backgroundColor: 'rgba(239,68,68,0.75)',  borderRadius: 4 }
-            ]
-        },
-        options: {
-            responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { position: 'top' } },
-            scales: { y: { beginAtZero: true, ticks: { callback: v => 'Rp ' + new Intl.NumberFormat('id-ID').format(v) } } }
-        }
-    });
-    </script>
+        <script>
+        (function() {
+            var ctx = document.getElementById('chartBulanan');
+            if (!ctx) return;
+            if (window._myChartBulanan) {
+                window._myChartBulanan.destroy();
+            }
+            window._myChartBulanan = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: <?= json_encode(array_values($labels)) ?>,
+                    datasets: [
+                        { label: 'Pemasukan',   data: <?= json_encode(array_column(array_values($bulanData), 'pemasukan')) ?>,   backgroundColor: 'rgba(22,163,74,0.75)',  borderRadius: 4 },
+                        { label: 'Pengeluaran', data: <?= json_encode(array_column(array_values($bulanData), 'pengeluaran')) ?>, backgroundColor: 'rgba(239,68,68,0.75)',  borderRadius: 4 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top' } },
+                    scales: { y: { beginAtZero: true, ticks: { callback: v => 'Rp ' + new Intl.NumberFormat('id-ID').format(v) } } }
+                }
+            });
+        })();
+        </script>
+    </main>
 </body>
 </html>

@@ -9,7 +9,7 @@ $nav = [
     ['href' => 'profil.php',      'label' => 'Profil',       'page' => 'profil'],
 ];
 ?>
-<aside class="fixed left-0 top-0 w-56 h-screen bg-navy-950 flex flex-col">
+<aside class="fixed left-0 top-0 w-56 h-screen bg-navy-950 flex flex-col z-30">
     <div class="px-5 py-4 border-b border-white/10">
         <span class="text-white font-bold text-base tracking-tight">AlpetBizz</span>
     </div>
@@ -33,3 +33,8 @@ $nav = [
         </form>
     </div>
 </aside>
+
+<!-- Global Script untuk Chart.js dan Navigasi SPA Tanpa Reload -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="profil.js"></script>
+<script src="spa.js"></script>
