@@ -41,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'jumlah'      => $jumlah,
                     'keterangan'  => $ket,
                 ];
+                simpanProduk();
                 header('Location: stok.php'); exit;
             }
         }
@@ -67,6 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['stok_log'] = array_values(
             array_filter($_SESSION['stok_log'], fn($l) => $l['id'] !== $id)
         );
+        simpanProduk();
         header('Location: stok.php'); exit;
     }
 }

@@ -28,7 +28,7 @@
     function updateSidebarActive(currentUrl) {
         const urlObj = new URL(currentUrl, window.location.origin);
         const path = urlObj.pathname.split('/').pop() || 'dashboard.php';
-        
+
         document.querySelectorAll('aside nav a').forEach(link => {
             const linkHref = link.getAttribute('href');
             if (!linkHref) return;
@@ -132,6 +132,7 @@
 
     // 6. Intercept form submit (CRUD tanpa reload)
     document.addEventListener('submit', async function (e) {
+        if (e.defaultPrevented) return;
         const form = e.target;
         if (!form || form.tagName !== 'FORM') return;
 

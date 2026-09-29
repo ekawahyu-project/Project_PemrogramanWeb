@@ -1,14 +1,37 @@
 <?php
-// includes/init.php — Inisialisasi semua data session (include setelah session_start)
+// includes/init.php Inisialisasi semua data session (include setelah session_start)
 
-if (!isset($_SESSION['produk'])) {
-    $_SESSION['produk'] = [
+$fileProduk = __DIR__ . '/../data/produk.json';
+
+function produkAwal(): array
+{
+    return [
         ['id' => 'p1', 'nama' => 'Kopi Arabika 250g', 'kategori' => 'Makanan & Minuman', 'harga_beli' => 30000, 'harga_jual' => 55000, 'satuan' => 'pack', 'stok' => 25, 'stok_min' => 5],
         ['id' => 'p2', 'nama' => 'Teh Hijau 100g',    'kategori' => 'Makanan & Minuman', 'harga_beli' => 12000, 'harga_jual' => 20000, 'satuan' => 'pack', 'stok' => 8,  'stok_min' => 10],
         ['id' => 'p3', 'nama' => 'Gula Pasir 1kg',    'kategori' => 'Makanan & Minuman', 'harga_beli' => 13000, 'harga_jual' => 17000, 'satuan' => 'kg',   'stok' => 3,  'stok_min' => 5],
         ['id' => 'p4', 'nama' => 'Tas Kanvas Polos',  'kategori' => 'Fashion',            'harga_beli' => 25000, 'harga_jual' => 45000, 'satuan' => 'pcs',  'stok' => 15, 'stok_min' => 3],
         ['id' => 'p5', 'nama' => 'Sabun Herbal',      'kategori' => 'Kecantikan',         'harga_beli' => 8000,  'harga_jual' => 15000, 'satuan' => 'pcs',  'stok' => 30, 'stok_min' => 10],
     ];
+}
+
+function simpanProduk(): bool {
+    global $fileProduk;
+    $dir = dirname($fileProduk);
+    if (!is_dir($dir) && !mkdir($dir, 0777, true)) return false;
+    return file_put_contents(
+        $fileProduk,
+        json_encode(array_values($_SESSION['produk']), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
+        LOCK_EX
+    ) !== false;
+}
+
+// Sumber data utama: file JSON. Kalau belum ada / rusak, pakai data awal lalu simpan.
+if (file_exists($fileProduk)) {
+    $dataJson = json_decode(file_get_contents($fileProduk), true);
+    $_SESSION['produk'] = is_array($dataJson) ? $dataJson : produkAwal();
+} else {
+    $_SESSION['produk'] = produkAwal();
+    simpanProduk();
 }
 
 if (!isset($_SESSION['transaksi'])) {
@@ -57,7 +80,8 @@ if (!isset($_SESSION['catatan_rekomendasi'])) {
 }
 
 // Helper: cari produk berdasarkan ID
-function getProdukById(string $id): ?array {
+function getProdukById(string $id): ?array
+{
     foreach ($_SESSION['produk'] as $p) {
         if ($p['id'] === $id) return $p;
     }

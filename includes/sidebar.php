@@ -36,5 +36,5 @@ $nav = [
 
 <!-- Global Script untuk Chart.js dan Navigasi SPA Tanpa Reload -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="profil.js"></script>
-<script src="spa.js"></script>
+<script src="assets/js/profil.js"></script>
+<script src="assets/js/spa.js"></script>
