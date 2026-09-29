@@ -4,11 +4,11 @@ if (!isset($_SESSION['user'])) { header('Location: login.php'); exit; }
 require_once 'includes/init.php';
 
 $currentPage = 'produk';
-$kategoriOpt = ['Makanan & Minuman', 'Fashion', 'Kerajinan', 'Jasa', 'Kecantikan', 'Elektronik', 'Lainnya'];
+$kategoriOpt = ['Makanan','Minuman','Lainnya'];
 $satuanOpt   = ['pcs', 'pack', 'kg', 'gram', 'liter', 'ml', 'box', 'lusin', 'meter', 'lembar'];
 $error       = '';
 
-// ── CRUD Handlers ──────────────────────────────────────────────
+//  CRUD Handlers 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
@@ -89,7 +89,7 @@ if ($editId) {
     <main class="ml-56 min-h-screen flex flex-col">
         <header class="bg-white border-b border-gray-100 px-6 py-4">
             <h2 class="font-semibold text-navy-900">Manajemen Produk</h2>
-            <p class="text-xs text-gray-500 mt-0.5">Kelola data produk — tambah, update, atau hapus produk.</p>
+            <p class="text-xs text-gray-500 mt-0.5">Kelola data produk tambah, update, atau hapus produk.</p>
         </header>
 
         <div class="p-6 flex-1 space-y-6">
