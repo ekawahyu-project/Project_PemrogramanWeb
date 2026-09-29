@@ -98,8 +98,9 @@ Arsitektur dibuat bersih dan flat (tidak boros folder `index.php`):
 |---|---|
 | Struktur | HTML5 |
 | Styling | Tailwind CSS v3 (CDN) — Tema Navy Elegan |
+| Navigasi Tanpa Reload | Single Page Navigation (`spa.js` - Fetch API + history.pushState + Form Interceptor) |
 | Grafik | Chart.js (CDN) |
-| Interaktivitas | JavaScript Vanilla (`profil.js`) |
+| Interaktivitas | JavaScript Vanilla (`profil.js`, `spa.js`) |
 | Backend & Session | PHP (`$_SESSION`, `$_POST`, `$_GET`) |
 | Penyimpanan | Session-based Storage (Ringan, DRY & Efisien) |
 
@@ -111,7 +112,7 @@ Arsitektur dibuat bersih dan flat (tidak boros folder `index.php`):
 Project_PemWeb/
 ├── includes/
 │   ├── init.php              ← Inisialisasi data session & variabel bersama ($inputClass)
-│   └── sidebar.php           ← Navigasi shared (DRY)
+│   └── sidebar.php           ← Navigasi shared (DRY) + load global spa.js & Chart.js
 ├── dashboard.php             ← Dashboard utama
 ├── index.php                 ← Entry redirector
 ├── laporan.php               ← Modul Laporan & Grafik (CRUD)
@@ -121,6 +122,7 @@ Project_PemWeb/
 ├── profil.php                ← Modul Profil Usaha
 ├── register.php              ← Registrasi Pengguna Baru
 ├── rekomendasi.php           ← Modul Rekomendasi Bisnis (CRUD)
+├── spa.js                    ← Engine navigasi SPA (tanpa reload halaman & form CRUD)
 ├── stok.php                  ← Modul Manajemen Stok (CRUD)
 ├── transaksi.php             ← Modul Transaksi Keuangan (CRUD)
 ├── AGENTS.md
