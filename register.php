@@ -17,11 +17,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'regis
     $pw2   = $_POST['password2']      ?? '';
 
     if (!$nama || !$uname || !$email || !$pw) {
-        $error = 'Semua field wajib diisi.';
+        $error = 'Semua field formulir wajib diisi.';
     } elseif ($pw !== $pw2) {
-        $error = 'Konfirmasi password tidak cocok.';
+        $error = 'Konfirmasi kata sandi tidak cocok.';
     } elseif (strlen($pw) < 6) {
-        $error = 'Password minimal 6 karakter.';
+        $error = 'Kata sandi minimal 6 karakter.';
     } elseif (isset($_SESSION['users'][$uname])) {
         $error = 'Username sudah terdaftar.';
     } else {
@@ -44,67 +44,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'regis
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AlpetBizz | Daftar</title>
+    <title>AlpetBizz | Daftar Akun</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{navy:{'100':'#dbe8ff','700':'#1e4080','800':'#162e5e','900':'#0e1f42','950':'#080f21'}}}}}</script>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-navy-950 to-navy-800 grid place-items-center p-6 font-sans">
-    <div class="w-full max-w-sm bg-white rounded-2xl shadow-2xl p-8">
-        <h1 class="text-xl font-bold text-navy-900 mb-1">Buat akun baru</h1>
-        <p class="text-sm text-gray-500 mb-6">Daftarkan usaha Anda di AlpetBizz.</p>
+<body class="min-h-screen bg-gradient-to-br from-navy-950 via-navy-900 to-navy-800 flex items-center justify-center p-3.5 sm:p-6 font-sans antialiased text-gray-800">
+    <div class="w-full max-w-[440px] bg-white rounded-2xl shadow-2xl p-5 sm:p-8 mx-auto my-4 sm:my-8">
+        <div class="text-center sm:text-left mb-6">
+            <span class="inline-block px-3 py-1 bg-navy-100 text-navy-800 text-xs font-bold rounded-lg mb-2 tracking-wide uppercase">AlpetBizz</span>
+            <h1 class="text-xl sm:text-2xl font-bold text-navy-900 tracking-tight">Buat Akun Baru</h1>
+            <p class="text-xs sm:text-sm text-gray-500 mt-1">Daftarkan usaha Anda dan mulai kelola dengan mudah.</p>
+        </div>
 
         <?php if ($error): ?>
-        <p class="text-sm text-red-600 bg-red-50 px-3 py-2.5 rounded-lg mb-4"><?= htmlspecialchars($error) ?></p>
+        <div class="text-xs sm:text-sm text-red-600 bg-red-50 border border-red-200 px-3.5 py-2.5 rounded-xl mb-4 font-medium"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
 
-        <form method="POST" action="register.php" class="space-y-4">
+        <form method="POST" action="register.php" class="space-y-3.5">
             <input type="hidden" name="action" value="register">
             <div>
                 <label class="block text-xs font-semibold text-gray-600 mb-1.5">Nama Lengkap</label>
                 <input type="text" name="nama" required
                     value="<?= htmlspecialchars($_POST['nama'] ?? '') ?>"
-                    placeholder="Masukkan nama lengkap"
-                    class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm outline-none
+                    placeholder="Masukkan nama lengkap pemilik"
+                    class="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm outline-none
                            focus:border-navy-700 focus:ring-2 focus:ring-navy-100 transition">
             </div>
             <div>
                 <label class="block text-xs font-semibold text-gray-600 mb-1.5">Username</label>
                 <input type="text" name="username" required
                     value="<?= htmlspecialchars($_POST['username'] ?? '') ?>"
-                    placeholder="Masukkan username"
-                    class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm outline-none
+                    placeholder="Pilih nama pengguna (username)"
+                    class="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm outline-none
                            focus:border-navy-700 focus:ring-2 focus:ring-navy-100 transition">
             </div>
             <div>
-                <label class="block text-xs font-semibold text-gray-600 mb-1.5">Email</label>
+                <label class="block text-xs font-semibold text-gray-600 mb-1.5">Alamat Email</label>
                 <input type="email" name="email" required
                     value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
-                    placeholder="Masukkan email"
-                    class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm outline-none
+                    placeholder="Contoh: nama@domain.com"
+                    class="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm outline-none
                            focus:border-navy-700 focus:ring-2 focus:ring-navy-100 transition">
             </div>
             <div>
-                <label class="block text-xs font-semibold text-gray-600 mb-1.5">Password</label>
+                <label class="block text-xs font-semibold text-gray-600 mb-1.5">Kata Sandi</label>
                 <input type="password" name="password" required placeholder="Minimal 6 karakter"
-                    class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm outline-none
+                    class="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm outline-none
                            focus:border-navy-700 focus:ring-2 focus:ring-navy-100 transition">
             </div>
             <div>
-                <label class="block text-xs font-semibold text-gray-600 mb-1.5">Konfirmasi Password</label>
-                <input type="password" name="password2" required placeholder="Ulangi password"
-                    class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm outline-none
+                <label class="block text-xs font-semibold text-gray-600 mb-1.5">Ulangi Kata Sandi</label>
+                <input type="password" name="password2" required placeholder="Konfirmasi kata sandi"
+                    class="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm outline-none
                            focus:border-navy-700 focus:ring-2 focus:ring-navy-100 transition">
             </div>
-            <button type="submit"
-                class="w-full py-2.5 bg-navy-800 hover:bg-navy-950 text-white rounded-lg text-sm font-semibold transition">
-                Daftar
-            </button>
+            <div class="pt-2">
+                <button type="submit"
+                    class="w-full py-3 bg-navy-800 hover:bg-navy-950 text-white rounded-xl text-sm font-semibold transition shadow-md hover:shadow-lg">
+                    Daftar Sekarang
+                </button>
+            </div>
         </form>
 
-        <p class="text-center text-xs text-gray-500 mt-5">
-            Sudah punya akun?
-            <a href="login.php" class="text-navy-700 font-semibold hover:underline">Masuk</a>
+        <p class="text-center text-xs text-gray-500 mt-6 pt-4 border-t border-gray-100">
+            Sudah memiliki akun?
+            <a href="login.php" class="text-navy-700 font-bold hover:underline">Masuk di sini</a>
         </p>
     </div>
 </body>

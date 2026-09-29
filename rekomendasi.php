@@ -90,16 +90,16 @@ $unsoldProd = array_filter($_SESSION['produk'], fn($p) => !in_array($p['id'], $s
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{navy:{'100':'#dbe8ff','700':'#1e4080','800':'#162e5e','900':'#0e1f42','950':'#080f21'}}}}}</script>
 </head>
-<body class="bg-gray-50 font-sans">
+<body class="bg-gray-50 font-sans antialiased text-gray-800">
     <?php include 'includes/sidebar.php'; ?>
-    <main class="ml-56 min-h-screen flex flex-col">
-        <header class="bg-white border-b border-gray-100 px-6 py-4">
-            <h2 class="font-semibold text-navy-900">Sistem Rekomendasi</h2>
-            <p class="text-xs text-gray-500 mt-0.5">Analisis otomatis + catatan tindak lanjut yang bisa dikelola.</p>
+    <main class="w-full min-h-screen lg:pl-64 flex flex-col transition-all duration-300">
+        <header class="bg-white border-b border-gray-100 px-4 sm:px-6 py-4">
+            <h2 class="font-bold text-lg sm:text-xl text-navy-900">Sistem Rekomendasi</h2>
+            <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Analisis pintar otomatis + catatan rencana tindak lanjut bisnis.</p>
         </header>
 
-        <div class="p-6 flex-1 space-y-6">
-            <div class="grid grid-cols-2 gap-6">
+        <div class="p-4 sm:p-6 lg:p-8 flex-1 space-y-6 max-w-7xl w-full mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                 <!-- Kolom kiri: Analisis otomatis (READ) -->
                 <div class="space-y-5">
                     <!-- Produk Terlaris -->
@@ -145,7 +145,7 @@ $unsoldProd = array_filter($_SESSION['produk'], fn($p) => !in_array($p['id'], $s
                                     <p class="text-sm font-medium text-navy-900"><?= htmlspecialchars($p['nama']) ?></p>
                                     <span class="text-xs text-orange-600 font-medium"><?= $p['stok'] === 0 ? 'Habis' : 'Menipis' ?></span>
                                 </div>
-                                <p class="text-xs text-gray-400 mt-0.5">Stok: <?= $p['stok'] ?> / Min: <?= $p['stok_min'] ?> — Saran isi: <?= $saran ?> <?= $p['satuan'] ?></p>
+                                <p class="text-xs text-gray-400 mt-0.5">Stok: <?= $p['stok'] ?> / Min: <?= $p['stok_min'] ?> | Saran isi: <?= $saran ?> <?= $p['satuan'] ?></p>
                             </div>
                             <?php endforeach; ?>
                         </div>
@@ -162,7 +162,7 @@ $unsoldProd = array_filter($_SESSION['produk'], fn($p) => !in_array($p['id'], $s
                             <?php foreach ($unsoldProd as $p): ?>
                             <div class="px-5 py-3 hover:bg-gray-50/60">
                                 <p class="text-sm font-medium text-navy-900"><?= htmlspecialchars($p['nama']) ?></p>
-                                <p class="text-xs text-gray-400 mt-0.5">Stok: <?= $p['stok'] ?> — Pertimbangkan promosi</p>
+                                <p class="text-xs text-gray-400 mt-0.5">Stok: <?= $p['stok'] ?> | Pertimbangkan promosi</p>
                             </div>
                             <?php endforeach; ?>
                         </div>

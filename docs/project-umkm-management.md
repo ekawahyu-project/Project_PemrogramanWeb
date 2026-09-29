@@ -97,10 +97,10 @@ Arsitektur dibuat bersih dan flat (tidak boros folder `index.php`):
 | Bagian | Teknologi |
 |---|---|
 | Struktur | HTML5 |
-| Styling | Tailwind CSS v3 (CDN) — Tema Navy Elegan |
-| Navigasi Tanpa Reload | Single Page Navigation (`spa.js` - Fetch API + history.pushState + Form Interceptor) |
+| Styling | Tailwind CSS v3 (CDN) — Tema Navy Elegan & Desain Responsif (Mobile S/M/L, Tablet, Desktop) |
+| Navigasi Tanpa Reload | Single Page Navigation (`assets/js/spa.js` - Fetch API + history.pushState + Drawer Mobile Interceptor) |
 | Grafik | Chart.js (CDN) |
-| Interaktivitas | JavaScript Vanilla (`profil.js`, `spa.js`) |
+| Interaktivitas | JavaScript Vanilla (`assets/js/profil.js`, `assets/js/spa.js`) |
 | Backend & Session | PHP (`$_SESSION`, `$_POST`, `$_GET`) |
 | Penyimpanan | Session-based Storage (Ringan, DRY & Efisien) |
 
@@ -110,21 +110,24 @@ Arsitektur dibuat bersih dan flat (tidak boros folder `index.php`):
 
 ```
 Project_PemWeb/
+├── assets/
+│   └── js/
+│       ├── profil.js         ← Logika interaksi & validasi profil
+│       └── spa.js            ← Engine navigasi SPA & drawer sidebar responsif
+├── docs/
+│   └── project-umkm-management.md ← Dokumentasi project
 ├── includes/
-│   ├── init.php              ← Inisialisasi data session & variabel bersama ($inputClass)
-│   └── sidebar.php           ← Navigasi shared (DRY) + load global spa.js & Chart.js
-├── dashboard.php             ← Dashboard utama
+│   ├── init.php              ← Inisialisasi data session & variabel UI ($inputClass)
+│   └── sidebar.php           ← Komponen sidebar + topbar navigasi mobile responsif
+├── dashboard.php             ← Dashboard utama ringkasan usaha
 ├── index.php                 ← Entry redirector
 ├── laporan.php               ← Modul Laporan & Grafik (CRUD)
-├── login.php                 ← Autentikasi Login
+├── login.php                 ← Autentikasi Login (Responsif)
 ├── produk.php                ← Modul Manajemen Produk (CRUD)
-├── profil.js                 ← Script interaksi profil
 ├── profil.php                ← Modul Profil Usaha
-├── register.php              ← Registrasi Pengguna Baru
+├── register.php              ← Registrasi Pengguna Baru (Responsif)
 ├── rekomendasi.php           ← Modul Rekomendasi Bisnis (CRUD)
-├── spa.js                    ← Engine navigasi SPA (tanpa reload halaman & form CRUD)
 ├── stok.php                  ← Modul Manajemen Stok (CRUD)
 ├── transaksi.php             ← Modul Transaksi Keuangan (CRUD)
-├── AGENTS.md
-└── project-umkm-management.md
+└── AGENTS.md
 ```

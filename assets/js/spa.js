@@ -1,6 +1,7 @@
 /**
  * spa.js — Single Page Application navigation for UMKM Manager / AlpetBizz
- * Menghilangkan reload/kedip saat berpindah halaman dan submit CRUD.
+ * Menghilangkan reload/kedip saat berpindah halaman dan submit CRUD,
+ * serta menangani drawer sidebar responsif untuk Mobile S, M, L & Tablet.
  */
 
 (function () {
@@ -24,7 +25,37 @@
         }, 150);
     }
 
-    // 2. Update active style pada sidebar
+    // 2. Kontrol Mobile Sidebar Drawer (Responsif)
+    function openSidebar() {
+        const sidebar = document.getElementById('app-sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+        if (sidebar) sidebar.classList.remove('-translate-x-full');
+        if (backdrop) backdrop.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden', 'lg:overflow-auto');
+    }
+
+    function closeSidebar() {
+        const sidebar = document.getElementById('app-sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+        if (sidebar) sidebar.classList.add('-translate-x-full');
+        if (backdrop) backdrop.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden', 'lg:overflow-auto');
+    }
+
+    // Event listener untuk tombol toggle, close, dan backdrop
+    document.addEventListener('click', function (e) {
+        if (e.target.closest('#sidebar-toggle')) {
+            openSidebar();
+        } else if (e.target.closest('#sidebar-close') || e.target.closest('#sidebar-backdrop')) {
+            closeSidebar();
+        }
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeSidebar();
+    });
+
+    // 3. Update active style pada sidebar
     function updateSidebarActive(currentUrl) {
         const urlObj = new URL(currentUrl, window.location.origin);
         const path = urlObj.pathname.split('/').pop() || 'dashboard.php';
@@ -35,14 +66,14 @@
             const linkPath = linkHref.split('?')[0];
 
             if (linkPath === path) {
-                link.className = 'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition bg-white/15 text-white';
+                link.className = 'flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition bg-white/15 text-white';
             } else {
-                link.className = 'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition text-white/65 hover:bg-white/10 hover:text-white';
+                link.className = 'flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition text-white/65 hover:bg-white/10 hover:text-white';
             }
         });
     }
 
-    // 3. Eksekusi script yang dibawa oleh halaman baru
+    // 4. Eksekusi script yang dibawa oleh halaman baru
     function executeScripts(container) {
         const scripts = container.querySelectorAll('script');
         scripts.forEach(oldScript => {
@@ -58,9 +89,12 @@
         }
     }
 
-    // 4. Core Loader Halaman
+    // 5. Core Loader Halaman
     async function loadPage(url, pushState = true) {
         startProgress();
+        // Tutup drawer mobile jika sedang terbuka
+        closeSidebar();
+
         try {
             const res = await fetch(url, {
                 headers: { 'X-Requested-With': 'SPA-Fetch' }
@@ -97,7 +131,7 @@
                 // Jalankan script yang ada di dalam main
                 executeScripts(currentMain);
 
-                // Scroll ke atas dengan halus
+                // Scroll ke atas
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
                 // Fallback jika struktur bukan layout utama
@@ -111,7 +145,7 @@
         }
     }
 
-    // 5. Intercept klik pada link
+    // 6. Intercept klik pada link
     document.addEventListener('click', function (e) {
         const link = e.target.closest('a');
         if (!link) return;
@@ -130,7 +164,7 @@
         loadPage(targetUrl.href, true);
     });
 
-    // 6. Intercept form submit (CRUD tanpa reload)
+    // 7. Intercept form submit (CRUD tanpa reload)
     document.addEventListener('submit', async function (e) {
         if (e.defaultPrevented) return;
         const form = e.target;
@@ -187,13 +221,13 @@
             }
         } catch (err) {
             console.error('SPA form submit error:', err);
-            form.submit(); // fallback submit biasa jika error
+            form.submit();
         } finally {
             endProgress();
         }
     });
 
-    // 7. Handle tombol Back / Forward browser
+    // 8. Handle tombol Back / Forward browser
     window.addEventListener('popstate', function () {
         loadPage(window.location.href, false);
     });

@@ -109,56 +109,62 @@ $totalLaba = $totalMasuk - $totalKeluar;
 </head>
 <body class="bg-gray-50 font-sans">
     <?php include 'includes/sidebar.php'; ?>
-    <main class="ml-56 min-h-screen flex flex-col">
-        <header class="bg-white border-b border-gray-100 px-6 py-4">
-            <h2 class="font-semibold text-navy-900">Laporan & Grafik</h2>
-            <p class="text-xs text-gray-500 mt-0.5">Grafik pemasukan/pengeluaran live + simpan laporan per periode.</p>
+    <main class="w-full min-h-screen lg:pl-64 flex flex-col transition-all duration-300">
+        <header class="bg-white border-b border-gray-100 px-4 sm:px-6 py-4">
+            <h2 class="font-bold text-lg sm:text-xl text-navy-900">Laporan & Grafik</h2>
+            <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Grafik pemasukan/pengeluaran live + arsip laporan per periode.</p>
         </header>
 
-        <div class="p-6 flex-1 space-y-6">
+        <div class="p-4 sm:p-6 lg:p-8 flex-1 space-y-6 max-w-7xl w-full mx-auto">
             <!-- READ: Ringkasan Total (live) -->
-            <div class="grid grid-cols-3 gap-4">
-                <div class="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
-                    <p class="text-xs font-medium text-gray-500 mb-2">Total Pemasukan</p>
-                    <p class="text-lg font-bold text-green-600">Rp <?= number_format($totalMasuk,  0, ',', '.') ?></p>
-                    <p class="text-xs text-gray-400 mt-1"><?= count(array_filter($_SESSION['transaksi'], fn($t) => $t['jenis'] === 'Pemasukan')) ?> transaksi</p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                <div class="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-gray-500 mb-1.5">Total Pemasukan</p>
+                        <p class="text-lg sm:text-xl font-bold tracking-tight text-green-600">Rp <?= number_format($totalMasuk,  0, ',', '.') ?></p>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2.5 pt-2 border-t border-gray-50"><?= count(array_filter($_SESSION['transaksi'], fn($t) => $t['jenis'] === 'Pemasukan')) ?> transaksi tercatat</p>
                 </div>
-                <div class="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
-                    <p class="text-xs font-medium text-gray-500 mb-2">Total Pengeluaran</p>
-                    <p class="text-lg font-bold text-red-500">Rp <?= number_format($totalKeluar, 0, ',', '.') ?></p>
-                    <p class="text-xs text-gray-400 mt-1"><?= count(array_filter($_SESSION['transaksi'], fn($t) => $t['jenis'] === 'Pengeluaran')) ?> transaksi</p>
+                <div class="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-gray-500 mb-1.5">Total Pengeluaran</p>
+                        <p class="text-lg sm:text-xl font-bold tracking-tight text-red-500">Rp <?= number_format($totalKeluar, 0, ',', '.') ?></p>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2.5 pt-2 border-t border-gray-50"><?= count(array_filter($_SESSION['transaksi'], fn($t) => $t['jenis'] === 'Pengeluaran')) ?> transaksi tercatat</p>
                 </div>
-                <div class="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
-                    <p class="text-xs font-medium text-gray-500 mb-2">Laba Bersih</p>
-                    <p class="text-lg font-bold <?= $totalLaba >= 0 ? 'text-navy-800' : 'text-red-500' ?>">
-                        Rp <?= number_format(abs($totalLaba), 0, ',', '.') ?>
-                    </p>
-                    <p class="text-xs text-gray-400 mt-1"><?= $totalLaba >= 0 ? 'Untung' : 'Rugi' ?></p>
+                <div class="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-gray-500 mb-1.5">Laba Bersih</p>
+                        <p class="text-lg sm:text-xl font-bold tracking-tight <?= $totalLaba >= 0 ? 'text-navy-800' : 'text-red-500' ?>">
+                            Rp <?= number_format(abs($totalLaba), 0, ',', '.') ?>
+                        </p>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2.5 pt-2 border-t border-gray-50"><?= $totalLaba >= 0 ? 'Status: Surplus (Untung)' : 'Status: Defisit (Rugi)' ?></p>
                 </div>
             </div>
 
             <!-- READ: Grafik live -->
-            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-                <h3 class="font-semibold text-navy-900 text-sm mb-4">Grafik Pemasukan vs Pengeluaran (Live)</h3>
-                <div class="relative" style="height:260px">
+            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 sm:p-6">
+                <h3 class="font-semibold text-navy-900 text-sm sm:text-base mb-3 sm:mb-4">Grafik Tren Bulanan Pemasukan vs Pengeluaran</h3>
+                <div class="relative w-full h-64 sm:h-72 md:h-80">
                     <canvas id="chartBulanan"></canvas>
                 </div>
             </div>
 
             <!-- CREATE & UPDATE: Form Simpan Laporan -->
-            <div class="bg-white rounded-xl border <?= $editLap ? 'border-navy-200' : 'border-gray-100' ?> shadow-sm p-5">
-                <h3 class="font-semibold text-navy-900 text-sm mb-4">
-                    <?= $editLap ? 'Edit Laporan Tersimpan' : '+ Simpan Laporan Periode' ?>
+            <div class="bg-white rounded-xl border <?= $editLap ? 'border-navy-200 ring-1 ring-navy-100' : 'border-gray-100' ?> shadow-sm p-4 sm:p-6">
+                <h3 class="font-semibold text-navy-900 text-sm sm:text-base mb-4 flex items-center gap-2">
+                    <?= $editLap ? 'Edit Data Laporan' : '+ Simpan Laporan Periode' ?>
                 </h3>
-                <form method="POST" action="laporan.php" class="grid grid-cols-2 gap-4">
+                <form method="POST" action="laporan.php" class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <input type="hidden" name="action" value="<?= $editLap ? 'update' : 'simpan' ?>">
                     <?php if ($editLap): ?>
                     <input type="hidden" name="id" value="<?= $editLap['id'] ?>">
                     <?php endif; ?>
 
-                    <div class="col-span-2">
+                    <div class="sm:col-span-2">
                         <label class="block text-xs font-semibold text-gray-600 mb-1.5">Judul Laporan</label>
-                        <input type="text" name="judul" required placeholder="Misal: Laporan September 2026"
+                        <input type="text" name="judul" required placeholder="Contoh: Laporan Penjualan Q3 2026"
                             value="<?= htmlspecialchars($editLap['judul'] ?? '') ?>"
                             class="<?= $inputClass ?>">
                     </div>
@@ -172,19 +178,19 @@ $totalLaba = $totalMasuk - $totalKeluar;
                         <input type="date" name="tanggal_sampai" required class="<?= $inputClass ?>">
                     </div>
                     <?php endif; ?>
-                    <div class="<?= $editLap ? 'col-span-2' : 'col-span-2' ?>">
-                        <label class="block text-xs font-semibold text-gray-600 mb-1.5">Catatan</label>
-                        <input type="text" name="catatan" placeholder="Catatan singkat laporan ini"
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-semibold text-gray-600 mb-1.5">Catatan Evaluasi</label>
+                        <input type="text" name="catatan" placeholder="Catatan singkat evaluasi laporan ini"
                             value="<?= htmlspecialchars($editLap['catatan'] ?? '') ?>"
                             class="<?= $inputClass ?>">
                     </div>
-                    <div class="col-span-2 flex gap-3">
+                    <div class="sm:col-span-2 flex flex-wrap items-center gap-2.5 pt-2">
                         <button type="submit"
-                            class="px-5 py-2 bg-navy-800 hover:bg-navy-950 text-white rounded-lg text-sm font-semibold transition">
-                            <?= $editLap ? 'Simpan Perubahan' : 'Simpan Laporan' ?>
+                            class="w-full sm:w-auto px-5 py-2.5 bg-navy-800 hover:bg-navy-950 text-white rounded-lg text-sm font-semibold transition">
+                            <?= $editLap ? 'Simpan Perubahan' : 'Simpan Laporan Ini' ?>
                         </button>
                         <?php if ($editLap): ?>
-                        <a href="laporan.php" class="px-5 py-2 border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-lg text-sm font-medium transition">Batal</a>
+                        <a href="laporan.php" class="w-full sm:w-auto text-center px-5 py-2.5 border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-lg text-sm font-medium transition">Batal</a>
                         <?php endif; ?>
                     </div>
                 </form>
@@ -192,55 +198,57 @@ $totalLaba = $totalMasuk - $totalKeluar;
 
             <!-- READ, UPDATE, DELETE: Tabel laporan tersimpan -->
             <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-                <div class="px-5 py-4 border-b border-gray-100">
-                    <h3 class="font-semibold text-navy-900 text-sm">Laporan Tersimpan</h3>
+                <div class="px-4 sm:px-5 py-3.5 sm:py-4 border-b border-gray-100">
+                    <h3 class="font-semibold text-navy-900 text-sm sm:text-base">Daftar Laporan Tersimpan</h3>
                 </div>
                 <?php if (empty($_SESSION['laporan_tersimpan'])): ?>
-                <p class="text-center text-gray-400 text-sm py-8">Belum ada laporan tersimpan.</p>
+                <p class="text-center text-gray-400 text-sm py-12">Belum ada laporan tersimpan.</p>
                 <?php else: ?>
-                <table class="w-full text-sm">
-                    <thead class="bg-gray-50 text-xs text-gray-500 font-semibold uppercase">
-                        <tr>
-                            <th class="px-4 py-3 text-left">Judul</th>
-                            <th class="px-4 py-3 text-left">Periode</th>
-                            <th class="px-4 py-3 text-right">Pemasukan</th>
-                            <th class="px-4 py-3 text-right">Pengeluaran</th>
-                            <th class="px-4 py-3 text-right">Laba/Rugi</th>
-                            <th class="px-4 py-3 text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-50">
-                        <?php foreach (array_reverse($_SESSION['laporan_tersimpan']) as $l): ?>
-                        <tr class="hover:bg-gray-50/60 transition <?= $l['id'] === $editId ? 'bg-navy-100/40' : '' ?>">
-                            <td class="px-4 py-3">
-                                <p class="font-medium text-navy-900"><?= htmlspecialchars($l['judul']) ?></p>
-                                <?php if ($l['catatan']): ?>
-                                <p class="text-xs text-gray-400 mt-0.5"><?= htmlspecialchars($l['catatan']) ?></p>
-                                <?php endif; ?>
-                            </td>
-                            <td class="px-4 py-3 text-gray-500 text-xs whitespace-nowrap">
-                                <?= date('d M Y', strtotime($l['tanggal_dari'])) ?> —
-                                <?= date('d M Y', strtotime($l['tanggal_sampai'])) ?>
-                            </td>
-                            <td class="px-4 py-3 text-right text-green-600 font-medium">Rp <?= number_format($l['pemasukan'],   0, ',', '.') ?></td>
-                            <td class="px-4 py-3 text-right text-red-500 font-medium">Rp <?= number_format($l['pengeluaran'], 0, ',', '.') ?></td>
-                            <td class="px-4 py-3 text-right font-semibold <?= $l['laba'] >= 0 ? 'text-navy-800' : 'text-red-500' ?>">
-                                <?= $l['laba'] >= 0 ? '+' : '' ?>Rp <?= number_format($l['laba'], 0, ',', '.') ?>
-                            </td>
-                            <td class="px-4 py-3 text-center">
-                                <div class="flex items-center justify-center gap-3">
-                                    <a href="?edit=<?= $l['id'] ?>" class="text-xs text-navy-700 hover:underline font-medium">Edit</a>
-                                    <form method="POST" action="laporan.php" onsubmit="return confirm('Hapus laporan ini?')">
-                                        <input type="hidden" name="action" value="hapus">
-                                        <input type="hidden" name="id" value="<?= $l['id'] ?>">
-                                        <button class="text-xs text-red-500 hover:underline font-medium">Hapus</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                <div class="overflow-x-auto w-full">
+                    <table class="w-full text-xs sm:text-sm min-w-[620px]">
+                        <thead class="bg-gray-50 text-xs text-gray-500 font-semibold uppercase">
+                            <tr>
+                                <th class="px-4 py-3 text-left">Judul & Catatan</th>
+                                <th class="px-4 py-3 text-left">Periode</th>
+                                <th class="px-4 py-3 text-right">Pemasukan</th>
+                                <th class="px-4 py-3 text-right">Pengeluaran</th>
+                                <th class="px-4 py-3 text-right">Laba/Rugi</th>
+                                <th class="px-4 py-3 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            <?php foreach (array_reverse($_SESSION['laporan_tersimpan']) as $l): ?>
+                            <tr class="hover:bg-gray-50/70 transition <?= $l['id'] === $editId ? 'bg-navy-100/40' : '' ?>">
+                                <td class="px-4 py-3.5">
+                                    <p class="font-medium text-navy-900"><?= htmlspecialchars($l['judul']) ?></p>
+                                    <?php if ($l['catatan']): ?>
+                                    <p class="text-xs text-gray-400 mt-0.5"><?= htmlspecialchars($l['catatan']) ?></p>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="px-4 py-3.5 text-gray-500 text-xs whitespace-nowrap">
+                                    <?= date('d M Y', strtotime($l['tanggal_dari'])) ?> —
+                                    <?= date('d M Y', strtotime($l['tanggal_sampai'])) ?>
+                                </td>
+                                <td class="px-4 py-3.5 text-right text-green-600 font-medium whitespace-nowrap">Rp <?= number_format($l['pemasukan'],   0, ',', '.') ?></td>
+                                <td class="px-4 py-3.5 text-right text-red-500 font-medium whitespace-nowrap">Rp <?= number_format($l['pengeluaran'], 0, ',', '.') ?></td>
+                                <td class="px-4 py-3.5 text-right font-semibold whitespace-nowrap <?= $l['laba'] >= 0 ? 'text-navy-800' : 'text-red-500' ?>">
+                                    <?= $l['laba'] >= 0 ? '+' : '' ?>Rp <?= number_format($l['laba'], 0, ',', '.') ?>
+                                </td>
+                                <td class="px-4 py-3.5 text-center whitespace-nowrap">
+                                    <div class="flex items-center justify-center gap-3">
+                                        <a href="?edit=<?= $l['id'] ?>" class="text-xs text-navy-700 hover:text-navy-950 font-semibold transition">Edit</a>
+                                        <form method="POST" action="laporan.php" onsubmit="return confirm('Hapus arsip laporan ini?')">
+                                            <input type="hidden" name="action" value="hapus">
+                                            <input type="hidden" name="id" value="<?= $l['id'] ?>">
+                                            <button class="text-xs text-red-500 hover:text-red-700 font-semibold transition">Hapus</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
                 <?php endif; ?>
             </div>
         </div>

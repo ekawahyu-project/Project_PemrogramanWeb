@@ -210,17 +210,17 @@ $val = fn(string $k, $default = '') => htmlspecialchars($raw($k, $default));
     </script>
 </head>
 
-<body class="bg-gray-50 font-sans">
     <?php include 'includes/sidebar.php'; ?>
-    <main class="ml-56 min-h-screen flex flex-col">
-        <header class="bg-white border-b border-gray-100 px-6 py-4">
-            <h2 class="font-semibold text-navy-900">Manajemen Produk</h2>
-            <p class="text-xs text-gray-500 mt-0.5">Kelola data produk tambah, update, atau hapus produk.</p>
+    <main class="w-full min-h-screen lg:pl-64 flex flex-col transition-all duration-300">
+        <header class="bg-white border-b border-gray-100 px-4 sm:px-6 py-4">
+            <h2 class="font-bold text-lg sm:text-xl text-navy-900">Manajemen Produk</h2>
+            <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Kelola data katalog produk — tambah, update, atau hapus produk.</p>
         </header>
 
-        <div class="p-6 flex-1 space-y-6">
+        <div class="p-4 sm:p-6 lg:p-8 flex-1 space-y-6 max-w-7xl w-full mx-auto">
             <?php if ($errors): ?>
-                <div class="text-sm text-red-600 bg-red-50 px-4 py-2.5 rounded-lg">
+                <div class="bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm rounded-xl p-4">
+                    <p class="font-semibold mb-1">Periksa kembali formulir:</p>
                     <ul class="list-disc list-inside space-y-0.5">
                         <?php foreach ($errors as $e): ?>
                             <li><?= htmlspecialchars($e) ?></li>
@@ -230,17 +230,17 @@ $val = fn(string $k, $default = '') => htmlspecialchars($raw($k, $default));
             <?php endif; ?>
 
             <!-- Form Tambah / Edit (CREATE & UPDATE) -->
-            <div class="bg-white rounded-xl border <?= $editPrd ? 'border-navy-700' : 'border-gray-100' ?> shadow-sm p-5">
-                <h3 class="font-semibold text-navy-900 text-sm mb-4">
-                    <?= $editPrd ? 'Edit Produk' : '+ Tambah Produk' ?>
+            <div class="bg-white rounded-xl border <?= $editPrd ? 'border-navy-700 ring-1 ring-navy-100' : 'border-gray-100' ?> shadow-sm p-4 sm:p-6">
+                <h3 class="font-semibold text-navy-900 text-sm sm:text-base mb-4 flex items-center gap-2">
+                    <?= $editPrd ? '✏️ Edit Data Produk' : '+ Tambah Produk Baru' ?>
                 </h3>
-                <form method="POST" action="produk.php" class="grid grid-cols-2 gap-4">
+                <form method="POST" action="produk.php" class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <input type="hidden" name="action" value="<?= $editPrd ? 'update' : 'tambah' ?>">
                     <?php if ($editPrd): ?>
                         <input type="hidden" name="id" value="<?= $editPrd['id'] ?>">
                     <?php endif; ?>
 
-                    <div class="col-span-2">
+                    <div class="sm:col-span-2">
                         <label class="block text-xs font-semibold text-gray-600 mb-1.5">Nama Produk</label>
                         <input type="text" name="nama" required maxlength="100" placeholder="Masukkan nama produk"
                             value="<?= $val('nama') ?>" class="<?= $inputClass ?>">
@@ -272,23 +272,23 @@ $val = fn(string $k, $default = '') => htmlspecialchars($raw($k, $default));
                             value="<?= $val('harga_jual') ?>" class="<?= $inputClass ?>">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1.5"><?= $editPrd ? 'Stok' : 'Stok Awal' ?></label>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1.5"><?= $editPrd ? 'Stok Saat Ini' : 'Stok Awal' ?></label>
                         <input type="number" name="stok" required min="0" step="1" placeholder="0"
                             value="<?= $val('stok', 0) ?>" class="<?= $inputClass ?>">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1.5">Stok Minimum</label>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1.5">Batas Stok Minimum</label>
                         <input type="number" name="stok_min" required min="0" step="1" placeholder="5"
                             value="<?= $val('stok_min', 5) ?>" class="<?= $inputClass ?>">
                     </div>
-                    <div class="col-span-2 flex gap-3">
+                    <div class="sm:col-span-2 flex flex-wrap items-center gap-2.5 pt-2">
                         <button type="submit"
-                            class="px-5 py-2 bg-navy-800 hover:bg-navy-950 text-white rounded-lg text-sm font-semibold transition">
+                            class="w-full sm:w-auto px-5 py-2.5 bg-navy-800 hover:bg-navy-950 text-white rounded-lg text-sm font-semibold transition">
                             <?= $editPrd ? 'Simpan Perubahan' : 'Tambah Produk' ?>
                         </button>
                         <?php if ($editPrd): ?>
                             <a href="produk.php"
-                                class="px-5 py-2 border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-lg text-sm font-medium transition">
+                                class="w-full sm:w-auto text-center px-5 py-2.5 border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-lg text-sm font-medium transition">
                                 Batal
                             </a>
                         <?php endif; ?>
@@ -298,62 +298,64 @@ $val = fn(string $k, $default = '') => htmlspecialchars($raw($k, $default));
 
             <!-- Tabel Produk (READ & DELETE) -->
             <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-                <div class="px-5 py-4 border-b border-gray-100">
-                    <h3 class="font-semibold text-navy-900 text-sm">Daftar Produk (<?= count($_SESSION['produk']) ?>)</h3>
+                <div class="px-4 sm:px-5 py-3.5 sm:py-4 border-b border-gray-100">
+                    <h3 class="font-semibold text-navy-900 text-sm sm:text-base">Daftar Katalog Produk (<?= count($_SESSION['produk']) ?>)</h3>
                 </div>
                 <?php if (empty($_SESSION['produk'])): ?>
-                    <p class="text-center text-gray-400 text-sm py-10">Belum ada produk.</p>
+                    <p class="text-center text-gray-400 text-sm py-12">Belum ada produk.</p>
                 <?php else: ?>
-                    <table class="w-full text-sm">
-                        <thead class="bg-gray-50 text-xs text-gray-500 font-semibold uppercase">
-                            <tr>
-                                <th class="px-4 py-3 text-left">Nama</th>
-                                <th class="px-4 py-3 text-left">Kategori</th>
-                                <th class="px-4 py-3 text-right">H. Beli</th>
-                                <th class="px-4 py-3 text-right">H. Jual</th>
-                                <th class="px-4 py-3 text-center">Stok</th>
-                                <th class="px-4 py-3 text-center">Status</th>
-                                <th class="px-4 py-3 text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-50">
-                            <?php foreach ($_SESSION['produk'] as $p):
-                                $stokOk = $p['stok'] > $p['stok_min'];
-                                $stokLow = $p['stok'] > 0 && $p['stok'] <= $p['stok_min'];
-                                $stokEmpty = $p['stok'] === 0;
-                            ?>
-                                <tr class="hover:bg-gray-50/60 transition <?= $p['id'] === $editId ? 'bg-navy-100/40' : '' ?>">
-                                    <td class="px-4 py-3 font-medium text-navy-900">
-                                        <?= htmlspecialchars($p['nama']) ?>
-                                        <span class="text-xs text-gray-400 font-normal">/<?= $p['satuan'] ?></span>
-                                    </td>
-                                    <td class="px-4 py-3 text-gray-500 text-xs"><?= $p['kategori'] ?></td>
-                                    <td class="px-4 py-3 text-right text-gray-600">Rp <?= number_format($p['harga_beli'], 0, ',', '.') ?></td>
-                                    <td class="px-4 py-3 text-right font-medium text-navy-800">Rp <?= number_format($p['harga_jual'], 0, ',', '.') ?></td>
-                                    <td class="px-4 py-3 text-center font-semibold"><?= $p['stok'] ?></td>
-                                    <td class="px-4 py-3 text-center">
-                                        <?php if ($stokEmpty): ?>
-                                            <span class="px-2 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-500">Habis</span>
-                                        <?php elseif ($stokLow): ?>
-                                            <span class="px-2 py-0.5 rounded-md text-xs font-medium bg-orange-100 text-orange-600">Menipis</span>
-                                        <?php else: ?>
-                                            <span class="px-2 py-0.5 rounded-md text-xs font-medium bg-green-100 text-green-700">Normal</span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td class="px-4 py-3 text-center">
-                                        <div class="flex items-center justify-center gap-3">
-                                            <a href="?edit=<?= $p['id'] ?>" class="text-xs text-navy-700 hover:underline font-medium">Edit</a>
-                                            <form method="POST" action="produk.php" onsubmit="return confirm('Hapus produk \'<?= htmlspecialchars(addslashes($p['nama'])) ?>\'?')">
-                                                <input type="hidden" name="action" value="hapus">
-                                                <input type="hidden" name="id" value="<?= $p['id'] ?>">
-                                                <button class="text-xs text-red-500 hover:underline font-medium">Hapus</button>
-                                            </form>
-                                        </div>
-                                    </td>
+                    <div class="overflow-x-auto w-full">
+                        <table class="w-full text-xs sm:text-sm min-w-[650px]">
+                            <thead class="bg-gray-50 text-xs text-gray-500 font-semibold uppercase">
+                                <tr>
+                                    <th class="px-4 py-3 text-left">Nama Produk</th>
+                                    <th class="px-4 py-3 text-left">Kategori</th>
+                                    <th class="px-4 py-3 text-right">H. Beli</th>
+                                    <th class="px-4 py-3 text-right">H. Jual</th>
+                                    <th class="px-4 py-3 text-center">Stok</th>
+                                    <th class="px-4 py-3 text-center">Status</th>
+                                    <th class="px-4 py-3 text-center">Aksi</th>
                                 </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50">
+                                <?php foreach ($_SESSION['produk'] as $p):
+                                    $stokOk = $p['stok'] > $p['stok_min'];
+                                    $stokLow = $p['stok'] > 0 && $p['stok'] <= $p['stok_min'];
+                                    $stokEmpty = $p['stok'] === 0;
+                                ?>
+                                    <tr class="hover:bg-gray-50/70 transition <?= $p['id'] === $editId ? 'bg-navy-100/40' : '' ?>">
+                                        <td class="px-4 py-3.5 font-medium text-navy-900">
+                                            <?= htmlspecialchars($p['nama']) ?>
+                                            <span class="text-xs text-gray-400 font-normal">/<?= $p['satuan'] ?></span>
+                                        </td>
+                                        <td class="px-4 py-3.5 text-gray-500 text-xs"><?= $p['kategori'] ?></td>
+                                        <td class="px-4 py-3.5 text-right text-gray-600 whitespace-nowrap">Rp <?= number_format($p['harga_beli'], 0, ',', '.') ?></td>
+                                        <td class="px-4 py-3.5 text-right font-medium text-navy-800 whitespace-nowrap">Rp <?= number_format($p['harga_jual'], 0, ',', '.') ?></td>
+                                        <td class="px-4 py-3.5 text-center font-semibold"><?= $p['stok'] ?></td>
+                                        <td class="px-4 py-3.5 text-center whitespace-nowrap">
+                                            <?php if ($stokEmpty): ?>
+                                                <span class="px-2 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-500">Habis</span>
+                                            <?php elseif ($stokLow): ?>
+                                                <span class="px-2 py-0.5 rounded-md text-xs font-medium bg-orange-100 text-orange-600">Menipis</span>
+                                            <?php else: ?>
+                                                <span class="px-2 py-0.5 rounded-md text-xs font-medium bg-green-100 text-green-700">Normal</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="px-4 py-3.5 text-center whitespace-nowrap">
+                                            <div class="flex items-center justify-center gap-3">
+                                                <a href="?edit=<?= $p['id'] ?>" class="text-xs text-navy-700 hover:text-navy-950 font-semibold transition">Edit</a>
+                                                <form method="POST" action="produk.php" onsubmit="return confirm('Hapus produk \'<?= htmlspecialchars(addslashes($p['nama'])) ?>\'?')">
+                                                    <input type="hidden" name="action" value="hapus">
+                                                    <input type="hidden" name="id" value="<?= $p['id'] ?>">
+                                                    <button class="text-xs text-red-500 hover:text-red-700 font-semibold transition">Hapus</button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 <?php endif; ?>
             </div>
         </div>
@@ -365,7 +367,4 @@ $val = fn(string $k, $default = '') => htmlspecialchars($raw($k, $default));
         <?php endif; ?>
     </main>
 </body>
-            
-</html>
-
 </html>
