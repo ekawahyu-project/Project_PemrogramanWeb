@@ -11,7 +11,7 @@ $nav = [
 ?>
 <aside class="fixed left-0 top-0 w-56 h-screen bg-navy-950 flex flex-col">
     <div class="px-5 py-4 border-b border-white/10">
-        <span class="text-white font-bold text-base tracking-tight">UMKM Manager</span>
+        <span class="text-white font-bold text-base tracking-tight">AlpetBizz</span>
     </div>
     <nav class="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
         <?php foreach ($nav as $item): ?>

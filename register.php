@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'regis
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UMKM Manager — Daftar</title>
+    <title>AlpetBizz | Daftar</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{navy:{'100':'#dbe8ff','700':'#1e4080','800':'#162e5e','900':'#0e1f42','950':'#080f21'}}}}}</script>
@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'regis
 <body class="min-h-screen bg-gradient-to-br from-navy-950 to-navy-800 grid place-items-center p-6 font-sans">
     <div class="w-full max-w-sm bg-white rounded-2xl shadow-2xl p-8">
         <h1 class="text-xl font-bold text-navy-900 mb-1">Buat akun baru</h1>
-        <p class="text-sm text-gray-500 mb-6">Daftarkan usaha Anda di UMKM Manager.</p>
+        <p class="text-sm text-gray-500 mb-6">Daftarkan usaha Anda di AlpetBizz.</p>
 
         <?php if ($error): ?>
         <p class="text-sm text-red-600 bg-red-50 px-3 py-2.5 rounded-lg mb-4"><?= htmlspecialchars($error) ?></p>
