@@ -1,7 +1,7 @@
 <?php
 session_start();
-if (!isset($_SESSION['user'])) { header('Location: ../login/index.php'); exit; }
-require_once '../includes/init.php';
+if (!isset($_SESSION['user'])) { header('Location: login.php'); exit; }
+require_once 'includes/init.php';
 
 $currentPage = 'produk';
 $kategoriOpt = ['Makanan & Minuman', 'Fashion', 'Kerajinan', 'Jasa', 'Kecantikan', 'Elektronik', 'Lainnya'];
@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'stok'       => (int) ($_POST['stok']            ?? 0),
                 'stok_min'   => (int) ($_POST['stok_min']        ?? 5),
             ];
-            header('Location: index.php'); exit;
+            header('Location: produk.php'); exit;
         }
         $error = 'Nama produk wajib diisi.';
     }
@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         unset($p);
-        header('Location: index.php'); exit;
+        header('Location: produk.php'); exit;
     }
 
     // DELETE
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($t['produk_id'] === $id) $t['produk_id'] = null;
         }
         unset($t);
-        header('Location: index.php'); exit;
+        header('Location: produk.php'); exit;
     }
 }
 
@@ -85,7 +85,7 @@ if ($editId) {
     <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{navy:{'100':'#dbe8ff','700':'#1e4080','800':'#162e5e','900':'#0e1f42','950':'#080f21'}}}}}</script>
 </head>
 <body class="bg-gray-50 font-sans">
-    <?php include '../includes/sidebar.php'; ?>
+    <?php include 'includes/sidebar.php'; ?>
     <main class="ml-56 min-h-screen flex flex-col">
         <header class="bg-white border-b border-gray-100 px-6 py-4">
             <h2 class="font-semibold text-navy-900">Manajemen Produk</h2>
@@ -102,7 +102,7 @@ if ($editId) {
                 <h3 class="font-semibold text-navy-900 text-sm mb-4">
                     <?= $editPrd ? '✏️ Edit Produk' : '+ Tambah Produk' ?>
                 </h3>
-                <form method="POST" action="index.php" class="grid grid-cols-2 gap-4">
+                <form method="POST" action="produk.php" class="grid grid-cols-2 gap-4">
                     <input type="hidden" name="action" value="<?= $editPrd ? 'update' : 'tambah' ?>">
                     <?php if ($editPrd): ?>
                     <input type="hidden" name="id" value="<?= $editPrd['id'] ?>">
@@ -160,7 +160,7 @@ if ($editId) {
                             <?= $editPrd ? 'Simpan Perubahan' : 'Tambah Produk' ?>
                         </button>
                         <?php if ($editPrd): ?>
-                        <a href="index.php"
+                        <a href="produk.php"
                             class="px-5 py-2 border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-lg text-sm font-medium transition">
                             Batal
                         </a>
@@ -216,7 +216,7 @@ if ($editId) {
                             <td class="px-4 py-3 text-center">
                                 <div class="flex items-center justify-center gap-3">
                                     <a href="?edit=<?= $p['id'] ?>" class="text-xs text-navy-700 hover:underline font-medium">Edit</a>
-                                    <form method="POST" action="index.php" onsubmit="return confirm('Hapus produk \'<?= htmlspecialchars(addslashes($p['nama'])) ?>\'?')">
+                                    <form method="POST" action="produk.php" onsubmit="return confirm('Hapus produk \'<?= htmlspecialchars(addslashes($p['nama'])) ?>\'?')">
                                         <input type="hidden" name="action" value="hapus">
                                         <input type="hidden" name="id" value="<?= $p['id'] ?>">
                                         <button class="text-xs text-red-500 hover:underline font-medium">Hapus</button>

@@ -1,7 +1,7 @@
 <?php
 session_start();
-if (!isset($_SESSION['user'])) { header('Location: ../login/index.php'); exit; }
-require_once '../includes/init.php';
+if (!isset($_SESSION['user'])) { header('Location: login.php'); exit; }
+require_once 'includes/init.php';
 
 $currentPage = 'profil';
 $message = '';
@@ -28,10 +28,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save'
 $profil = $_SESSION['profil'];
 $initial = !empty($profil['nama']) ? strtoupper($profil['nama'][0]) : '?';
 
-$inputClass = 'w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm outline-none
-               focus:border-navy-700 focus:ring-2 focus:ring-navy-100 transition
-               disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed';
-
 $kategoriOptions = ['', 'Makanan & Minuman', 'Fashion', 'Kerajinan', 'Jasa', 'Kecantikan', 'Elektronik', 'Lainnya'];
 ?>
 <!DOCTYPE html>
@@ -39,13 +35,13 @@ $kategoriOptions = ['', 'Makanan & Minuman', 'Fashion', 'Kerajinan', 'Jasa', 'Ke
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AlpetBizz | Proil</title>
+    <title>Profil — UMKM Manager</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{navy:{'100':'#dbe8ff','700':'#1e4080','800':'#162e5e','900':'#0e1f42','950':'#080f21'}}}}}</script>
 </head>
 <body class="bg-gray-50 font-sans">
-    <?php include '../includes/sidebar.php'; ?>
+    <?php include 'includes/sidebar.php'; ?>
 
     <main class="ml-56 min-h-screen flex flex-col">
         <header class="bg-white border-b border-gray-100 px-6 py-4">
@@ -85,7 +81,7 @@ $kategoriOptions = ['', 'Makanan & Minuman', 'Fashion', 'Kerajinan', 'Jasa', 'Ke
                 </div>
                 <?php endif; ?>
 
-                <form method="POST" id="profileForm" class="px-6 py-5 space-y-6">
+                <form method="POST" action="profil.php" id="profileForm" class="px-6 py-5 space-y-6">
                     <input type="hidden" name="action" value="save">
 
                     <!-- Informasi Akun -->
@@ -161,6 +157,6 @@ $kategoriOptions = ['', 'Makanan & Minuman', 'Fashion', 'Kerajinan', 'Jasa', 'Ke
         </div>
     </main>
 
-    <script src="index.js"></script>
+    <script src="profil.js"></script>
 </body>
 </html>

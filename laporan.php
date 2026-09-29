@@ -1,7 +1,7 @@
 <?php
 session_start();
-if (!isset($_SESSION['user'])) { header('Location: ../login/index.php'); exit; }
-require_once '../includes/init.php';
+if (!isset($_SESSION['user'])) { header('Location: login.php'); exit; }
+require_once 'includes/init.php';
 
 $currentPage = 'laporan';
 $bulanNama   = ['01'=>'Jan','02'=>'Feb','03'=>'Mar','04'=>'Apr','05'=>'Mei','06'=>'Jun',
@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'catatan'        => $catatan,
                 'dibuat'         => date('Y-m-d'),
             ];
-            header('Location: index.php'); exit;
+            header('Location: laporan.php'); exit;
         }
     }
 
@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         unset($l);
-        header('Location: index.php'); exit;
+        header('Location: laporan.php'); exit;
     }
 
     // DELETE
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['laporan_tersimpan'] = array_values(
             array_filter($_SESSION['laporan_tersimpan'], fn($l) => $l['id'] !== $id)
         );
-        header('Location: index.php'); exit;
+        header('Location: laporan.php'); exit;
     }
 }
 
@@ -108,7 +108,7 @@ $totalLaba = $totalMasuk - $totalKeluar;
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-50 font-sans">
-    <?php include '../includes/sidebar.php'; ?>
+    <?php include 'includes/sidebar.php'; ?>
     <main class="ml-56 min-h-screen flex flex-col">
         <header class="bg-white border-b border-gray-100 px-6 py-4">
             <h2 class="font-semibold text-navy-900">Laporan & Grafik</h2>
@@ -150,7 +150,7 @@ $totalLaba = $totalMasuk - $totalKeluar;
                 <h3 class="font-semibold text-navy-900 text-sm mb-4">
                     <?= $editLap ? '✏️ Edit Laporan Tersimpan' : '+ Simpan Laporan Periode' ?>
                 </h3>
-                <form method="POST" action="index.php" class="grid grid-cols-2 gap-4">
+                <form method="POST" action="laporan.php" class="grid grid-cols-2 gap-4">
                     <input type="hidden" name="action" value="<?= $editLap ? 'update' : 'simpan' ?>">
                     <?php if ($editLap): ?>
                     <input type="hidden" name="id" value="<?= $editLap['id'] ?>">
@@ -184,7 +184,7 @@ $totalLaba = $totalMasuk - $totalKeluar;
                             <?= $editLap ? 'Simpan Perubahan' : 'Simpan Laporan' ?>
                         </button>
                         <?php if ($editLap): ?>
-                        <a href="index.php" class="px-5 py-2 border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-lg text-sm font-medium transition">Batal</a>
+                        <a href="laporan.php" class="px-5 py-2 border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-lg text-sm font-medium transition">Batal</a>
                         <?php endif; ?>
                     </div>
                 </form>
@@ -230,7 +230,7 @@ $totalLaba = $totalMasuk - $totalKeluar;
                             <td class="px-4 py-3 text-center">
                                 <div class="flex items-center justify-center gap-3">
                                     <a href="?edit=<?= $l['id'] ?>" class="text-xs text-navy-700 hover:underline font-medium">Edit</a>
-                                    <form method="POST" action="index.php" onsubmit="return confirm('Hapus laporan ini?')">
+                                    <form method="POST" action="laporan.php" onsubmit="return confirm('Hapus laporan ini?')">
                                         <input type="hidden" name="action" value="hapus">
                                         <input type="hidden" name="id" value="<?= $l['id'] ?>">
                                         <button class="text-xs text-red-500 hover:underline font-medium">Hapus</button>

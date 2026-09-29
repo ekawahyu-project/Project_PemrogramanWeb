@@ -1,7 +1,7 @@
 <?php
 session_start();
-if (!isset($_SESSION['user'])) { header('Location: ../login/index.php'); exit; }
-require_once '../includes/init.php';
+if (!isset($_SESSION['user'])) { header('Location: login.php'); exit; }
+require_once 'includes/init.php';
 
 $currentPage = 'transaksi';
 
@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'produk_id'  => $_POST['produk_id']  ?: null,
             ];
         }
-        header('Location: index.php'); exit;
+        header('Location: transaksi.php'); exit;
     }
 
     // UPDATE
@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         unset($t);
-        header('Location: index.php'); exit;
+        header('Location: transaksi.php'); exit;
     }
 
     // DELETE
@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['transaksi'] = array_values(
             array_filter($_SESSION['transaksi'], fn($t) => $t['id'] !== $id)
         );
-        header('Location: index.php'); exit;
+        header('Location: transaksi.php'); exit;
     }
 }
 
@@ -73,7 +73,7 @@ if ($editId) {
     <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{navy:{'100':'#dbe8ff','700':'#1e4080','800':'#162e5e','900':'#0e1f42','950':'#080f21'}}}}}</script>
 </head>
 <body class="bg-gray-50 font-sans">
-    <?php include '../includes/sidebar.php'; ?>
+    <?php include 'includes/sidebar.php'; ?>
     <main class="ml-56 min-h-screen flex flex-col">
         <header class="bg-white border-b border-gray-100 px-6 py-4">
             <h2 class="font-semibold text-navy-900">Manajemen Transaksi</h2>
@@ -86,7 +86,7 @@ if ($editId) {
                 <h3 class="font-semibold text-navy-900 text-sm mb-4">
                     <?= $editTrx ? '✏️ Edit Transaksi' : '+ Tambah Transaksi' ?>
                 </h3>
-                <form method="POST" action="index.php" class="grid grid-cols-2 gap-4">
+                <form method="POST" action="transaksi.php" class="grid grid-cols-2 gap-4">
                     <input type="hidden" name="action" value="<?= $editTrx ? 'update' : 'tambah' ?>">
                     <?php if ($editTrx): ?>
                     <input type="hidden" name="id" value="<?= $editTrx['id'] ?>">
@@ -135,7 +135,7 @@ if ($editId) {
                             <?= $editTrx ? 'Simpan Perubahan' : 'Tambah' ?>
                         </button>
                         <?php if ($editTrx): ?>
-                        <a href="index.php"
+                        <a href="transaksi.php"
                             class="px-5 py-2 border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-lg text-sm font-medium transition">
                             Batal
                         </a>
@@ -186,7 +186,7 @@ if ($editId) {
                             <td class="px-4 py-3 text-center">
                                 <div class="flex items-center justify-center gap-3">
                                     <a href="?edit=<?= $t['id'] ?>" class="text-xs text-navy-700 hover:underline font-medium">Edit</a>
-                                    <form method="POST" action="index.php" onsubmit="return confirm('Hapus transaksi ini?')">
+                                    <form method="POST" action="transaksi.php" onsubmit="return confirm('Hapus transaksi ini?')">
                                         <input type="hidden" name="action" value="hapus">
                                         <input type="hidden" name="id" value="<?= $t['id'] ?>">
                                         <button class="text-xs text-red-500 hover:underline font-medium">Hapus</button>

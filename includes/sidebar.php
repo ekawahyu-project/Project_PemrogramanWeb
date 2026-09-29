@@ -1,12 +1,12 @@
 <?php
 $nav = [
-    ['href' => '../dashboard/index.php',   'label' => 'Dashboard',    'page' => 'dashboard'],
-    ['href' => '../transaksi/index.php',   'label' => 'Transaksi',    'page' => 'transaksi'],
-    ['href' => '../produk/index.php',      'label' => 'Produk',       'page' => 'produk'],
-    ['href' => '../stok/index.php',        'label' => 'Stok',         'page' => 'stok'],
-    ['href' => '../laporan/index.php',     'label' => 'Laporan',      'page' => 'laporan'],
-    ['href' => '../rekomendasi/index.php', 'label' => 'Rekomendasi',  'page' => 'rekomendasi'],
-    ['href' => '../profil/index.php',      'label' => 'Profil',       'page' => 'profil'],
+    ['href' => 'dashboard.php',   'label' => 'Dashboard',    'page' => 'dashboard'],
+    ['href' => 'transaksi.php',   'label' => 'Transaksi',    'page' => 'transaksi'],
+    ['href' => 'produk.php',      'label' => 'Produk',       'page' => 'produk'],
+    ['href' => 'stok.php',        'label' => 'Stok',         'page' => 'stok'],
+    ['href' => 'laporan.php',     'label' => 'Laporan',      'page' => 'laporan'],
+    ['href' => 'rekomendasi.php', 'label' => 'Rekomendasi',  'page' => 'rekomendasi'],
+    ['href' => 'profil.php',      'label' => 'Profil',       'page' => 'profil'],
 ];
 ?>
 <aside class="fixed left-0 top-0 w-56 h-screen bg-navy-950 flex flex-col">
@@ -25,7 +25,7 @@ $nav = [
         <?php endforeach; ?>
     </nav>
     <div class="px-3 py-3 border-t border-white/10">
-        <form method="POST" action="../dashboard/index.php">
+        <form method="POST" action="dashboard.php">
             <input type="hidden" name="action" value="logout">
             <button class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-white/65 hover:bg-red-500/80 hover:text-white transition">
                 Keluar

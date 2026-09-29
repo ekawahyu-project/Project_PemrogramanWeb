@@ -1,7 +1,7 @@
 <?php
 session_start();
-if (!isset($_SESSION['user'])) { header('Location: ../login/index.php'); exit; }
-require_once '../includes/init.php';
+if (!isset($_SESSION['user'])) { header('Location: login.php'); exit; }
+require_once 'includes/init.php';
 
 $currentPage    = 'rekomendasi';
 $prioritasOpt   = ['Tinggi', 'Sedang', 'Rendah'];
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'prioritas' => $prioritas,
                 'dibuat'    => date('Y-m-d'),
             ];
-            header('Location: index.php'); exit;
+            header('Location: rekomendasi.php'); exit;
         }
     }
 
@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         unset($c);
-        header('Location: index.php'); exit;
+        header('Location: rekomendasi.php'); exit;
     }
 
     // DELETE
@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['catatan_rekomendasi'] = array_values(
             array_filter($_SESSION['catatan_rekomendasi'], fn($c) => $c['id'] !== $id)
         );
-        header('Location: index.php'); exit;
+        header('Location: rekomendasi.php'); exit;
     }
 }
 
@@ -91,7 +91,7 @@ $unsoldProd = array_filter($_SESSION['produk'], fn($p) => !in_array($p['id'], $s
     <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{navy:{'100':'#dbe8ff','700':'#1e4080','800':'#162e5e','900':'#0e1f42','950':'#080f21'}}}}}</script>
 </head>
 <body class="bg-gray-50 font-sans">
-    <?php include '../includes/sidebar.php'; ?>
+    <?php include 'includes/sidebar.php'; ?>
     <main class="ml-56 min-h-screen flex flex-col">
         <header class="bg-white border-b border-gray-100 px-6 py-4">
             <h2 class="font-semibold text-navy-900">Sistem Rekomendasi</h2>
@@ -177,7 +177,7 @@ $unsoldProd = array_filter($_SESSION['produk'], fn($p) => !in_array($p['id'], $s
                         <h3 class="font-semibold text-navy-900 text-sm mb-4">
                             <?= $editCat ? '✏️ Edit Catatan' : '+ Tambah Catatan Tindak Lanjut' ?>
                         </h3>
-                        <form method="POST" action="index.php" class="space-y-3">
+                        <form method="POST" action="rekomendasi.php" class="space-y-3">
                             <input type="hidden" name="action" value="<?= $editCat ? 'update' : 'tambah' ?>">
                             <?php if ($editCat): ?>
                             <input type="hidden" name="id" value="<?= $editCat['id'] ?>">
@@ -208,7 +208,7 @@ $unsoldProd = array_filter($_SESSION['produk'], fn($p) => !in_array($p['id'], $s
                                     <?= $editCat ? 'Simpan' : 'Tambah' ?>
                                 </button>
                                 <?php if ($editCat): ?>
-                                <a href="index.php" class="px-5 py-2 border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-lg text-sm font-medium transition">Batal</a>
+                                <a href="rekomendasi.php" class="px-5 py-2 border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-lg text-sm font-medium transition">Batal</a>
                                 <?php endif; ?>
                             </div>
                         </form>
@@ -238,7 +238,7 @@ $unsoldProd = array_filter($_SESSION['produk'], fn($p) => !in_array($p['id'], $s
                                     </div>
                                     <div class="flex flex-col gap-1 flex-shrink-0">
                                         <a href="?edit=<?= $c['id'] ?>" class="text-xs text-navy-700 hover:underline font-medium">Edit</a>
-                                        <form method="POST" action="index.php" onsubmit="return confirm('Hapus catatan ini?')">
+                                        <form method="POST" action="rekomendasi.php" onsubmit="return confirm('Hapus catatan ini?')">
                                             <input type="hidden" name="action" value="hapus">
                                             <input type="hidden" name="id" value="<?= $c['id'] ?>">
                                             <button class="text-xs text-red-500 hover:underline font-medium">Hapus</button>

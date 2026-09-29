@@ -1,7 +1,7 @@
 <?php
 session_start();
-if (!isset($_SESSION['user'])) { header('Location: ../login/index.php'); exit; }
-require_once '../includes/init.php';
+if (!isset($_SESSION['user'])) { header('Location: login.php'); exit; }
+require_once 'includes/init.php';
 
 $currentPage = 'stok';
 $error       = '';
@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'jumlah'      => $jumlah,
                     'keterangan'  => $ket,
                 ];
-                header('Location: index.php'); exit;
+                header('Location: stok.php'); exit;
             }
         }
     }
@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['stok_log'] = array_values(
             array_filter($_SESSION['stok_log'], fn($l) => $l['id'] !== $id)
         );
-        header('Location: index.php'); exit;
+        header('Location: stok.php'); exit;
     }
 }
 
@@ -85,7 +85,7 @@ $lowStock = array_filter($_SESSION['produk'], fn($p) => $p['stok'] <= $p['stok_m
     <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{navy:{'100':'#dbe8ff','700':'#1e4080','800':'#162e5e','900':'#0e1f42','950':'#080f21'}}}}}</script>
 </head>
 <body class="bg-gray-50 font-sans">
-    <?php include '../includes/sidebar.php'; ?>
+    <?php include 'includes/sidebar.php'; ?>
     <main class="ml-56 min-h-screen flex flex-col">
         <header class="bg-white border-b border-gray-100 px-6 py-4">
             <h2 class="font-semibold text-navy-900">Manajemen Stok</h2>
@@ -160,7 +160,7 @@ $lowStock = array_filter($_SESSION['produk'], fn($p) => $p['stok'] <= $p['stok_m
             <!-- Form Catat Pergerakan (CREATE) -->
             <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
                 <h3 class="font-semibold text-navy-900 text-sm mb-4">+ Catat Pergerakan Stok</h3>
-                <form method="POST" action="index.php" class="grid grid-cols-2 gap-4">
+                <form method="POST" action="stok.php" class="grid grid-cols-2 gap-4">
                     <input type="hidden" name="action" value="catat">
                     <div>
                         <label class="block text-xs font-semibold text-gray-600 mb-1.5">Produk</label>
@@ -236,7 +236,7 @@ $lowStock = array_filter($_SESSION['produk'], fn($p) => $p['stok'] <= $p['stok_m
                             </td>
                             <td class="px-5 py-3 text-gray-500"><?= htmlspecialchars($log['keterangan']) ?: '—' ?></td>
                             <td class="px-5 py-3 text-center">
-                                <form method="POST" action="index.php"
+                                <form method="POST" action="stok.php"
                                     onsubmit="return confirm('Hapus log ini? Stok produk akan dibalikkan.')">
                                     <input type="hidden" name="action" value="hapus_log">
                                     <input type="hidden" name="id" value="<?= $log['id'] ?>">

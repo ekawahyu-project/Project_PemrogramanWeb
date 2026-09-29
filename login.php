@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (isset($_SESSION['user'])) { header('Location: ../dashboard/index.php'); exit; }
+if (isset($_SESSION['user'])) { header('Location: dashboard.php'); exit; }
 
 // Inisialisasi toko user dengan akun default
 if (!isset($_SESSION['users'])) {
@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (($uname === $id || strtolower($data['email']) === strtolower($id)) && $data['password'] === $pw) {
             $_SESSION['user']      = $uname;
             $_SESSION['user_nama'] = $data['nama'];
-            header('Location: ../dashboard/index.php');
+            header('Location: dashboard.php');
             exit;
         }
     }
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AlpetBizz | Login</title>
+    <title>UMKM Manager — Login</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{navy:{'100':'#dbe8ff','700':'#1e4080','800':'#162e5e','900':'#0e1f42','950':'#080f21'}}}}}</script>
@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p class="text-sm text-red-600 bg-red-50 px-3 py-2.5 rounded-lg mb-4"><?= htmlspecialchars($error) ?></p>
         <?php endif; ?>
 
-        <form method="POST" action="" class="space-y-4">
+        <form method="POST" action="login.php" class="space-y-4">
             <div>
                 <label class="block text-xs font-semibold text-gray-600 mb-1.5">Email / Username</label>
                 <input type="text" name="username" required autocomplete="off"
@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <p class="text-center text-xs text-gray-500 mt-5">
             Belum punya akun?
-            <a href="../register/index.php" class="text-navy-700 font-semibold hover:underline">Daftar sekarang</a>
+            <a href="register.php" class="text-navy-700 font-semibold hover:underline">Daftar sekarang</a>
         </p>
     </div>
 </body>

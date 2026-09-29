@@ -1,12 +1,12 @@
 <?php
 session_start();
-if (!isset($_SESSION['user'])) { header('Location: ../login/index.php'); exit; }
-require_once '../includes/init.php';
+if (!isset($_SESSION['user'])) { header('Location: login.php'); exit; }
+require_once 'includes/init.php';
 
 // Handle logout
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'logout') {
     session_destroy();
-    header('Location: ../login/index.php'); exit;
+    header('Location: login.php'); exit;
 }
 
 $currentPage = 'dashboard';
@@ -40,7 +40,7 @@ $stats = [
     <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{navy:{'100':'#dbe8ff','700':'#1e4080','800':'#162e5e','900':'#0e1f42','950':'#080f21'}}}}}</script>
 </head>
 <body class="bg-gray-50 font-sans">
-    <?php include '../includes/sidebar.php'; ?>
+    <?php include 'includes/sidebar.php'; ?>
 
     <main class="ml-56 min-h-screen flex flex-col">
         <header class="bg-white border-b border-gray-100 px-6 py-4">
@@ -55,7 +55,7 @@ $stats = [
                 <span class="text-orange-500">⚠</span>
                 <p class="text-sm text-orange-700 font-medium">
                     <?= $lowStock ?> produk stok menipis. —
-                    <a href="../stok/index.php" class="underline">Cek halaman Stok</a>
+                    <a href="stok.php" class="underline">Cek halaman Stok</a>
                 </p>
             </div>
             <?php endif; ?>
@@ -75,12 +75,12 @@ $stats = [
             <div class="grid grid-cols-3 gap-4">
                 <?php
                 $shortcuts = [
-                    ['href' => '../transaksi/index.php',   'label' => 'Transaksi',   'desc' => 'Catat pemasukan & pengeluaran'],
-                    ['href' => '../produk/index.php',      'label' => 'Produk',      'desc' => 'Kelola data produk'],
-                    ['href' => '../stok/index.php',        'label' => 'Stok',        'desc' => 'Pantau & catat pergerakan stok'],
-                    ['href' => '../laporan/index.php',     'label' => 'Laporan',     'desc' => 'Grafik pemasukan & pengeluaran'],
-                    ['href' => '../rekomendasi/index.php', 'label' => 'Rekomendasi', 'desc' => 'Analisis & saran bisnis'],
-                    ['href' => '../profil/index.php',      'label' => 'Profil',      'desc' => 'Informasi akun & usaha'],
+                    ['href' => 'transaksi.php',   'label' => 'Transaksi',   'desc' => 'Catat pemasukan & pengeluaran'],
+                    ['href' => 'produk.php',      'label' => 'Produk',      'desc' => 'Kelola data produk'],
+                    ['href' => 'stok.php',        'label' => 'Stok',        'desc' => 'Pantau & catat pergerakan stok'],
+                    ['href' => 'laporan.php',     'label' => 'Laporan',     'desc' => 'Grafik pemasukan & pengeluaran'],
+                    ['href' => 'rekomendasi.php', 'label' => 'Rekomendasi', 'desc' => 'Analisis & saran bisnis'],
+                    ['href' => 'profil.php',      'label' => 'Profil',      'desc' => 'Informasi akun & usaha'],
                 ];
                 foreach ($shortcuts as $s): ?>
                 <a href="<?= $s['href'] ?>"
@@ -95,7 +95,7 @@ $stats = [
             <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
                 <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
                     <h3 class="font-semibold text-navy-900 text-sm">Transaksi Terakhir</h3>
-                    <a href="../transaksi/index.php" class="text-xs text-navy-700 hover:underline">Lihat semua →</a>
+                    <a href="transaksi.php" class="text-xs text-navy-700 hover:underline">Lihat semua →</a>
                 </div>
                 <table class="w-full text-sm">
                     <thead class="bg-gray-50 text-xs text-gray-500 font-semibold uppercase">

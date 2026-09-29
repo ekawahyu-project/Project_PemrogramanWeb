@@ -12,75 +12,83 @@ Sistem informasi manajemen UMKM berbasis web yang menyediakan fitur untuk mengel
 
 | Anggota | Fungsi yang Dikerjakan | Gambaran Singkat |
 |---|---|---|
-| [EWM] | Sistem Rekomendasi | Merekomendasikan barang yang sering dibeli, stok menipis, dan produk belum terjual |
-| [MARA] | Halaman Laporan/Grafik | Grafik batang bulanan pemasukan vs pengeluaran (Chart.js) + tabel ringkasan |
-| [AZNP] | Halaman Manajemen Stok | Pantau stok saat ini, catat masuk/keluar, riwayat pergerakan dengan reversal |
-| [ZAG] | Halaman Manajemen Produk | CRUD produk: tambah, edit, hapus, status stok (Normal/Menipis/Habis) |
-| [AABS] | Halaman Manajemen Transaksi | CRUD transaksi pemasukan & pengeluaran, link opsional ke produk |
-| [ALL] | Login, Register, Dashboard, Profil | Fitur umum: autentikasi, dashboard ringkasan, profil usaha |
+| [EWM] | Sistem Rekomendasi | Analisis barang terlaris, notifikasi restock, dan manajemen catatan rekomendasi (CRUD) |
+| [MARA] | Halaman Laporan/Grafik | Grafik bulanan pemasukan vs pengeluaran (Chart.js) + manajemen laporan periode tersimpan (CRUD) |
+| [AZNP] | Halaman Manajemen Stok | Pantau stok saat ini, catat masuk/keluar (otomatis sinkron ke produk), riwayat pergerakan & reversal (CRUD) |
+| [ZAG] | Halaman Manajemen Produk | CRUD data produk: tambah, edit, hapus (membersihkan referensi transaksi), dan status stok |
+| [AABS] | Halaman Manajemen Transaksi | CRUD pencatatan transaksi pemasukan & pengeluaran yang terhubung opsional ke produk |
+| [ALL] | Login, Register, Dashboard, Profil | Fitur umum: autentikasi multi-user, dashboard ringkasan eksekutif, dan manajemen profil usaha |
 
 ---
 
-## Status Implementasi
+## Status Implementasi & Arsitektur File
 
-| Halaman | File | Status | CRUD |
+Arsitektur dibuat bersih dan flat (tidak boros folder `index.php`):
+
+| Halaman / Fitur | File Utama | Status | CRUD |
 |---|---|---|---|
-| Login | `login/index.php` | ✅ Selesai | — |
-| Register | `register/index.php` | ✅ Selesai | C (buat akun) |
-| Dashboard | `dashboard/index.php` | ✅ Selesai | R (ringkasan) |
-| Transaksi | `transaksi/index.php` | ✅ Selesai | **C R U D** |
-| Produk | `produk/index.php` | ✅ Selesai | **C R U D** |
-| Stok | `stok/index.php` | ✅ Selesai | **C R U D** |
-| Laporan | `laporan/index.php` | ✅ Selesai | **C R U D** |
-| Rekomendasi | `rekomendasi/index.php` | ✅ Selesai | **C R U D** |
-| Profil | `profil/index.php` | ✅ Selesai | R U (edit profil) |
+| Entry Redirect | `index.php` | ✅ Selesai | Redirect otomatis ke login/dashboard |
+| Login | `login.php` | ✅ Selesai | Verifikasi data akun session |
+| Register | `register.php` | ✅ Selesai | **C** (pendaftaran akun baru) |
+| Dashboard | `dashboard.php` | ✅ Selesai | **R** (ringkasan statistik & shortcut) |
+| Transaksi | `transaksi.php` | ✅ Selesai | **C R U D** (kelola pemasukan/pengeluaran) |
+| Produk | `produk.php` | ✅ Selesai | **C R U D** (kelola katalog & stok master) |
+| Stok | `stok.php` | ✅ Selesai | **C R U D** (pergerakan stok barang) |
+| Laporan | `laporan.php` | ✅ Selesai | **C R U D** (grafik live & arsip laporan periode) |
+| Rekomendasi | `rekomendasi.php` | ✅ Selesai | **C R U D** (analisis pintar & catatan tindak lanjut) |
+| Profil | `profil.php` (`profil.js`) | ✅ Selesai | **R U** (manajemen profil akun & usaha) |
 
 ---
 
 ## Alur Navigasi & `action=`
 
 ```
-[Register] --POST action="register"--> simpan $_SESSION['users'] --> Login
-[Login]    --POST --> validasi $_SESSION['users'] --> Dashboard
+[index.php]    -- (Cek session) -> login.php atau dashboard.php
+[register.php] --POST action="register.php" (action=register)--> simpan $_SESSION['users'] --> login.php
+[login.php]    --POST action="login.php"--> validasi user --> set $_SESSION['user'] --> dashboard.php
 
-[Dashboard]   -- read-only summary, link ke semua halaman
-[Transaksi]   --POST action="tambah"  --> Create
-              --GET  ?edit=id          --> pre-fill form
-              --POST action="update"  --> Update
-              --POST action="hapus"   --> Delete
-[Produk]      --POST action="tambah"  --> Create
-              --GET  ?edit=id          --> pre-fill form
-              --POST action="update"  --> Update (juga bersihkan ref di transaksi)
-              --POST action="hapus"   --> Delete
-[Stok]        --POST action="catat"   --> Create log + update produk.stok
-              --POST action="hapus_log"--> Delete log + reversal stok
-[Laporan]     -- read-only grafik & tabel
-[Rekomendasi] -- read-only analisis
-[Profil]      --POST action="save"   --> Update
-[Sidebar]     --POST action="logout" --> session_destroy() --> Login
+[dashboard.php]   -- Ringkasan statistik, shortcut ke modul, dan 5 transaksi terakhir
+[transaksi.php]   --POST action="transaksi.php" (action=tambah / update / hapus)
+[produk.php]      --POST action="produk.php" (action=tambah / update / hapus)
+[stok.php]        --POST action="stok.php" (action=catat / hapus_log)
+[laporan.php]     --POST action="laporan.php" (action=simpan / update / hapus)
+[rekomendasi.php] --POST action="rekomendasi.php" (action=tambah / update / hapus)
+[profil.php]      --POST action="profil.php" (action=save)
+[sidebar.php]     --POST action="dashboard.php" (action=logout) --> session_destroy() --> login.php
 ```
 
 ---
 
 ## Logika CRUD yang Diterapkan
 
-### Transaksi
-- **C**: Tambah dengan opsional link ke produk
-- **R**: Tabel semua transaksi, sorted terbaru, tampil nama produk jika ada
-- **U**: GET `?edit=id` → pre-fill form → POST `action=update`
-- **D**: Hapus transaksi
+1. **Transaksi (`transaksi.php`)**
+   - **Create**: Tambah transaksi pemasukan/pengeluaran baru, opsional pilih produk terkait.
+   - **Read**: Tabel daftar seluruh transaksi (diurutkan terbaru), filter jenis pemasukan/pengeluaran.
+   - **Update**: Edit transaksi dengan parameter `?edit=id`.
+   - **Delete**: Hapus transaksi dari daftar.
 
-### Produk
-- **C**: Tambah produk baru dengan stok awal
-- **R**: Tabel produk dengan badge status stok (Normal/Menipis/Habis)
-- **U**: Edit semua atribut produk termasuk stok
-- **D**: Hapus produk & otomatis bersihkan `produk_id` di transaksi terkait
+2. **Produk (`produk.php`)**
+   - **Create**: Tambah produk baru dengan detail harga beli, harga jual, satuan, dan stok awal.
+   - **Read**: Katalog daftar produk lengkap dengan indikator status (Normal / Menipis / Habis).
+   - **Update**: Edit rincian informasi dan stok produk.
+   - **Delete**: Hapus produk dari sistem (sekaligus mengosongkan relasi `produk_id` di transaksi).
 
-### Stok (logika terhubung ke Produk)
-- **C**: Catat stok masuk/keluar → `produk.stok` diupdate otomatis
-- **R**: Tabel stok saat ini + progress bar visual + riwayat pergerakan
-- **U**: Tidak ada (history bersifat audit trail; edit via halaman Produk)
-- **D**: Hapus log pergerakan → stok produk di-*reverse* otomatis
+3. **Stok (`stok.php`)**
+   - **Create**: Catat barang Masuk/Keluar. Stok produk master otomatis terupdate secara sinkron.
+   - **Read**: Monitor stok saat ini dengan visual progress bar + tabel riwayat mutasi stok.
+   - **Delete (Reversal)**: Hapus log mutasi stok, sistem otomatis mengembalikan kuantitas stok produk ke saldo sebelumnya.
+
+4. **Laporan (`laporan.php`)**
+   - **Create**: Simpan snapshot laporan keuangan berdasarkan rentang tanggal (`tanggal_dari` s/d `tanggal_sampai`).
+   - **Read**: Grafik batang bulanan interaktif Chart.js + daftar laporan tersimpan.
+   - **Update**: Edit judul laporan dan catatan evaluasi bisnis.
+   - **Delete**: Hapus arsip laporan yang sudah tidak diperlukan.
+
+5. **Rekomendasi (`rekomendasi.php`)**
+   - **Create**: Buat catatan rencana tindakan bisnis (judul, deskripsi, prioritas: Tinggi/Sedang/Rendah).
+   - **Read**: Analisis cerdas produk terlaris, barang menipis yang perlu restock, dan barang belum terjual.
+   - **Update**: Edit catatan rekomendasi dan prioritas tindak lanjut.
+   - **Delete**: Hapus catatan rencana yang sudah diselesaikan.
 
 ---
 
@@ -89,40 +97,32 @@ Sistem informasi manajemen UMKM berbasis web yang menyediakan fitur untuk mengel
 | Bagian | Teknologi |
 |---|---|
 | Struktur | HTML5 |
-| Styling | Tailwind CSS v3 (CDN) — tema navy |
+| Styling | Tailwind CSS v3 (CDN) — Tema Navy Elegan |
 | Grafik | Chart.js (CDN) |
-| Client-side | JavaScript vanilla |
-| Server-side | PHP (`$_SESSION`, `$_POST`, `$_GET`) |
-| Penyimpanan | PHP Session (tahap awal tanpa database) |
-| Database | MySQL *(tahap lanjut)* |
-| Dev server | XAMPP / Laragon |
+| Interaktivitas | JavaScript Vanilla (`profil.js`) |
+| Backend & Session | PHP (`$_SESSION`, `$_POST`, `$_GET`) |
+| Penyimpanan | Session-based Storage (Ringan, DRY & Efisien) |
 
 ---
 
-## Struktur File
+## Struktur Direktori Saat Ini
 
 ```
 Project_PemWeb/
 ├── includes/
-│   ├── sidebar.php       ← Navigasi shared (DRY)
-│   └── init.php          ← Seed data session (produk, transaksi, stok_log)
-├── login/index.php
-├── register/index.php
-├── dashboard/index.php
-├── transaksi/index.php   ← CRUD transaksi
-├── produk/index.php      ← CRUD produk
-├── stok/index.php        ← Manajemen stok + log
-├── laporan/index.php     ← Grafik & laporan
-├── rekomendasi/index.php ← Sistem rekomendasi
-└── profil/index.php
+│   ├── init.php              ← Inisialisasi data session & variabel bersama ($inputClass)
+│   └── sidebar.php           ← Navigasi shared (DRY)
+├── dashboard.php             ← Dashboard utama
+├── index.php                 ← Entry redirector
+├── laporan.php               ← Modul Laporan & Grafik (CRUD)
+├── login.php                 ← Autentikasi Login
+├── produk.php                ← Modul Manajemen Produk (CRUD)
+├── profil.js                 ← Script interaksi profil
+├── profil.php                ← Modul Profil Usaha
+├── register.php              ← Registrasi Pengguna Baru
+├── rekomendasi.php           ← Modul Rekomendasi Bisnis (CRUD)
+├── stok.php                  ← Modul Manajemen Stok (CRUD)
+├── transaksi.php             ← Modul Transaksi Keuangan (CRUD)
+├── AGENTS.md
+└── project-umkm-management.md
 ```
-
----
-
-## Catatan Teknis
-
-- **Session-based storage**: Data disimpan di `$_SESSION`. Hilang saat sesi browser berakhir — disengaja untuk tahap awal sebelum koneksi database.
-- **Akun default**: `username: admin` / `password: admin123` tersedia saat sesi baru dimulai.
-- **Integritas data**: Hapus produk → referensi `produk_id` di transaksi dibersihkan. Hapus log stok → perubahan stok di-reverse.
-- **Tailwind CSS**: CDN tanpa file CSS statis. Konfigurasi warna navy inline.
-- **Chart.js**: CDN di `laporan/index.php` untuk grafik batang bulanan.
