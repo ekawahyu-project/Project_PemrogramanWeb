@@ -1,34 +1,65 @@
 <?php
 session_start();
-if (!isset($_SESSION['user'])) { header('Location: login.php'); exit; }
+
+if (!isset($_SESSION['user'])) {
+    header('Location: login.php');
+    exit;
+}
+
 require_once 'includes/init.php';
 
 $currentPage = 'profil';
 $message = '';
 $messageType = '';
 
+$usernameLogin = $_SESSION['user'];
+
+$akun = $_SESSION['users'][$usernameLogin] ?? [
+    'nama' => '',
+    'email' => ''
+];
+
+$nama = $akun['nama'];
+$username = $usernameLogin;
+$email = $akun['email'];
+
 if (!isset($_SESSION['profil'])) {
-    $_SESSION['profil'] = ['nama' => '', 'username' => '', 'email' => '', 'no_hp' => '', 'nama_usaha' => '', 'kategori' => '', 'alamat' => ''];
+    $_SESSION['profil'] = [
+        'no_hp' => '',
+        'nama_usaha' => '',
+        'kategori' => '',
+        'alamat' => ''
+    ];
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save') {
     $_SESSION['profil'] = [
-        'nama'       => trim($_POST['nama']       ?? ''),
-        'username'   => trim($_POST['username']   ?? ''),
-        'email'      => trim($_POST['email']      ?? ''),
-        'no_hp'      => trim($_POST['no_hp']      ?? ''),
+        'no_hp'      => trim($_POST['no_hp'] ?? ''),
         'nama_usaha' => trim($_POST['nama_usaha'] ?? ''),
-        'kategori'   => $_POST['kategori']         ?? '',
-        'alamat'     => trim($_POST['alamat']      ?? ''),
+        'kategori'   => $_POST['kategori'] ?? '',
+        'alamat'     => trim($_POST['alamat'] ?? '')
     ];
+
     $message = 'Profil berhasil disimpan.';
     $messageType = 'success';
 }
 
 $profil = $_SESSION['profil'];
-$initial = !empty($profil['nama']) ? strtoupper($profil['nama'][0]) : '?';
 
-$kategoriOptions = ['', 'Makanan & Minuman', 'Fashion', 'Kerajinan', 'Jasa', 'Kecantikan', 'Elektronik', 'Lainnya'];
+$initial = !empty($nama)
+    ? strtoupper($nama[0])
+    : '?';
+
+$kategoriOptions = [
+    '',
+    'Makanan & Minuman',
+    'Fashion',
+    'Kerajinan',
+    'Jasa',
+    'Kecantikan',
+    'Elektronik',
+    'Lainnya'
+];
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -43,26 +74,26 @@ $kategoriOptions = ['', 'Makanan & Minuman', 'Fashion', 'Kerajinan', 'Jasa', 'Ke
 <body class="bg-gray-50 font-sans">
     <?php include 'includes/sidebar.php'; ?>
 
-    <main class="ml-56 min-h-screen flex flex-col">
+    <main class="ml-56 min-h-screen bg-gray-50 flex flex-col min-w-0 overflow-x-auto">
         <header class="bg-white border-b border-gray-100 px-6 py-4">
             <h2 class="font-semibold text-navy-900">Profil Saya</h2>
             <p class="text-xs text-gray-500 mt-0.5">Kelola informasi akun dan data usaha Anda.</p>
         </header>
 
-        <div class="p-6 flex-1">
-            <div class="max-w-3xl mx-auto bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="p-6 flex-1 min-w-0">
+        <div class="w-full bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
                 <!-- Profile Top -->
-                <div class="flex items-center gap-4 px-6 py-5 border-b border-gray-100">
+                <div class="flex items-center gap-4 px-4 sm:px-6 py-5 border-b border-gray-100">
                     <div class="w-14 h-14 rounded-full bg-gradient-to-br from-navy-800 to-navy-950
                                 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
                         <?= $initial ?>
                     </div>
                     <div class="flex-1 min-w-0">
                         <p class="font-semibold text-navy-900 truncate">
-                            <?= $profil['nama'] ? htmlspecialchars($profil['nama']) : 'Profil Pemilik' ?>
+                            <?= $nama ? htmlspecialchars($nama) : 'Profil Pemilik' ?>
                         </p>
                         <p class="text-xs text-gray-500">
-                            <?= $profil['username'] ? '@' . htmlspecialchars($profil['username']) : 'Lengkapi informasi akun Anda' ?>
+                            <?= $username ? '@' . htmlspecialchars($username) : 'Lengkapi informasi akun Anda' ?>
                         </p>
                         <span class="inline-block mt-1.5 px-2 py-0.5 bg-navy-100 text-navy-800 text-xs font-semibold rounded-md">
                             Pemilik UMKM
@@ -81,7 +112,7 @@ $kategoriOptions = ['', 'Makanan & Minuman', 'Fashion', 'Kerajinan', 'Jasa', 'Ke
                 </div>
                 <?php endif; ?>
 
-                <form method="POST" action="profil.php" id="profileForm" class="px-6 py-5 space-y-6">
+                <form method="POST" action="profil.php" id="profileForm" class="px-4 sm:px-6 py-5 space-y-6">
                     <input type="hidden" name="action" value="save">
 
                     <!-- Informasi Akun -->
@@ -91,17 +122,17 @@ $kategoriOptions = ['', 'Makanan & Minuman', 'Fashion', 'Kerajinan', 'Jasa', 'Ke
                             <div>
                                 <label class="block text-xs font-semibold text-gray-600 mb-1.5">Nama Lengkap</label>
                                 <input type="text" id="nama" name="nama" placeholder="Masukkan nama lengkap"
-                                    value="<?= htmlspecialchars($profil['nama']) ?>" disabled class="<?= $inputClass ?>">
+                                    value="<?= htmlspecialchars($nama) ?>" disabled class="<?= $inputClass ?>">
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-600 mb-1.5">Username</label>
                                 <input type="text" id="username" name="username" placeholder="Masukkan username"
-                                    value="<?= htmlspecialchars($profil['username']) ?>" disabled class="<?= $inputClass ?>">
+                                    value="<?= htmlspecialchars($username) ?>" disabled class="<?= $inputClass ?>">
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-600 mb-1.5">Email</label>
                                 <input type="email" id="email" name="email" placeholder="Masukkan email"
-                                    value="<?= htmlspecialchars($profil['email']) ?>" disabled class="<?= $inputClass ?>">
+                                    value="<?= htmlspecialchars($email) ?>" disabled class="<?= $inputClass ?>">
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-600 mb-1.5">Nomor WhatsApp</label>
