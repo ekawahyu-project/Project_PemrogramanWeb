@@ -37,7 +37,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body class="min-h-screen bg-gradient-to-br from-navy-950 via-navy-900 to-navy-800 flex items-center justify-center p-3.5 sm:p-6 font-sans antialiased text-gray-800">
     <div class="w-full max-w-[420px] bg-white rounded-2xl shadow-2xl p-5 sm:p-8 mx-auto">
         <div class="text-center sm:text-left mb-6">
-            <span class="inline-block px-3 py-1 bg-navy-100 text-navy-800 text-xs font-bold rounded-lg mb-2 tracking-wide uppercase">AlpetBizz</span>
             <h1 class="text-xl sm:text-2xl font-bold text-navy-900 tracking-tight">Masuk ke Akun</h1>
             <p class="text-xs sm:text-sm text-gray-500 mt-1">Kelola keuangan dan stok usaha Anda di satu tempat.</p>
         </div>
