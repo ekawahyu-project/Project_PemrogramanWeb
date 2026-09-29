@@ -2,14 +2,19 @@
 session_start();
 if (isset($_SESSION['user'])) { header('Location: ../dashboard/index.php'); exit; }
 
+// Inisialisasi toko user yang sama dengan login.php
+if (!isset($_SESSION['users'])) {
+    $_SESSION['users']['admin'] = ['nama' => 'Administrator', 'email' => 'admin@gmail.com', 'password' => 'admin123'];
+}
+
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'register') {
-    $nama  = trim($_POST['nama']      ?? '');
-    $uname = trim($_POST['username']  ?? '');
-    $email = trim($_POST['email']     ?? '');
-    $pw    = $_POST['password']        ?? '';
-    $pw2   = $_POST['password2']       ?? '';
+    $nama  = trim($_POST['nama']     ?? '');
+    $uname = trim($_POST['username'] ?? '');
+    $email = trim($_POST['email']    ?? '');
+    $pw    = $_POST['password']       ?? '';
+    $pw2   = $_POST['password2']      ?? '';
 
     if (!$nama || !$uname || !$email || !$pw) {
         $error = 'Semua field wajib diisi.';
@@ -17,10 +22,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'regis
         $error = 'Konfirmasi password tidak cocok.';
     } elseif (strlen($pw) < 6) {
         $error = 'Password minimal 6 karakter.';
+    } elseif (isset($_SESSION['users'][$uname])) {
+        $error = 'Username sudah terdaftar.';
     } else {
-        $_SESSION['registered_user'] = compact('nama', 'uname', 'email');
-        header('Location: ../login/index.php');
-        exit;
+        // Cek duplikasi email
+        foreach ($_SESSION['users'] as $u) {
+            if (strtolower($u['email']) === strtolower($email)) {
+                $error = 'Email sudah terdaftar.'; break;
+            }
+        }
+        if (!$error) {
+            $_SESSION['users'][$uname] = ['nama' => $nama, 'email' => $email, 'password' => $pw];
+            header('Location: ../login/index.php');
+            exit;
+        }
     }
 }
 ?>
@@ -29,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'regis
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UMKM Manager — Daftar</title>
+    <title>AlpetBizz | Daftar</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{navy:{'100':'#dbe8ff','700':'#1e4080','800':'#162e5e','900':'#0e1f42','950':'#080f21'}}}}}</script>

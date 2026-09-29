@@ -1,7 +1,12 @@
 <?php
 $nav = [
-    ['href' => '../dashboard/index.php', 'label' => 'Dashboard', 'page' => 'dashboard'],
-    ['href' => '../profil/index.php',    'label' => 'Profil',    'page' => 'profil'],
+    ['href' => '../dashboard/index.php',   'label' => 'Dashboard',    'page' => 'dashboard'],
+    ['href' => '../transaksi/index.php',   'label' => 'Transaksi',    'page' => 'transaksi'],
+    ['href' => '../produk/index.php',      'label' => 'Produk',       'page' => 'produk'],
+    ['href' => '../stok/index.php',        'label' => 'Stok',         'page' => 'stok'],
+    ['href' => '../laporan/index.php',     'label' => 'Laporan',      'page' => 'laporan'],
+    ['href' => '../rekomendasi/index.php', 'label' => 'Rekomendasi',  'page' => 'rekomendasi'],
+    ['href' => '../profil/index.php',      'label' => 'Profil',       'page' => 'profil'],
 ];
 ?>
 <aside class="fixed left-0 top-0 w-56 h-screen bg-navy-950 flex flex-col">

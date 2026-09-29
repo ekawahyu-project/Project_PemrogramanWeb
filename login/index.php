@@ -2,18 +2,24 @@
 session_start();
 if (isset($_SESSION['user'])) { header('Location: ../dashboard/index.php'); exit; }
 
-$VALID_USERNAME = 'admin';
-$VALID_EMAIL    = 'admin@gmail.com';
-$VALID_PASSWORD = 'admin123';
+// Inisialisasi toko user dengan akun default
+if (!isset($_SESSION['users'])) {
+    $_SESSION['users']['admin'] = ['nama' => 'Administrator', 'email' => 'admin@gmail.com', 'password' => 'admin123'];
+}
+
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = trim($_POST['username'] ?? '');
     $pw = $_POST['password'] ?? '';
-    if (($id === $VALID_USERNAME || strtolower($id) === $VALID_EMAIL) && $pw === $VALID_PASSWORD) {
-        $_SESSION['user'] = $id;
-        header('Location: ../dashboard/index.php');
-        exit;
+
+    foreach ($_SESSION['users'] as $uname => $data) {
+        if (($uname === $id || strtolower($data['email']) === strtolower($id)) && $data['password'] === $pw) {
+            $_SESSION['user']      = $uname;
+            $_SESSION['user_nama'] = $data['nama'];
+            header('Location: ../dashboard/index.php');
+            exit;
+        }
     }
     $error = 'Email / Username atau password salah.';
 }
@@ -23,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UMKM Manager — Login</title>
+    <title>AlpetBizz | Login</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{navy:{'100':'#dbe8ff','700':'#1e4080','800':'#162e5e','900':'#0e1f42','950':'#080f21'}}}}}</script>
