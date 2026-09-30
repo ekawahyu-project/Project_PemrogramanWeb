@@ -33,6 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{navy:{'100':'#dbe8ff','700':'#1e4080','800':'#162e5e','900':'#0e1f42','950':'#080f21'}}}}}</script>
+    <link rel="stylesheet" href="assets/css/animations.css">
 </head>
 <body class="min-h-screen bg-cover bg-center bg-no-repeat relative flex items-center justify-center p-3.5 sm:p-6 font-sans antialiased text-gray-800"
       style="background-image: url('img/background.jpg');">

@@ -23,10 +23,10 @@ $jmlStok   = count($_SESSION['produk']);
 $lowStock  = count(array_filter($_SESSION['produk'], fn($p) => $p['stok'] <= $p['stok_min']));
 
 $stats = [
-    ['label' => 'Total Pemasukan',   'value' => 'Rp ' . number_format($pemasukan,   0, ',', '.'), 'sub' => count(array_filter($_SESSION['transaksi'], fn($t) => $t['jenis'] === 'Pemasukan')) . ' transaksi', 'color' => 'text-green-600'],
-    ['label' => 'Total Pengeluaran', 'value' => 'Rp ' . number_format($pengeluaran, 0, ',', '.'), 'sub' => count(array_filter($_SESSION['transaksi'], fn($t) => $t['jenis'] === 'Pengeluaran')) . ' transaksi', 'color' => 'text-red-500'],
-    ['label' => 'Produk',            'value' => $jmlStok . ' item',                                'sub' => $lowStock > 0 ? $lowStock . ' stok menipis' : 'Semua aman',                                        'color' => $lowStock > 0 ? 'text-orange-500' : 'text-blue-600'],
-    ['label' => 'Laba Bersih',       'value' => 'Rp ' . number_format(abs($laba),   0, ',', '.'), 'sub' => $laba >= 0 ? 'Untung' : 'Rugi',                                                                    'color' => $laba >= 0 ? 'text-navy-800' : 'text-red-500'],
+    ['label' => 'Total Pemasukan',   'value' => 'Rp ' . number_format($pemasukan,   0, ',', '.'), 'sub' => count(array_filter($_SESSION['transaksi'], fn($t) => $t['jenis'] === 'Pemasukan')) . ' transaksi', 'color' => 'text-emerald-400'],
+    ['label' => 'Total Pengeluaran', 'value' => 'Rp ' . number_format($pengeluaran, 0, ',', '.'), 'sub' => count(array_filter($_SESSION['transaksi'], fn($t) => $t['jenis'] === 'Pengeluaran')) . ' transaksi', 'color' => 'text-rose-400'],
+    ['label' => 'Produk',            'value' => $jmlStok . ' item',                                'sub' => $lowStock > 0 ? $lowStock . ' stok menipis' : 'Semua aman',                                        'color' => $lowStock > 0 ? 'text-amber-400' : 'text-sky-400'],
+    ['label' => 'Laba Bersih',       'value' => 'Rp ' . number_format(abs($laba),   0, ',', '.'), 'sub' => $laba >= 0 ? 'Untung' : 'Rugi',                                                                    'color' => $laba >= 0 ? 'text-sky-400' : 'text-rose-400'],
 ];
 ?>
 <!DOCTYPE html>
@@ -63,12 +63,12 @@ $stats = [
             <!-- Kartu Statistik -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 <?php foreach ($stats as $s): ?>
-                <div class="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm flex flex-col justify-between">
+                <div class="bg-navy-950 rounded-xl p-4 sm:p-5 border border-white/10 shadow-sm flex flex-col justify-between">
                     <div>
-                        <p class="text-xs font-medium text-gray-500 mb-1.5"><?= $s['label'] ?></p>
+                        <p class="text-xs font-semibold text-slate-300 mb-1.5"><?= $s['label'] ?></p>
                         <p class="text-lg sm:text-xl font-bold tracking-tight <?= $s['color'] ?>"><?= $s['value'] ?></p>
                     </div>
-                    <p class="text-xs text-gray-400 mt-2.5 pt-2 border-t border-gray-50"><?= $s['sub'] ?></p>
+                    <p class="text-xs text-slate-400 mt-2.5 pt-2 border-t border-white/10"><?= $s['sub'] ?></p>
                 </div>
                 <?php endforeach; ?>
             </div>
@@ -88,13 +88,13 @@ $stats = [
                     ];
                     foreach ($shortcuts as $s): ?>
                     <a href="<?= $s['href'] ?>"
-                        class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm hover:border-navy-300 hover:shadow-md transition group flex flex-col justify-between">
+                        class="bg-navy-950 rounded-xl p-4 border border-white/10 shadow-sm hover:border-white/25 hover:bg-navy-900 transition group flex flex-col justify-between">
                         <div>
-                            <p class="font-semibold text-navy-900 text-sm group-hover:text-navy-700 flex items-center justify-between">
+                            <p class="font-semibold text-white text-sm flex items-center justify-between">
                                 <?= $s['label'] ?>
-                                <span class="text-gray-300 group-hover:text-navy-600 transition-transform group-hover:translate-x-0.5">→</span>
+                                <span class="text-slate-400 group-hover:text-white transition-transform group-hover:translate-x-0.5">→</span>
                             </p>
-                            <p class="text-xs text-gray-400 mt-1"><?= $s['desc'] ?></p>
+                            <p class="text-xs text-slate-300 mt-1"><?= $s['desc'] ?></p>
                         </div>
                     </a>
                     <?php endforeach; ?>

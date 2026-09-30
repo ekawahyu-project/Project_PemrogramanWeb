@@ -1,0 +1,181 @@
+/**
+ * animations.css — UI Micro-interactions & Smooth Transitions untuk AlpetBizz PHP
+ */
+
+/* Keyframe Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.85;
+  }
+}
+
+@keyframes rowSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Page entrance animation */
+main > div.flex-1,
+main > header {
+  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Kartu Statistik: Animasi masuk dan hover lift 3D */
+.grid > div.bg-white.rounded-xl,
+.grid > a.bg-white.rounded-xl,
+.grid > button.bg-white.rounded-xl {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.2s ease;
+  will-change: transform, box-shadow;
+}
+
+.grid > div.bg-white.rounded-xl:hover,
+.grid > a.bg-white.rounded-xl:hover,
+.grid > button.bg-white.rounded-xl:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px -6px rgba(14, 31, 66, 0.1),
+              0 6px 12px -4px rgba(14, 31, 66, 0.05);
+}
+
+/* Stagger entrance untuk kartu statistik (1, 2, 3, 4) */
+.grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-4 > div:nth-child(1) {
+  animation: fadeInUp 0.35s 0.05s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-4 > div:nth-child(2) {
+  animation: fadeInUp 0.35s 0.10s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-4 > div:nth-child(3) {
+  animation: fadeInUp 0.35s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-4 > div:nth-child(4) {
+  animation: fadeInUp 0.35s 0.20s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Akses Cepat Modul Stagger */
+.grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-3 > *:nth-child(1) { animation: fadeInUp 0.35s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-3 > *:nth-child(2) { animation: fadeInUp 0.35s 0.18s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-3 > *:nth-child(3) { animation: fadeInUp 0.35s 0.21s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-3 > *:nth-child(4) { animation: fadeInUp 0.35s 0.24s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-3 > *:nth-child(5) { animation: fadeInUp 0.35s 0.27s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-3 > *:nth-child(6) { animation: fadeInUp 0.35s 0.30s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* Panah shortcut modul interaktif */
+a.group span.text-gray-300,
+button.group span.text-gray-300 {
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease;
+  display: inline-block;
+}
+
+a.group:hover span.text-gray-300,
+button.group:hover span.text-gray-300 {
+  transform: translateX(4px);
+  color: #162e5e !important;
+}
+
+/* Alert Peringatan Stok Menipis */
+div.bg-orange-50 {
+  animation: fadeInDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+div.bg-orange-50 span.text-orange-500 {
+  animation: pulseGlow 2.5s infinite ease-in-out;
+  display: inline-block;
+}
+
+/* Tabel Transaksi Baris Masuk Berurutan (Stagger) */
+table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+table tbody tr:hover {
+  background-color: rgba(243, 244, 246, 0.8) !important;
+}
+
+table tbody tr:nth-child(1) { animation: rowSlideIn 0.3s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both; }
+table tbody tr:nth-child(2) { animation: rowSlideIn 0.3s 0.20s cubic-bezier(0.16, 1, 0.3, 1) both; }
+table tbody tr:nth-child(3) { animation: rowSlideIn 0.3s 0.25s cubic-bezier(0.16, 1, 0.3, 1) both; }
+table tbody tr:nth-child(4) { animation: rowSlideIn 0.3s 0.30s cubic-bezier(0.16, 1, 0.3, 1) both; }
+table tbody tr:nth-child(5) { animation: rowSlideIn 0.3s 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
+table tbody tr:nth-child(n+6) { animation: rowSlideIn 0.3s 0.40s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* Status Badges */
+span.rounded-md {
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+tr:hover span.rounded-md {
+  transform: scale(1.05);
+}
+
+/* Sidebar: floating card entrance */
+aside > div {
+  animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Sidebar nav item hover */
+aside nav a {
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.12s ease;
+}
+aside nav a:active {
+  transform: scale(0.97);
+}
+
+/* Tombol umum */
+button:not(:disabled) {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+button:not(:disabled):active {
+  transform: scale(0.97);
+}
+
+/* Smooth Form Focus Glow */
+input:focus,
+select:focus,
+textarea:focus {
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  box-shadow: 0 0 0 3px rgba(22, 46, 94, 0.12) !important;
+}
