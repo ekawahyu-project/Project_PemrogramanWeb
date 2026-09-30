@@ -23,10 +23,42 @@ $jmlStok   = count($_SESSION['produk']);
 $lowStock  = count(array_filter($_SESSION['produk'], fn($p) => $p['stok'] <= $p['stok_min']));
 
 $stats = [
-    ['label' => 'Total Pemasukan',   'value' => 'Rp ' . number_format($pemasukan,   0, ',', '.'), 'sub' => count(array_filter($_SESSION['transaksi'], fn($t) => $t['jenis'] === 'Pemasukan')) . ' transaksi', 'color' => 'text-emerald-400'],
-    ['label' => 'Total Pengeluaran', 'value' => 'Rp ' . number_format($pengeluaran, 0, ',', '.'), 'sub' => count(array_filter($_SESSION['transaksi'], fn($t) => $t['jenis'] === 'Pengeluaran')) . ' transaksi', 'color' => 'text-rose-400'],
-    ['label' => 'Produk',            'value' => $jmlStok . ' item',                                'sub' => $lowStock > 0 ? $lowStock . ' stok menipis' : 'Semua aman',                                        'color' => $lowStock > 0 ? 'text-amber-400' : 'text-sky-400'],
-    ['label' => 'Laba Bersih',       'value' => 'Rp ' . number_format(abs($laba),   0, ',', '.'), 'sub' => $laba >= 0 ? 'Untung' : 'Rugi',                                                                    'color' => $laba >= 0 ? 'text-sky-400' : 'text-rose-400'],
+    [
+        'label'      => 'Total Pemasukan',
+        'value'      => 'Rp ' . number_format($pemasukan, 0, ',', '.'),
+        'sub'        => count(array_filter($_SESSION['transaksi'], fn($t) => $t['jenis'] === 'Pemasukan')) . ' transaksi',
+        'cardClass'  => 'bg-emerald-50/70 border border-emerald-100/90',
+        'labelClass' => 'text-emerald-900/70',
+        'valueClass' => 'text-emerald-700',
+        'subClass'   => 'text-emerald-700/70 border-t border-emerald-100',
+    ],
+    [
+        'label'      => 'Total Pengeluaran',
+        'value'      => 'Rp ' . number_format($pengeluaran, 0, ',', '.'),
+        'sub'        => count(array_filter($_SESSION['transaksi'], fn($t) => $t['jenis'] === 'Pengeluaran')) . ' transaksi',
+        'cardClass'  => 'bg-rose-50/70 border border-rose-100/90',
+        'labelClass' => 'text-rose-900/70',
+        'valueClass' => 'text-rose-700',
+        'subClass'   => 'text-rose-700/70 border-t border-rose-100',
+    ],
+    [
+        'label'      => 'Produk',
+        'value'      => $jmlStok . ' item',
+        'sub'        => $lowStock > 0 ? $lowStock . ' stok menipis' : 'Semua aman',
+        'cardClass'  => 'bg-sky-50/70 border border-sky-100/90',
+        'labelClass' => 'text-sky-900/70',
+        'valueClass' => 'text-sky-700',
+        'subClass'   => 'text-sky-700/70 border-t border-sky-100',
+    ],
+    [
+        'label'      => 'Laba Bersih',
+        'value'      => 'Rp ' . number_format(abs($laba), 0, ',', '.'),
+        'sub'        => $laba >= 0 ? 'Surplus (Untung)' : 'Defisit (Rugi)',
+        'cardClass'  => $laba >= 0 ? 'bg-indigo-50/70 border border-indigo-100/90' : 'bg-rose-50/70 border border-rose-100/90',
+        'labelClass' => $laba >= 0 ? 'text-indigo-900/70' : 'text-rose-900/70',
+        'valueClass' => $laba >= 0 ? 'text-indigo-700' : 'text-rose-700',
+        'subClass'   => $laba >= 0 ? 'text-indigo-700/70 border-t border-indigo-100' : 'text-rose-700/70 border-t border-rose-100',
+    ],
 ];
 ?>
 <!DOCTYPE html>
@@ -54,21 +86,21 @@ $stats = [
             <div class="bg-orange-50 border border-orange-200 rounded-xl p-3.5 sm:p-4 flex items-start sm:items-center gap-3">
                 <span class="text-orange-500 text-lg flex-shrink-0">⚠</span>
                 <p class="text-xs sm:text-sm text-orange-800 font-medium leading-relaxed">
-                    <?= $lowStock ?> produk stok menipis. —
+                    <?= $lowStock ?> produk stok menipis.
                     <a href="stok.php" class="underline font-semibold hover:text-orange-950">Cek halaman Stok</a>
                 </p>
             </div>
             <?php endif; ?>
 
-            <!-- Kartu Statistik -->
+            <!-- Kartu Statistik (Soft Pastel Tint - Clean) -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 <?php foreach ($stats as $s): ?>
-                <div class="bg-navy-950 rounded-xl p-4 sm:p-5 border border-white/10 shadow-sm flex flex-col justify-between">
+                <div class="<?= $s['cardClass'] ?> rounded-xl p-4 sm:p-5 shadow-sm flex flex-col justify-between">
                     <div>
-                        <p class="text-xs font-semibold text-slate-300 mb-1.5"><?= $s['label'] ?></p>
-                        <p class="text-lg sm:text-xl font-bold tracking-tight <?= $s['color'] ?>"><?= $s['value'] ?></p>
+                        <p class="text-xs font-semibold <?= $s['labelClass'] ?> mb-1.5"><?= $s['label'] ?></p>
+                        <p class="text-lg sm:text-xl font-bold tracking-tight <?= $s['valueClass'] ?>"><?= $s['value'] ?></p>
                     </div>
-                    <p class="text-xs text-slate-400 mt-2.5 pt-2 border-t border-white/10"><?= $s['sub'] ?></p>
+                    <p class="text-xs <?= $s['subClass'] ?> mt-2.5 pt-2"><?= $s['sub'] ?></p>
                 </div>
                 <?php endforeach; ?>
             </div>
@@ -88,13 +120,13 @@ $stats = [
                     ];
                     foreach ($shortcuts as $s): ?>
                     <a href="<?= $s['href'] ?>"
-                        class="bg-navy-950 rounded-xl p-4 border border-white/10 shadow-sm hover:border-white/25 hover:bg-navy-900 transition group flex flex-col justify-between">
+                        class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm hover:border-navy-300 hover:shadow-md transition group flex flex-col justify-between">
                         <div>
-                            <p class="font-semibold text-white text-sm flex items-center justify-between">
+                            <p class="font-semibold text-navy-900 text-sm group-hover:text-navy-700 flex items-center justify-between">
                                 <?= $s['label'] ?>
-                                <span class="text-slate-400 group-hover:text-white transition-transform group-hover:translate-x-0.5">→</span>
+                                <span class="text-gray-300 group-hover:text-navy-600 transition-transform group-hover:translate-x-0.5">→</span>
                             </p>
-                            <p class="text-xs text-slate-300 mt-1"><?= $s['desc'] ?></p>
+                            <p class="text-xs text-gray-500 mt-1"><?= $s['desc'] ?></p>
                         </div>
                     </a>
                     <?php endforeach; ?>

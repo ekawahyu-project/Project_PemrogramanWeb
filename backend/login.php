@@ -2,9 +2,18 @@
 session_start();
 if (isset($_SESSION['user'])) { header('Location: dashboard.php'); exit; }
 
-// Inisialisasi toko user dengan akun default
+// Inisialisasi toko user dengan akun default lengkap
 if (!isset($_SESSION['users'])) {
-    $_SESSION['users']['admin'] = ['nama' => 'Administrator', 'email' => 'admin@gmail.com', 'password' => 'admin123'];
+    $_SESSION['users']['admin'] = [
+        'nama'       => 'Administrator',
+        'username'   => 'admin',
+        'email'      => 'admin@gmail.com',
+        'password'   => 'admin123',
+        'no_hp'      => '08123456789',
+        'nama_usaha' => 'AlpetBizz Store',
+        'kategori'   => 'Makanan & Minuman',
+        'alamat'     => 'Jl. Boulevard Raya No. 12, Jakarta',
+    ];
 }
 
 $error = '';
@@ -14,9 +23,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $pw = $_POST['password'] ?? '';
 
     foreach ($_SESSION['users'] as $uname => $data) {
-        if (($uname === $id || strtolower($data['email']) === strtolower($id)) && $data['password'] === $pw) {
+        if (($uname === $id || strtolower($data['email'] ?? '') === strtolower($id)) && ($data['password'] ?? '') === $pw) {
             $_SESSION['user']      = $uname;
-            $_SESSION['user_nama'] = $data['nama'];
+            $_SESSION['user_nama'] = $data['nama'] ?? 'User';
+            $_SESSION['profil']    = [
+                'no_hp'      => $data['no_hp']      ?? '',
+                'nama_usaha' => $data['nama_usaha'] ?? '',
+                'kategori'   => $data['kategori']   ?? '',
+                'alamat'     => $data['alamat']     ?? '',
+            ];
             header('Location: dashboard.php');
             exit;
         }

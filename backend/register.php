@@ -4,20 +4,33 @@ if (isset($_SESSION['user'])) { header('Location: dashboard.php'); exit; }
 
 // Inisialisasi toko user yang sama dengan login.php
 if (!isset($_SESSION['users'])) {
-    $_SESSION['users']['admin'] = ['nama' => 'Administrator', 'email' => 'admin@gmail.com', 'password' => 'admin123'];
+    $_SESSION['users']['admin'] = [
+        'nama'       => 'Administrator',
+        'username'   => 'admin',
+        'email'      => 'admin@gmail.com',
+        'password'   => 'admin123',
+        'no_hp'      => '08123456789',
+        'nama_usaha' => 'AlpetBizz Store',
+        'kategori'   => 'Makanan & Minuman',
+        'alamat'     => 'Jl. Boulevard Raya No. 12, Jakarta',
+    ];
 }
 
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'register') {
-    $nama  = trim($_POST['nama']     ?? '');
-    $uname = trim($_POST['username'] ?? '');
-    $email = trim($_POST['email']    ?? '');
-    $pw    = $_POST['password']       ?? '';
-    $pw2   = $_POST['password2']      ?? '';
+    $nama       = trim($_POST['nama']        ?? '');
+    $uname      = trim($_POST['username']    ?? '');
+    $email      = trim($_POST['email']       ?? '');
+    $no_hp      = trim($_POST['no_hp']       ?? '');
+    $nama_usaha = trim($_POST['nama_usaha']  ?? '');
+    $kategori   = trim($_POST['kategori']    ?? '');
+    $alamat     = trim($_POST['alamat']      ?? '');
+    $pw         = $_POST['password']          ?? '';
+    $pw2        = $_POST['password2']         ?? '';
 
     if (!$nama || !$uname || !$email || !$pw) {
-        $error = 'Semua field formulir wajib diisi.';
+        $error = 'Nama lengkap, username, email, dan kata sandi wajib diisi.';
     } elseif ($pw !== $pw2) {
         $error = 'Konfirmasi kata sandi tidak cocok.';
     } elseif (strlen($pw) < 6) {
@@ -27,17 +40,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'regis
     } else {
         // Cek duplikasi email
         foreach ($_SESSION['users'] as $u) {
-            if (strtolower($u['email']) === strtolower($email)) {
+            if (strtolower($u['email'] ?? '') === strtolower($email)) {
                 $error = 'Email sudah terdaftar.'; break;
             }
         }
         if (!$error) {
-            $_SESSION['users'][$uname] = ['nama' => $nama, 'email' => $email, 'password' => $pw];
+            $_SESSION['users'][$uname] = [
+                'nama'       => $nama,
+                'username'   => $uname,
+                'email'      => $email,
+                'no_hp'      => $no_hp,
+                'nama_usaha' => $nama_usaha,
+                'kategori'   => $kategori,
+                'alamat'     => $alamat,
+                'password'   => $pw,
+            ];
             header('Location: login.php');
             exit;
         }
     }
 }
+
+$kategoriList = [
+    'Makanan & Minuman',
+    'Fashion',
+    'Kerajinan',
+    'Jasa',
+    'Kecantikan',
+    'Elektronik',
+    'Lainnya'
+];
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -57,10 +89,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'regis
     <div class="absolute inset-0 bg-navy-950/30"></div>
 
     <!-- Container Card Register -->
-    <div class="relative z-10 w-full max-w-[440px] bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-6 sm:p-8 mx-auto my-4 sm:my-8 border border-white/20">
+    <div class="relative z-10 w-full max-w-[560px] bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-6 sm:p-8 mx-auto my-4 sm:my-8 border border-white/20">
         <div class="text-center sm:text-left mb-6">
             <h1 class="text-xl sm:text-2xl font-bold text-navy-900 tracking-tight">Buat Akun Baru</h1>
-            <p class="text-xs sm:text-sm text-gray-500 mt-1">Daftarkan usaha Anda dan mulai kelola dengan mudah.</p>
+            <p class="text-xs sm:text-sm text-gray-500 mt-1">Daftarkan akun dan profil usaha UMKM Anda di AlpetBizz.</p>
         </div>
 
         <?php if ($error): ?>
@@ -72,63 +104,102 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'regis
         </div>
         <?php endif; ?>
 
-        <form method="POST" action="register.php" class="space-y-3.5">
+        <form method="POST" action="register.php" class="space-y-4">
             <input type="hidden" name="action" value="register">
-            <div>
-                <label class="block text-xs font-semibold text-gray-600 mb-1.5">Nama Lengkap</label>
-                <input type="text" name="nama" required
-                    value="<?= htmlspecialchars($_POST['nama'] ?? '') ?>"
-                    placeholder="Masukkan nama lengkap pemilik"
-                    class="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm outline-none
-                           focus:border-navy-700 focus:ring-2 focus:ring-navy-100 transition bg-white/90">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-gray-600 mb-1.5">Username</label>
-                <input type="text" name="username" required
-                    value="<?= htmlspecialchars($_POST['username'] ?? '') ?>"
-                    placeholder="Pilih nama pengguna (username)"
-                    class="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm outline-none
-                           focus:border-navy-700 focus:ring-2 focus:ring-navy-100 transition bg-white/90">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-gray-600 mb-1.5">Alamat Email</label>
-                <input type="email" name="email" required
-                    value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
-                    placeholder="Contoh: nama@domain.com"
-                    class="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl text-sm outline-none
-                           focus:border-navy-700 focus:ring-2 focus:ring-navy-100 transition bg-white/90">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-gray-600 mb-1.5">Kata Sandi</label>
-                <div class="relative">
-                    <input type="password" id="regPassword" name="password" required placeholder="Minimal 6 karakter"
-                        class="w-full pl-3.5 pr-11 py-2.5 border border-gray-200 rounded-xl text-sm outline-none
-                               focus:border-navy-700 focus:ring-2 focus:ring-navy-100 transition bg-white/90">
-                    <button type="button" onclick="togglePasswordVisibility('regPassword', this)"
-                        class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-navy-800 focus:outline-none transition rounded-lg"
-                        title="Tampilkan / Sembunyikan Kata Sandi" aria-label="Toggle Password Visibility">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"></path>
-                        </svg>
-                    </button>
+
+            <!-- Bagian 1: Informasi Akun -->
+            <div class="space-y-3">
+                <p class="text-xs font-bold text-navy-900 uppercase tracking-wider border-b border-gray-100 pb-1.5">Informasi Akun</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Nama Lengkap *</label>
+                        <input type="text" name="nama" required
+                            value="<?= htmlspecialchars($_POST['nama'] ?? '') ?>"
+                            placeholder="Nama lengkap pemilik"
+                            class="w-full px-3.5 py-2 border border-gray-200 rounded-xl text-sm outline-none focus:border-navy-700 focus:ring-2 focus:ring-navy-100 transition bg-white/90">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Username *</label>
+                        <input type="text" name="username" required
+                            value="<?= htmlspecialchars($_POST['username'] ?? '') ?>"
+                            placeholder="Username unik"
+                            class="w-full px-3.5 py-2 border border-gray-200 rounded-xl text-sm outline-none focus:border-navy-700 focus:ring-2 focus:ring-navy-100 transition bg-white/90">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Alamat Email *</label>
+                        <input type="email" name="email" required
+                            value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
+                            placeholder="nama@domain.com"
+                            class="w-full px-3.5 py-2 border border-gray-200 rounded-xl text-sm outline-none focus:border-navy-700 focus:ring-2 focus:ring-navy-100 transition bg-white/90">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Nomor WhatsApp / HP</label>
+                        <input type="tel" name="no_hp"
+                            value="<?= htmlspecialchars($_POST['no_hp'] ?? '') ?>"
+                            placeholder="Contoh: 08123456789"
+                            class="w-full px-3.5 py-2 border border-gray-200 rounded-xl text-sm outline-none focus:border-navy-700 focus:ring-2 focus:ring-navy-100 transition bg-white/90">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Kata Sandi *</label>
+                        <div class="relative">
+                            <input type="password" id="regPassword" name="password" required placeholder="Min. 6 karakter"
+                                class="w-full pl-3.5 pr-10 py-2 border border-gray-200 rounded-xl text-sm outline-none focus:border-navy-700 focus:ring-2 focus:ring-navy-100 transition bg-white/90">
+                            <button type="button" onclick="togglePasswordVisibility('regPassword', this)"
+                                class="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-navy-800 transition"
+                                title="Lihat Sandi">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Ulangi Sandi *</label>
+                        <div class="relative">
+                            <input type="password" id="regPassword2" name="password2" required placeholder="Konfirmasi sandi"
+                                class="w-full pl-3.5 pr-10 py-2 border border-gray-200 rounded-xl text-sm outline-none focus:border-navy-700 focus:ring-2 focus:ring-navy-100 transition bg-white/90">
+                            <button type="button" onclick="togglePasswordVisibility('regPassword2', this)"
+                                class="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-navy-800 transition"
+                                title="Lihat Sandi">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div>
-                <label class="block text-xs font-semibold text-gray-600 mb-1.5">Ulangi Kata Sandi</label>
-                <div class="relative">
-                    <input type="password" id="regPassword2" name="password2" required placeholder="Konfirmasi kata sandi"
-                        class="w-full pl-3.5 pr-11 py-2.5 border border-gray-200 rounded-xl text-sm outline-none
-                               focus:border-navy-700 focus:ring-2 focus:ring-navy-100 transition bg-white/90">
-                    <button type="button" onclick="togglePasswordVisibility('regPassword2', this)"
-                        class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-navy-800 focus:outline-none transition rounded-lg"
-                        title="Tampilkan / Sembunyikan Kata Sandi" aria-label="Toggle Password Visibility">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"></path>
-                        </svg>
-                    </button>
+
+            <!-- Bagian 2: Informasi Usaha UMKM -->
+            <div class="space-y-3 pt-2">
+                <p class="text-xs font-bold text-navy-900 uppercase tracking-wider border-b border-gray-100 pb-1.5">Informasi Usaha UMKM</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Nama Usaha / Toko</label>
+                        <input type="text" name="nama_usaha"
+                            value="<?= htmlspecialchars($_POST['nama_usaha'] ?? '') ?>"
+                            placeholder="Contoh: Toko Berkah Jaya"
+                            class="w-full px-3.5 py-2 border border-gray-200 rounded-xl text-sm outline-none focus:border-navy-700 focus:ring-2 focus:ring-navy-100 transition bg-white/90">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Kategori Usaha</label>
+                        <?php $currKategori = $_POST['kategori'] ?? ''; ?>
+                        <select name="kategori" class="w-full px-3.5 py-2 border border-gray-200 rounded-xl text-sm outline-none focus:border-navy-700 focus:ring-2 focus:ring-navy-100 transition bg-white/90">
+                            <option value="">-- Pilih kategori usaha --</option>
+                            <?php foreach ($kategoriList as $kat): ?>
+                            <option value="<?= htmlspecialchars($kat) ?>" <?= $currKategori === $kat ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($kat) ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Alamat Lengkap Usaha</label>
+                        <input type="text" name="alamat"
+                            value="<?= htmlspecialchars($_POST['alamat'] ?? '') ?>"
+                            placeholder="Alamat lokasi usaha Anda"
+                            class="w-full px-3.5 py-2 border border-gray-200 rounded-xl text-sm outline-none focus:border-navy-700 focus:ring-2 focus:ring-navy-100 transition bg-white/90">
+                    </div>
                 </div>
             </div>
-            <div class="pt-2">
+
+            <div class="pt-3">
                 <button type="submit"
                     class="w-full py-3 bg-navy-800 hover:bg-navy-950 text-white rounded-xl text-sm font-semibold transition shadow-md hover:shadow-lg">
                     Daftar Sekarang
@@ -136,7 +207,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'regis
             </div>
         </form>
 
-        <p class="text-center text-xs text-gray-500 mt-6 pt-4 border-t border-gray-100">
+        <p class="text-center text-xs text-gray-500 mt-5 pt-3 border-t border-gray-100">
             Sudah memiliki akun?
             <a href="login.php" class="text-navy-700 font-bold hover:underline">Masuk di sini</a>
         </p>

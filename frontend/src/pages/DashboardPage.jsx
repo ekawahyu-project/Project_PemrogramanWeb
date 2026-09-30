@@ -109,7 +109,7 @@ export default function DashboardPage({ onNavigate, showToast }) {
         >
           <span className="text-orange-500 text-lg flex-shrink-0">⚠</span>
           <p className="text-xs sm:text-sm text-orange-800 font-medium leading-relaxed">
-            {lowStockCount} produk stok menipis. —{' '}
+            {lowStockCount} produk stok menipis.{' '}
             <button
               onClick={() => onNavigate('stok')}
               className="underline font-semibold hover:text-orange-950 cursor-pointer"

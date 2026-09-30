@@ -668,25 +668,58 @@ switch ($action) {
     case 'profil_get':
         requireAuth();
         $u = $_SESSION['user'];
-        $akun = $_SESSION['users'][$u] ?? ['nama' => '', 'email' => ''];
+        $akun = $_SESSION['users'][$u] ?? [];
+        $profil = $_SESSION['profil'] ?? [];
+        $mergedProfil = [
+            'no_hp'      => !empty($akun['no_hp']) ? $akun['no_hp'] : ($profil['no_hp'] ?? ''),
+            'nama_usaha' => !empty($akun['nama_usaha']) ? $akun['nama_usaha'] : ($profil['nama_usaha'] ?? ''),
+            'kategori'   => !empty($akun['kategori']) ? $akun['kategori'] : ($profil['kategori'] ?? ''),
+            'alamat'     => !empty($akun['alamat']) ? $akun['alamat'] : ($profil['alamat'] ?? ''),
+        ];
         sendJson([
             'success' => true,
             'user' => [
-                'username' => $u,
-                'nama' => $akun['nama'] ?? $u,
-                'email' => $akun['email'] ?? ''
+                'username'   => $u,
+                'nama'       => $akun['nama'] ?? ($_SESSION['user_nama'] ?? $u),
+                'email'      => $akun['email'] ?? '',
+                'no_hp'      => $mergedProfil['no_hp'],
+                'nama_usaha' => $mergedProfil['nama_usaha'],
+                'kategori'   => $mergedProfil['kategori'],
+                'alamat'     => $mergedProfil['alamat'],
             ],
-            'profil' => $_SESSION['profil']
+            'profil' => $mergedProfil
         ]);
         break;
 
     case 'profil_save':
         requireAuth();
+        $u = $_SESSION['user'];
+        $no_hp      = trim($input['no_hp'] ?? '');
+        $nama_usaha = trim($input['nama_usaha'] ?? '');
+        $kategori   = $input['kategori'] ?? '';
+        $alamat     = trim($input['alamat'] ?? '');
+        $nama       = trim($input['nama'] ?? '');
+        $email      = trim($input['email'] ?? '');
+
+        if ($nama && isset($_SESSION['users'][$u])) {
+            $_SESSION['users'][$u]['nama'] = $nama;
+            $_SESSION['user_nama'] = $nama;
+        }
+        if ($email && isset($_SESSION['users'][$u])) {
+            $_SESSION['users'][$u]['email'] = $email;
+        }
+        if (isset($_SESSION['users'][$u])) {
+            $_SESSION['users'][$u]['no_hp']      = $no_hp;
+            $_SESSION['users'][$u]['nama_usaha'] = $nama_usaha;
+            $_SESSION['users'][$u]['kategori']   = $kategori;
+            $_SESSION['users'][$u]['alamat']     = $alamat;
+        }
+
         $_SESSION['profil'] = [
-            'no_hp' => trim($input['no_hp'] ?? ''),
-            'nama_usaha' => trim($input['nama_usaha'] ?? ''),
-            'kategori' => $input['kategori'] ?? '',
-            'alamat' => trim($input['alamat'] ?? '')
+            'no_hp'      => $no_hp,
+            'nama_usaha' => $nama_usaha,
+            'kategori'   => $kategori,
+            'alamat'     => $alamat
         ];
         sendJson(['success' => true, 'message' => 'Profil usaha berhasil disimpan.', 'profil' => $_SESSION['profil']]);
         break;

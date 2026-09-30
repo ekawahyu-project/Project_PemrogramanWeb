@@ -115,30 +115,32 @@ $totalLaba = $totalMasuk - $totalKeluar;
         </header>
 
         <div class="p-4 sm:p-6 lg:p-8 flex-1 space-y-6 w-full">
-            <!-- READ: Ringkasan Total (live) -->
+            <!-- READ: Ringkasan Total (live) - Soft Pastel Tint (Clean) -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                <div class="bg-navy-950 rounded-xl p-4 sm:p-5 border border-white/10 shadow-sm flex flex-col justify-between">
+                <div class="bg-emerald-50/70 border border-emerald-100/90 rounded-xl p-4 sm:p-5 shadow-sm flex flex-col justify-between">
                     <div>
-                        <p class="text-xs font-semibold text-slate-300 mb-1.5">Total Pemasukan</p>
-                        <p class="text-lg sm:text-xl font-bold tracking-tight text-emerald-400">Rp <?= number_format($totalMasuk,  0, ',', '.') ?></p>
+                        <p class="text-xs font-semibold text-emerald-900/70 mb-1.5">Total Pemasukan</p>
+                        <p class="text-lg sm:text-xl font-bold tracking-tight text-emerald-700">Rp <?= number_format($totalMasuk,  0, ',', '.') ?></p>
                     </div>
-                    <p class="text-xs text-slate-400 mt-2.5 pt-2 border-t border-white/10"><?= count(array_filter($_SESSION['transaksi'], fn($t) => $t['jenis'] === 'Pemasukan')) ?> transaksi tercatat</p>
+                    <p class="text-xs text-emerald-700/70 mt-2.5 pt-2 border-t border-emerald-100"><?= count(array_filter($_SESSION['transaksi'], fn($t) => $t['jenis'] === 'Pemasukan')) ?> transaksi tercatat</p>
                 </div>
-                <div class="bg-navy-950 rounded-xl p-4 sm:p-5 border border-white/10 shadow-sm flex flex-col justify-between">
+
+                <div class="bg-rose-50/70 border border-rose-100/90 rounded-xl p-4 sm:p-5 shadow-sm flex flex-col justify-between">
                     <div>
-                        <p class="text-xs font-semibold text-slate-300 mb-1.5">Total Pengeluaran</p>
-                        <p class="text-lg sm:text-xl font-bold tracking-tight text-rose-400">Rp <?= number_format($totalKeluar, 0, ',', '.') ?></p>
+                        <p class="text-xs font-semibold text-rose-900/70 mb-1.5">Total Pengeluaran</p>
+                        <p class="text-lg sm:text-xl font-bold tracking-tight text-rose-700">Rp <?= number_format($totalKeluar, 0, ',', '.') ?></p>
                     </div>
-                    <p class="text-xs text-slate-400 mt-2.5 pt-2 border-t border-white/10"><?= count(array_filter($_SESSION['transaksi'], fn($t) => $t['jenis'] === 'Pengeluaran')) ?> transaksi tercatat</p>
+                    <p class="text-xs text-rose-700/70 mt-2.5 pt-2 border-t border-rose-100"><?= count(array_filter($_SESSION['transaksi'], fn($t) => $t['jenis'] === 'Pengeluaran')) ?> transaksi tercatat</p>
                 </div>
-                <div class="bg-navy-950 rounded-xl p-4 sm:p-5 border border-white/10 shadow-sm flex flex-col justify-between">
+
+                <div class="<?= $totalLaba >= 0 ? 'bg-indigo-50/70 border-indigo-100/90' : 'bg-rose-50/70 border-rose-100/90' ?> border rounded-xl p-4 sm:p-5 shadow-sm flex flex-col justify-between">
                     <div>
-                        <p class="text-xs font-semibold text-slate-300 mb-1.5">Laba Bersih</p>
-                        <p class="text-lg sm:text-xl font-bold tracking-tight <?= $totalLaba >= 0 ? 'text-sky-400' : 'text-rose-400' ?>">
+                        <p class="text-xs font-semibold <?= $totalLaba >= 0 ? 'text-indigo-900/70' : 'text-rose-900/70' ?> mb-1.5">Laba Bersih</p>
+                        <p class="text-lg sm:text-xl font-bold tracking-tight <?= $totalLaba >= 0 ? 'text-indigo-700' : 'text-rose-700' ?>">
                             Rp <?= number_format(abs($totalLaba), 0, ',', '.') ?>
                         </p>
                     </div>
-                    <p class="text-xs text-slate-400 mt-2.5 pt-2 border-t border-white/10"><?= $totalLaba >= 0 ? 'Status: Surplus (Untung)' : 'Status: Defisit (Rugi)' ?></p>
+                    <p class="text-xs <?= $totalLaba >= 0 ? 'text-indigo-700/70 border-indigo-100' : 'text-rose-700/70 border-rose-100' ?> mt-2.5 pt-2 border-t"><?= $totalLaba >= 0 ? 'Status: Surplus (Untung)' : 'Status: Defisit (Rugi)' ?></p>
                 </div>
             </div>
 
@@ -254,7 +256,7 @@ $totalLaba = $totalMasuk - $totalKeluar;
                                 <td class="px-4 py-3.5 text-gray-600 text-xs whitespace-nowrap">
                                     <div class="flex items-center gap-1.5">
                                         <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                        <span><?= !empty($l['tanggal_dari']) ? date('d M Y', strtotime($l['tanggal_dari'])) : '-' ?> — <?= !empty($l['tanggal_sampai']) ? date('d M Y', strtotime($l['tanggal_sampai'])) : '-' ?></span>
+                                        <span><?= !empty($l['tanggal_dari']) ? date('d M Y', strtotime($l['tanggal_dari'])) : '-' ?> - <?= !empty($l['tanggal_sampai']) ? date('d M Y', strtotime($l['tanggal_sampai'])) : '-' ?></span>
                                     </div>
                                 </td>
                                 <td class="px-4 py-3.5 text-center whitespace-nowrap">
@@ -262,7 +264,7 @@ $totalLaba = $totalMasuk - $totalKeluar;
                                     $st = $l['status'] ?? 'Selesai';
                                     if ($st === 'Selesai'): ?>
                                         <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Selesai
+                                            <span class="bg-emerald-50"></span>Selesai
                                         </span>
                                     <?php elseif ($st === 'Dalam Tinjauan'): ?>
                                         <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">

@@ -5,26 +5,30 @@ $fileProduk = file_exists(__DIR__ . '/../../data/produk.json')
     ? __DIR__ . '/../../data/produk.json'
     : __DIR__ . '/../data/produk.json';
 
-function produkAwal(): array
-{
-    return [
-        ['id' => 'p1', 'nama' => 'Kopi Arabika 250g', 'kategori' => 'Makanan & Minuman', 'harga_beli' => 30000, 'harga_jual' => 55000, 'satuan' => 'pack', 'stok' => 25, 'stok_min' => 5],
-        ['id' => 'p2', 'nama' => 'Teh Hijau 100g',    'kategori' => 'Makanan & Minuman', 'harga_beli' => 12000, 'harga_jual' => 20000, 'satuan' => 'pack', 'stok' => 8,  'stok_min' => 10],
-        ['id' => 'p3', 'nama' => 'Gula Pasir 1kg',    'kategori' => 'Makanan & Minuman', 'harga_beli' => 13000, 'harga_jual' => 17000, 'satuan' => 'kg',   'stok' => 3,  'stok_min' => 5],
-        ['id' => 'p4', 'nama' => 'Tas Kanvas Polos',  'kategori' => 'Fashion',            'harga_beli' => 25000, 'harga_jual' => 45000, 'satuan' => 'pcs',  'stok' => 15, 'stok_min' => 3],
-        ['id' => 'p5', 'nama' => 'Sabun Herbal',      'kategori' => 'Kecantikan',         'harga_beli' => 8000,  'harga_jual' => 15000, 'satuan' => 'pcs',  'stok' => 30, 'stok_min' => 10],
-    ];
+if (!function_exists('produkAwal')) {
+    function produkAwal(): array
+    {
+        return [
+            ['id' => 'p1', 'nama' => 'Kopi Arabika 250g', 'kategori' => 'Makanan & Minuman', 'harga_beli' => 30000, 'harga_jual' => 55000, 'satuan' => 'pack', 'stok' => 25, 'stok_min' => 5],
+            ['id' => 'p2', 'nama' => 'Teh Hijau 100g',    'kategori' => 'Makanan & Minuman', 'harga_beli' => 12000, 'harga_jual' => 20000, 'satuan' => 'pack', 'stok' => 8,  'stok_min' => 10],
+            ['id' => 'p3', 'nama' => 'Gula Pasir 1kg',    'kategori' => 'Makanan & Minuman', 'harga_beli' => 13000, 'harga_jual' => 17000, 'satuan' => 'kg',   'stok' => 3,  'stok_min' => 5],
+            ['id' => 'p4', 'nama' => 'Tas Kanvas Polos',  'kategori' => 'Fashion',            'harga_beli' => 25000, 'harga_jual' => 45000, 'satuan' => 'pcs',  'stok' => 15, 'stok_min' => 3],
+            ['id' => 'p5', 'nama' => 'Sabun Herbal',      'kategori' => 'Kecantikan',         'harga_beli' => 8000,  'harga_jual' => 15000, 'satuan' => 'pcs',  'stok' => 30, 'stok_min' => 10],
+        ];
+    }
 }
 
-function simpanProduk(): bool {
-    global $fileProduk;
-    $dir = dirname($fileProduk);
-    if (!is_dir($dir) && !mkdir($dir, 0777, true)) return false;
-    return file_put_contents(
-        $fileProduk,
-        json_encode(array_values($_SESSION['produk']), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
-        LOCK_EX
-    ) !== false;
+if (!function_exists('simpanProduk')) {
+    function simpanProduk(): bool {
+        global $fileProduk;
+        $dir = dirname($fileProduk);
+        if (!is_dir($dir) && !mkdir($dir, 0777, true)) return false;
+        return file_put_contents(
+            $fileProduk,
+            json_encode(array_values($_SESSION['produk']), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
+            LOCK_EX
+        ) !== false;
+    }
 }
 
 // Sumber data utama: file JSON. Kalau belum ada / rusak, pakai data awal lalu simpan.
@@ -89,13 +93,52 @@ if (!isset($_SESSION['catatan_rekomendasi'])) {
     ];
 }
 
-// Helper: cari produk berdasarkan ID
-function getProdukById(string $id): ?array
-{
-    foreach ($_SESSION['produk'] as $p) {
-        if ($p['id'] === $id) return $p;
+// Inisialisasi & normalisasi data akun pengguna
+if (!isset($_SESSION['users'])) {
+    $_SESSION['users'] = [
+        'admin' => [
+            'nama'       => 'Administrator',
+            'username'   => 'admin',
+            'email'      => 'admin@gmail.com',
+            'password'   => 'admin123',
+            'no_hp'      => '08123456789',
+            'nama_usaha' => 'AlpetBizz Store',
+            'kategori'   => 'Makanan & Minuman',
+            'alamat'     => 'Jl. Boulevard Raya No. 12, Jakarta',
+        ]
+    ];
+} else {
+    foreach ($_SESSION['users'] as $uKey => &$uVal) {
+        if (!isset($uVal['username']) || empty($uVal['username'])) $uVal['username'] = $uKey;
+        if (!isset($uVal['no_hp']))      $uVal['no_hp']      = '';
+        if (!isset($uVal['nama_usaha'])) $uVal['nama_usaha'] = '';
+        if (!isset($uVal['kategori']))   $uVal['kategori']   = '';
+        if (!isset($uVal['alamat']))     $uVal['alamat']     = '';
     }
-    return null;
+    unset($uVal);
+}
+
+// Inisialisasi profil pengguna aktif
+if (!isset($_SESSION['profil'])) {
+    $curUname = $_SESSION['user'] ?? 'admin';
+    $curUser = $_SESSION['users'][$curUname] ?? [];
+    $_SESSION['profil'] = [
+        'no_hp'      => $curUser['no_hp']      ?? '08123456789',
+        'nama_usaha' => $curUser['nama_usaha'] ?? 'AlpetBizz Store',
+        'kategori'   => $curUser['kategori']   ?? 'Makanan & Minuman',
+        'alamat'     => $curUser['alamat']     ?? 'Jl. Boulevard Raya No. 12, Jakarta',
+    ];
+}
+
+// Helper: cari produk berdasarkan ID
+if (!function_exists('getProdukById')) {
+    function getProdukById(string $id): ?array
+    {
+        foreach ($_SESSION['produk'] as $p) {
+            if ($p['id'] === $id) return $p;
+        }
+        return null;
+    }
 }
 
 // Variabel UI bersama — tersedia di semua halaman yang include init.php
