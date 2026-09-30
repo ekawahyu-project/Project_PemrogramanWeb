@@ -84,7 +84,7 @@ if ($editId) {
             <!-- Form Tambah / Edit (CREATE & UPDATE) -->
             <div class="bg-white rounded-xl border <?= $editTrx ? 'border-navy-200 ring-1 ring-navy-100' : 'border-gray-100' ?> shadow-sm p-4 sm:p-6">
                 <h3 class="font-semibold text-navy-900 text-sm sm:text-base mb-4 flex items-center gap-2">
-                    <?= $editTrx ? '✏️ Edit Transaksi' : '+ Tambah Transaksi Baru' ?>
+                    <?= $editTrx ? 'Edit Transaksi' : '+ Tambah Transaksi Baru' ?>
                 </h3>
                 <form method="POST" action="transaksi.php" class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <input type="hidden" name="action" value="<?= $editTrx ? 'update' : 'tambah' ?>">
