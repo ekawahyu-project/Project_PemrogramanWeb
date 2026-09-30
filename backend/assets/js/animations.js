@@ -30,7 +30,7 @@
 
   function initCounterAnimations() {
     // Cari semua elemen nilai statistik (angka besar dengan class font-bold tracking-tight)
-    const statValues = document.querySelectorAll('.grid > div.bg-white p.font-bold, .grid > div.bg-white p.text-xl, .grid > div.bg-white p.text-lg');
+    const statValues = document.querySelectorAll('.grid > div p.font-bold, .grid > div p.text-xl');
     
     statValues.forEach(el => {
       const rawText = el.textContent.trim();

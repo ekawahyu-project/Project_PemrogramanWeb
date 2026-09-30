@@ -118,28 +118,28 @@ $totalLaba = $totalMasuk - $totalKeluar;
         <div class="p-4 sm:p-6 lg:p-8 flex-1 space-y-6 w-full">
             <!-- READ: Ringkasan Total (live) -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                <div class="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm flex flex-col justify-between">
+                <div class="bg-navy-950 rounded-xl p-4 sm:p-5 border border-white/10 shadow-sm flex flex-col justify-between">
                     <div>
-                        <p class="text-xs font-medium text-gray-500 mb-1.5">Total Pemasukan</p>
-                        <p class="text-lg sm:text-xl font-bold tracking-tight text-green-600">Rp <?= number_format($totalMasuk,  0, ',', '.') ?></p>
+                        <p class="text-xs font-semibold text-slate-300 mb-1.5">Total Pemasukan</p>
+                        <p class="text-lg sm:text-xl font-bold tracking-tight text-emerald-400">Rp <?= number_format($totalMasuk,  0, ',', '.') ?></p>
                     </div>
-                    <p class="text-xs text-gray-400 mt-2.5 pt-2 border-t border-gray-50"><?= count(array_filter($_SESSION['transaksi'], fn($t) => $t['jenis'] === 'Pemasukan')) ?> transaksi tercatat</p>
+                    <p class="text-xs text-slate-400 mt-2.5 pt-2 border-t border-white/10"><?= count(array_filter($_SESSION['transaksi'], fn($t) => $t['jenis'] === 'Pemasukan')) ?> transaksi tercatat</p>
                 </div>
-                <div class="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm flex flex-col justify-between">
+                <div class="bg-navy-950 rounded-xl p-4 sm:p-5 border border-white/10 shadow-sm flex flex-col justify-between">
                     <div>
-                        <p class="text-xs font-medium text-gray-500 mb-1.5">Total Pengeluaran</p>
-                        <p class="text-lg sm:text-xl font-bold tracking-tight text-red-500">Rp <?= number_format($totalKeluar, 0, ',', '.') ?></p>
+                        <p class="text-xs font-semibold text-slate-300 mb-1.5">Total Pengeluaran</p>
+                        <p class="text-lg sm:text-xl font-bold tracking-tight text-rose-400">Rp <?= number_format($totalKeluar, 0, ',', '.') ?></p>
                     </div>
-                    <p class="text-xs text-gray-400 mt-2.5 pt-2 border-t border-gray-50"><?= count(array_filter($_SESSION['transaksi'], fn($t) => $t['jenis'] === 'Pengeluaran')) ?> transaksi tercatat</p>
+                    <p class="text-xs text-slate-400 mt-2.5 pt-2 border-t border-white/10"><?= count(array_filter($_SESSION['transaksi'], fn($t) => $t['jenis'] === 'Pengeluaran')) ?> transaksi tercatat</p>
                 </div>
-                <div class="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm flex flex-col justify-between">
+                <div class="bg-navy-950 rounded-xl p-4 sm:p-5 border border-white/10 shadow-sm flex flex-col justify-between">
                     <div>
-                        <p class="text-xs font-medium text-gray-500 mb-1.5">Laba Bersih</p>
-                        <p class="text-lg sm:text-xl font-bold tracking-tight <?= $totalLaba >= 0 ? 'text-navy-800' : 'text-red-500' ?>">
+                        <p class="text-xs font-semibold text-slate-300 mb-1.5">Laba Bersih</p>
+                        <p class="text-lg sm:text-xl font-bold tracking-tight <?= $totalLaba >= 0 ? 'text-sky-400' : 'text-rose-400' ?>">
                             Rp <?= number_format(abs($totalLaba), 0, ',', '.') ?>
                         </p>
                     </div>
-                    <p class="text-xs text-gray-400 mt-2.5 pt-2 border-t border-gray-50"><?= $totalLaba >= 0 ? 'Status: Surplus (Untung)' : 'Status: Defisit (Rugi)' ?></p>
+                    <p class="text-xs text-slate-400 mt-2.5 pt-2 border-t border-white/10"><?= $totalLaba >= 0 ? 'Status: Surplus (Untung)' : 'Status: Defisit (Rugi)' ?></p>
                 </div>
             </div>
 
