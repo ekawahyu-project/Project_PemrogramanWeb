@@ -94,7 +94,7 @@ $lowStock = array_filter($_SESSION['produk'], fn($p) => $p['stok'] <= $p['stok_m
             <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Pantau stok saat ini dan catat mutasi keluar masuk barang.</p>
         </header>
 
-        <div class="p-4 sm:p-6 lg:p-8 flex-1 space-y-6 max-w-7xl w-full mx-auto">
+        <div class="p-4 sm:p-6 lg:p-8 flex-1 space-y-6 w-full">
             <?php if ($error): ?>
             <div class="text-xs sm:text-sm text-red-700 bg-red-50 border border-red-200 px-4 py-3 rounded-xl font-medium"><?= htmlspecialchars($error) ?></div>
             <?php endif; ?>

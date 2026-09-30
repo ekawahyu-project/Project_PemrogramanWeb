@@ -217,7 +217,7 @@ $val = fn(string $k, $default = '') => htmlspecialchars($raw($k, $default));
             <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Kelola data katalog produk — tambah, update, atau hapus produk.</p>
         </header>
 
-        <div class="p-4 sm:p-6 lg:p-8 flex-1 space-y-6 max-w-7xl w-full mx-auto">
+        <div class="p-4 sm:p-6 lg:p-8 flex-1 space-y-6 w-full">
             <?php if ($errors): ?>
                 <div class="bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm rounded-xl p-4">
                     <p class="font-semibold mb-1">Periksa kembali formulir:</p>

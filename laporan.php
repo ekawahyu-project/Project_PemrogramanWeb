@@ -115,7 +115,7 @@ $totalLaba = $totalMasuk - $totalKeluar;
             <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Grafik pemasukan/pengeluaran live + arsip laporan per periode.</p>
         </header>
 
-        <div class="p-4 sm:p-6 lg:p-8 flex-1 space-y-6 max-w-7xl w-full mx-auto">
+        <div class="p-4 sm:p-6 lg:p-8 flex-1 space-y-6 w-full">
             <!-- READ: Ringkasan Total (live) -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                 <div class="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm flex flex-col justify-between">

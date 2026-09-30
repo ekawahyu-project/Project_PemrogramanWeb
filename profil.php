@@ -80,7 +80,7 @@ $kategoriOptions = [
             <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Kelola informasi akun dan identitas usaha Anda.</p>
         </header>
 
-        <div class="p-4 sm:p-6 lg:p-8 flex-1 max-w-4xl w-full mx-auto">
+        <div class="p-4 sm:p-6 lg:p-8 flex-1 w-full">
             <div class="w-full bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
                 <!-- Profile Top -->
                 <div class="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4 px-4 sm:px-6 py-5 border-b border-gray-100">

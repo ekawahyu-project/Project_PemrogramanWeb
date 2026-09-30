@@ -80,7 +80,7 @@ if ($editId) {
             <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Catat dan kelola riwayat pemasukan & pengeluaran usaha.</p>
         </header>
 
-        <div class="p-4 sm:p-6 lg:p-8 flex-1 space-y-6 max-w-7xl w-full mx-auto">
+        <div class="p-4 sm:p-6 lg:p-8 flex-1 space-y-6 w-full">
             <!-- Form Tambah / Edit (CREATE & UPDATE) -->
             <div class="bg-white rounded-xl border <?= $editTrx ? 'border-navy-200 ring-1 ring-navy-100' : 'border-gray-100' ?> shadow-sm p-4 sm:p-6">
                 <h3 class="font-semibold text-navy-900 text-sm sm:text-base mb-4 flex items-center gap-2">

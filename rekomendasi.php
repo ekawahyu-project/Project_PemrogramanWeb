@@ -98,7 +98,7 @@ $unsoldProd = array_filter($_SESSION['produk'], fn($p) => !in_array($p['id'], $s
             <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Analisis pintar otomatis + catatan rencana tindak lanjut bisnis.</p>
         </header>
 
-        <div class="p-4 sm:p-6 lg:p-8 flex-1 space-y-6 max-w-7xl w-full mx-auto">
+        <div class="p-4 sm:p-6 lg:p-8 flex-1 space-y-6 w-full">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                 <!-- Kolom kiri: Analisis otomatis (READ) -->
                 <div class="space-y-5">
