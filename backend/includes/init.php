@@ -69,9 +69,17 @@ if (!isset($_SESSION['stok_log'])) {
 
 if (!isset($_SESSION['laporan_tersimpan'])) {
     $_SESSION['laporan_tersimpan'] = [
-        ['id' => 'l1', 'judul' => 'Laporan Juli 2026',     'tanggal_dari' => '2026-07-01', 'tanggal_sampai' => '2026-07-31', 'pemasukan' => 505000, 'pengeluaran' => 500000, 'laba' => 5000,   'catatan' => 'Bulan pertama operasi.',         'dibuat' => '2026-08-01'],
-        ['id' => 'l2', 'judul' => 'Laporan Agustus 2026',  'tanggal_dari' => '2026-08-01', 'tanggal_sampai' => '2026-08-31', 'pemasukan' => 755000, 'pengeluaran' => 450000, 'laba' => 305000, 'catatan' => 'Peningkatan penjualan kopi.',    'dibuat' => '2026-09-01'],
+        ['id' => 'l1', 'judul' => 'Evaluasi Bisnis Juli 2026',    'kategori' => 'Evaluasi Bulanan',   'tanggal_dari' => '2026-07-01', 'tanggal_sampai' => '2026-07-31', 'status' => 'Selesai',        'catatan' => 'Bulan pertama operasi, operasional stabil.',         'dibuat' => '2026-08-01', 'pembuat' => 'Admin'],
+        ['id' => 'l2', 'judul' => 'Performa Penjualan Agustus',   'kategori' => 'Penjualan & Produk', 'tanggal_dari' => '2026-08-01', 'tanggal_sampai' => '2026-08-31', 'status' => 'Selesai',        'catatan' => 'Peningkatan repeat order kopi Arabika 250g.',        'dibuat' => '2026-09-01', 'pembuat' => 'Admin'],
     ];
+} else {
+    // Normalisasi session lama agar memiliki atribut baru
+    foreach ($_SESSION['laporan_tersimpan'] as &$lItem) {
+        if (!isset($lItem['kategori'])) $lItem['kategori'] = 'Evaluasi Bulanan';
+        if (!isset($lItem['status']))   $lItem['status']   = 'Selesai';
+        if (!isset($lItem['pembuat']))  $lItem['pembuat']  = 'Admin';
+    }
+    unset($lItem);
 }
 
 if (!isset($_SESSION['catatan_rekomendasi'])) {

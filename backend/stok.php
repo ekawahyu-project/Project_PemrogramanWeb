@@ -47,6 +47,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    // UPDATE — perbarui log mutasi & sesuaikan perubahan fisik stok
+    if ($action === 'update_log') {
+        $id        = $_POST['id'] ?? '';
+        $produk_id = $_POST['produk_id'] ?? '';
+        $jenis     = $_POST['jenis'] ?? 'Masuk';
+        $jumlah    = (int) ($_POST['jumlah'] ?? 0);
+        $tanggal   = $_POST['tanggal'] ?? date('Y-m-d');
+        $ket       = trim($_POST['keterangan'] ?? '');
+
+        $oldLogIndex = null;
+        foreach ($_SESSION['stok_log'] as $idx => $l) {
+            if ($l['id'] === $id) {
+                $oldLogIndex = $idx;
+                break;
+            }
+        }
+
+        if ($oldLogIndex !== null && $produk_id && $jumlah > 0) {
+            $oldLog       = $_SESSION['stok_log'][$oldLogIndex];
+            $produkBackup = $_SESSION['produk'];
+
+            // Balikkan efek log lama dari stok produk lama
+            foreach ($_SESSION['produk'] as &$p) {
+                if ($p['id'] === $oldLog['produk_id']) {
+                    $p['stok'] = $oldLog['jenis'] === 'Masuk'
+                        ? max(0, $p['stok'] - $oldLog['jumlah'])
+                        : $p['stok'] + $oldLog['jumlah'];
+                    break;
+                }
+            }
+            unset($p);
+
+            // Terapkan efek log baru pada produk target
+            $valid = true;
+            foreach ($_SESSION['produk'] as &$p) {
+                if ($p['id'] === $produk_id) {
+                    if ($jenis === 'Keluar' && $p['stok'] < $jumlah) {
+                        $error = "Stok {$p['nama']} tidak mencukupi untuk mutasi ini (tersedia: {$p['stok']}).";
+                        $valid = false;
+                    } else {
+                        $p['stok'] = $jenis === 'Masuk' ? $p['stok'] + $jumlah : $p['stok'] - $jumlah;
+                    }
+                    break;
+                }
+            }
+            unset($p);
+
+            if ($valid) {
+                $_SESSION['stok_log'][$oldLogIndex]['tanggal']    = $tanggal;
+                $_SESSION['stok_log'][$oldLogIndex]['produk_id']  = $produk_id;
+                $_SESSION['stok_log'][$oldLogIndex]['jenis']      = $jenis;
+                $_SESSION['stok_log'][$oldLogIndex]['jumlah']     = $jumlah;
+                $_SESSION['stok_log'][$oldLogIndex]['keterangan'] = $ket;
+
+                simpanProduk();
+                header('Location: stok.php'); exit;
+            } else {
+                $_SESSION['produk'] = $produkBackup;
+            }
+        }
+    }
+
     // DELETE — hapus log & balikkan perubahan stok (reversal)
     if ($action === 'hapus_log') {
         $id = $_POST['id'] ?? '';
@@ -70,6 +132,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
         simpanProduk();
         header('Location: stok.php'); exit;
+    }
+}
+
+// Edit mode — pre-fill form
+$editId  = $_GET['edit'] ?? null;
+$editLog = null;
+if ($editId) {
+    foreach ($_SESSION['stok_log'] as $l) {
+        if ($l['id'] === $editId) { $editLog = $l; break; }
     }
 }
 
@@ -161,49 +232,67 @@ $lowStock = array_filter($_SESSION['produk'], fn($p) => $p['stok'] <= $p['stok_m
                 </div>
             </div>
 
-            <!-- Form Catat Pergerakan (CREATE) -->
-            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 sm:p-6">
-                <h3 class="font-semibold text-navy-900 text-sm sm:text-base mb-4 flex items-center gap-2">+ Catat Mutasi / Pergerakan Stok</h3>
+            <!-- Form Catat Pergerakan (CREATE & UPDATE) -->
+            <div id="form-stok" class="bg-white rounded-xl border <?= $editLog ? 'border-navy-200 ring-1 ring-navy-100' : 'border-gray-100' ?> shadow-sm p-4 sm:p-6">
+                <h3 class="font-semibold text-navy-900 text-sm sm:text-base mb-4 flex items-center gap-2">
+                    <?= $editLog ? 'Edit Catatan Mutasi Stok' : '+ Catat Mutasi / Pergerakan Stok' ?>
+                </h3>
                 <form method="POST" action="stok.php" class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                    <input type="hidden" name="action" value="catat">
+                    <input type="hidden" name="action" value="<?= $editLog ? 'update_log' : 'catat' ?>">
+                    <?php if ($editLog): ?>
+                    <input type="hidden" name="id" value="<?= $editLog['id'] ?>">
+                    <?php endif; ?>
+
                     <div>
                         <label class="block text-xs font-semibold text-gray-600 mb-1.5">Pilih Produk</label>
                         <select name="produk_id" required class="<?= $inputClass ?>">
                             <option value="">-- Pilih Produk --</option>
                             <?php foreach ($_SESSION['produk'] as $p): ?>
-                            <option value="<?= $p['id'] ?>"><?= htmlspecialchars($p['nama']) ?> (Sisa: <?= $p['stok'] ?> <?= $p['satuan'] ?>)</option>
+                            <option value="<?= $p['id'] ?>" <?= ($editLog && $editLog['produk_id'] === $p['id']) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($p['nama']) ?> (Sisa: <?= $p['stok'] ?> <?= $p['satuan'] ?>)
+                            </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-gray-600 mb-1.5">Jenis Mutasi</label>
+                        <?php $currJenis = $editLog['jenis'] ?? 'Masuk'; ?>
                         <select name="jenis" class="<?= $inputClass ?>">
-                            <option value="Masuk">Barang Masuk (Restock / Tambah)</option>
-                            <option value="Keluar">Barang Keluar (Terjual / Rusak)</option>
+                            <option value="Masuk" <?= $currJenis === 'Masuk' ? 'selected' : '' ?>>Barang Masuk (Restock / Tambah)</option>
+                            <option value="Keluar" <?= $currJenis === 'Keluar' ? 'selected' : '' ?>>Barang Keluar (Terjual / Rusak)</option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-gray-600 mb-1.5">Tanggal Mutasi</label>
-                        <input type="date" name="tanggal" required value="<?= date('Y-m-d') ?>" class="<?= $inputClass ?>">
+                        <input type="date" name="tanggal" required
+                            value="<?= htmlspecialchars($editLog['tanggal'] ?? date('Y-m-d')) ?>"
+                            class="<?= $inputClass ?>">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-gray-600 mb-1.5">Jumlah Unit</label>
-                        <input type="number" name="jumlah" required min="1" placeholder="0" class="<?= $inputClass ?>">
+                        <input type="number" name="jumlah" required min="1" placeholder="0"
+                            value="<?= htmlspecialchars((string)($editLog['jumlah'] ?? '')) ?>"
+                            class="<?= $inputClass ?>">
                     </div>
                     <div class="sm:col-span-2">
                         <label class="block text-xs font-semibold text-gray-600 mb-1.5">Keterangan Catatan</label>
-                        <input type="text" name="keterangan" placeholder="Contoh: Restock dari supplier batch #4" class="<?= $inputClass ?>">
+                        <input type="text" name="keterangan" placeholder="Contoh: Restock dari supplier batch #4"
+                            value="<?= htmlspecialchars($editLog['keterangan'] ?? '') ?>"
+                            class="<?= $inputClass ?>">
                     </div>
-                    <div class="sm:col-span-2 pt-2">
+                    <div class="sm:col-span-2 flex flex-wrap items-center gap-2.5 pt-2">
                         <button type="submit"
                             class="w-full sm:w-auto px-5 py-2.5 bg-navy-800 hover:bg-navy-950 text-white rounded-lg text-sm font-semibold transition">
-                            Simpan Catatan Mutasi
+                            <?= $editLog ? 'Simpan Perubahan' : 'Simpan Catatan Mutasi' ?>
                         </button>
+                        <?php if ($editLog): ?>
+                        <a href="stok.php" class="w-full sm:w-auto text-center px-5 py-2.5 border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-lg text-sm font-medium transition">Batal</a>
+                        <?php endif; ?>
                     </div>
                 </form>
             </div>
 
-            <!-- Riwayat Pergerakan (READ & DELETE) -->
+            <!-- Riwayat Pergerakan (READ, UPDATE & DELETE) -->
             <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
                 <div class="px-4 sm:px-5 py-3.5 sm:py-4 border-b border-gray-100">
                     <h3 class="font-semibold text-navy-900 text-sm sm:text-base">Riwayat Mutasi Stok</h3>
@@ -227,7 +316,7 @@ $lowStock = array_filter($_SESSION['produk'], fn($p) => $p['stok'] <= $p['stok_m
                             <?php foreach (array_reverse($_SESSION['stok_log']) as $log):
                                 $prd = getProdukById($log['produk_id']);
                             ?>
-                            <tr class="hover:bg-gray-50/70 transition">
+                            <tr class="hover:bg-gray-50/70 transition <?= ($log['id'] ?? '') === $editId ? 'bg-navy-100/40' : '' ?>">
                                 <td class="px-4 sm:px-5 py-3.5 text-gray-500 whitespace-nowrap"><?= date('d M Y', strtotime($log['tanggal'])) ?></td>
                                 <td class="px-4 sm:px-5 py-3.5 font-medium text-navy-900"><?= $prd ? htmlspecialchars($prd['nama']) : '<span class="text-gray-400">Dihapus</span>' ?></td>
                                 <td class="px-4 sm:px-5 py-3.5 text-center whitespace-nowrap">
@@ -241,12 +330,15 @@ $lowStock = array_filter($_SESSION['produk'], fn($p) => $p['stok'] <= $p['stok_m
                                 </td>
                                 <td class="px-4 sm:px-5 py-3.5 text-gray-500"><?= htmlspecialchars($log['keterangan']) ?: '<span class="text-gray-400">—</span>' ?></td>
                                 <td class="px-4 sm:px-5 py-3.5 text-center whitespace-nowrap">
-                                    <form method="POST" action="stok.php"
-                                        onsubmit="return confirm('Hapus riwayat log ini? Stok produk akan dikembalikan (reversal).')">
-                                        <input type="hidden" name="action" value="hapus_log">
-                                        <input type="hidden" name="id" value="<?= $log['id'] ?>">
-                                        <button class="text-xs text-red-500 hover:text-red-700 font-semibold transition">Hapus</button>
-                                    </form>
+                                    <div class="flex items-center justify-center gap-3">
+                                        <a href="?edit=<?= $log['id'] ?>#form-stok" class="text-xs text-navy-700 hover:text-navy-950 font-semibold transition">Edit</a>
+                                        <form method="POST" action="stok.php"
+                                            onsubmit="return confirm('Hapus riwayat log ini? Stok produk akan dikembalikan (reversal).')">
+                                            <input type="hidden" name="action" value="hapus_log">
+                                            <input type="hidden" name="id" value="<?= $log['id'] ?>">
+                                            <button type="submit" class="text-xs text-red-500 hover:text-red-700 font-semibold transition">Hapus</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                             <?php endforeach; ?>

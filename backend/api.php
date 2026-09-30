@@ -423,6 +423,72 @@ switch ($action) {
         }
         break;
 
+    case 'stok_update':
+        requireAuth();
+        $id        = $input['id'] ?? '';
+        $produk_id = $input['produk_id'] ?? '';
+        $jenis     = $input['jenis'] ?? 'Masuk';
+        $jumlah    = (int)($input['jumlah'] ?? 0);
+        $tanggal   = $input['tanggal'] ?? date('Y-m-d');
+        $ket       = trim($input['keterangan'] ?? '');
+
+        if (!$id || !$produk_id || $jumlah <= 0) {
+            sendError('ID, produk, dan jumlah unit valid wajib diisi.');
+        }
+
+        $oldLogIndex = null;
+        foreach ($_SESSION['stok_log'] as $idx => $l) {
+            if ($l['id'] === $id) {
+                $oldLogIndex = $idx;
+                break;
+            }
+        }
+
+        if ($oldLogIndex === null) sendError('Log stok tidak ditemukan.');
+
+        $oldLog       = $_SESSION['stok_log'][$oldLogIndex];
+        $produkBackup = $_SESSION['produk'];
+
+        // Reversal log lama
+        foreach ($_SESSION['produk'] as &$p) {
+            if ($p['id'] === $oldLog['produk_id']) {
+                $p['stok'] = $oldLog['jenis'] === 'Masuk'
+                    ? max(0, $p['stok'] - (int)$oldLog['jumlah'])
+                    : $p['stok'] + (int)$oldLog['jumlah'];
+                break;
+            }
+        }
+        unset($p);
+
+        // Terapkan log baru
+        $valid = true;
+        foreach ($_SESSION['produk'] as &$p) {
+            if ($p['id'] === $produk_id) {
+                if ($jenis === 'Keluar' && $p['stok'] < $jumlah) {
+                    $valid = false;
+                } else {
+                    $p['stok'] = $jenis === 'Masuk' ? $p['stok'] + $jumlah : $p['stok'] - $jumlah;
+                }
+                break;
+            }
+        }
+        unset($p);
+
+        if ($valid) {
+            $_SESSION['stok_log'][$oldLogIndex]['tanggal']    = $tanggal;
+            $_SESSION['stok_log'][$oldLogIndex]['produk_id']  = $produk_id;
+            $_SESSION['stok_log'][$oldLogIndex]['jenis']      = $jenis;
+            $_SESSION['stok_log'][$oldLogIndex]['jumlah']     = $jumlah;
+            $_SESSION['stok_log'][$oldLogIndex]['keterangan'] = $ket;
+
+            simpanProduk();
+            sendJson(['success' => true, 'message' => 'Catatan mutasi stok berhasil diperbarui.', 'data' => $_SESSION['stok_log'][$oldLogIndex]]);
+        } else {
+            $_SESSION['produk'] = $produkBackup;
+            sendError('Stok produk tidak mencukupi untuk mutasi keluar ini.');
+        }
+        break;
+
     // ── LAPORAN ───────────────────────────────────────────────
     case 'laporan_data':
         requireAuth();
@@ -477,28 +543,23 @@ switch ($action) {
         if (!$judul || !$dari || !$sampai) sendError('Judul dan rentang tanggal wajib diisi.');
         if ($dari > $sampai) sendError('Tanggal awal tidak boleh lebih besar dari tanggal akhir.');
 
-        $p = $k = 0;
-        foreach ($_SESSION['transaksi'] as $t) {
-            if ($t['tanggal'] >= $dari && $t['tanggal'] <= $sampai) {
-                if ($t['jenis'] === 'Pemasukan') $p += (int)$t['jumlah'];
-                else $k += (int)$t['jumlah'];
-            }
-        }
+        $kategori = trim($input['kategori'] ?? 'Evaluasi Bulanan');
+        $status   = trim($input['status']   ?? 'Selesai');
 
         $newReport = [
-            'id' => uniqid('l'),
-            'judul' => $judul,
-            'tanggal_dari' => $dari,
+            'id'             => uniqid('l'),
+            'judul'          => $judul,
+            'kategori'       => $kategori,
+            'tanggal_dari'   => $dari,
             'tanggal_sampai' => $sampai,
-            'pemasukan' => $p,
-            'pengeluaran' => $k,
-            'laba' => $p - $k,
-            'catatan' => $catatan,
-            'dibuat' => date('Y-m-d')
+            'status'         => $status,
+            'catatan'        => $catatan,
+            'dibuat'         => date('Y-m-d'),
+            'pembuat'        => $_SESSION['user'] ?? 'Admin',
         ];
 
         $_SESSION['laporan_tersimpan'][] = $newReport;
-        sendJson(['success' => true, 'message' => 'Laporan snapshot berhasil disimpan.', 'data' => $newReport]);
+        sendJson(['success' => true, 'message' => 'Laporan arsip berhasil disimpan.', 'data' => $newReport]);
         break;
 
     case 'laporan_delete':

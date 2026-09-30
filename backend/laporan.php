@@ -11,43 +11,42 @@ $bulanNama   = ['01'=>'Jan','02'=>'Feb','03'=>'Mar','04'=>'Apr','05'=>'Mei','06'
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
-    // CREATE — hitung snapshot dari date range
+    // CREATE
     if ($action === 'simpan') {
-        $judul   = trim($_POST['judul']          ?? '');
-        $dari    = $_POST['tanggal_dari']          ?? '';
-        $sampai  = $_POST['tanggal_sampai']        ?? '';
-        $catatan = trim($_POST['catatan']          ?? '');
+        $judul    = trim($_POST['judul']          ?? '');
+        $kategori = trim($_POST['kategori']       ?? 'Evaluasi Bulanan');
+        $dari     = $_POST['tanggal_dari']          ?? '';
+        $sampai   = $_POST['tanggal_sampai']        ?? '';
+        $status   = trim($_POST['status']         ?? 'Selesai');
+        $catatan  = trim($_POST['catatan']          ?? '');
 
         if ($judul && $dari && $sampai && $dari <= $sampai) {
-            $p = $k = 0;
-            foreach ($_SESSION['transaksi'] as $t) {
-                if ($t['tanggal'] >= $dari && $t['tanggal'] <= $sampai) {
-                    if ($t['jenis'] === 'Pemasukan') $p += $t['jumlah'];
-                    else $k += $t['jumlah'];
-                }
-            }
             $_SESSION['laporan_tersimpan'][] = [
                 'id'             => uniqid('l'),
                 'judul'          => $judul,
+                'kategori'       => $kategori,
                 'tanggal_dari'   => $dari,
                 'tanggal_sampai' => $sampai,
-                'pemasukan'      => $p,
-                'pengeluaran'    => $k,
-                'laba'           => $p - $k,
+                'status'         => $status,
                 'catatan'        => $catatan,
                 'dibuat'         => date('Y-m-d'),
+                'pembuat'        => $_SESSION['user'] ?? 'Admin',
             ];
             header('Location: laporan.php'); exit;
         }
     }
 
-    // UPDATE — hanya judul & catatan (data finansial adalah snapshot, tidak berubah)
+    // UPDATE
     if ($action === 'update') {
         $id = $_POST['id'] ?? '';
         foreach ($_SESSION['laporan_tersimpan'] as &$l) {
             if ($l['id'] === $id) {
-                $l['judul']   = trim($_POST['judul']   ?? $l['judul']);
-                $l['catatan'] = trim($_POST['catatan'] ?? $l['catatan']);
+                $l['judul']          = trim($_POST['judul']          ?? $l['judul']);
+                $l['kategori']       = trim($_POST['kategori']       ?? ($l['kategori'] ?? 'Evaluasi Bulanan'));
+                $l['tanggal_dari']   = $_POST['tanggal_dari']          ?? ($l['tanggal_dari'] ?? '');
+                $l['tanggal_sampai'] = $_POST['tanggal_sampai']        ?? ($l['tanggal_sampai'] ?? '');
+                $l['status']         = trim($_POST['status']         ?? ($l['status'] ?? 'Selesai'));
+                $l['catatan']        = trim($_POST['catatan']        ?? $l['catatan']);
                 break;
             }
         }
@@ -162,28 +161,55 @@ $totalLaba = $totalMasuk - $totalKeluar;
                     <input type="hidden" name="id" value="<?= $editLap['id'] ?>">
                     <?php endif; ?>
 
-                    <div class="sm:col-span-2">
+                    <div>
                         <label class="block text-xs font-semibold text-gray-600 mb-1.5">Judul Laporan</label>
                         <input type="text" name="judul" required placeholder="Contoh: Laporan Penjualan Q3 2026"
                             value="<?= htmlspecialchars($editLap['judul'] ?? '') ?>"
                             class="<?= $inputClass ?>">
                     </div>
-                    <?php if (!$editLap): ?>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1.5">Kategori Laporan</label>
+                        <?php $currKat = $editLap['kategori'] ?? 'Evaluasi Bulanan'; ?>
+                        <select name="kategori" class="<?= $inputClass ?>">
+                            <option value="Evaluasi Bulanan" <?= $currKat === 'Evaluasi Bulanan' ? 'selected' : '' ?>>Evaluasi Bulanan</option>
+                            <option value="Penjualan & Produk" <?= $currKat === 'Penjualan & Produk' ? 'selected' : '' ?>>Penjualan & Produk</option>
+                            <option value="Keuangan & Kas" <?= $currKat === 'Keuangan & Kas' ? 'selected' : '' ?>>Keuangan & Kas</option>
+                            <option value="Operasional & Stok" <?= $currKat === 'Operasional & Stok' ? 'selected' : '' ?>>Operasional & Stok</option>
+                        </select>
+                    </div>
+
                     <div>
                         <label class="block text-xs font-semibold text-gray-600 mb-1.5">Tanggal Dari</label>
-                        <input type="date" name="tanggal_dari" required class="<?= $inputClass ?>">
+                        <input type="date" name="tanggal_dari" required
+                            value="<?= htmlspecialchars($editLap['tanggal_dari'] ?? '') ?>"
+                            class="<?= $inputClass ?>">
                     </div>
+
                     <div>
                         <label class="block text-xs font-semibold text-gray-600 mb-1.5">Tanggal Sampai</label>
-                        <input type="date" name="tanggal_sampai" required class="<?= $inputClass ?>">
+                        <input type="date" name="tanggal_sampai" required
+                            value="<?= htmlspecialchars($editLap['tanggal_sampai'] ?? '') ?>"
+                            class="<?= $inputClass ?>">
                     </div>
-                    <?php endif; ?>
-                    <div class="sm:col-span-2">
+
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1.5">Status Laporan</label>
+                        <?php $currStatus = $editLap['status'] ?? 'Selesai'; ?>
+                        <select name="status" class="<?= $inputClass ?>">
+                            <option value="Selesai" <?= $currStatus === 'Selesai' ? 'selected' : '' ?>>Selesai</option>
+                            <option value="Dalam Tinjauan" <?= $currStatus === 'Dalam Tinjauan' ? 'selected' : '' ?>>Dalam Tinjauan</option>
+                            <option value="Draft" <?= $currStatus === 'Draft' ? 'selected' : '' ?>>Draft</option>
+                        </select>
+                    </div>
+
+                    <div>
                         <label class="block text-xs font-semibold text-gray-600 mb-1.5">Catatan Evaluasi</label>
                         <input type="text" name="catatan" placeholder="Catatan singkat evaluasi laporan ini"
                             value="<?= htmlspecialchars($editLap['catatan'] ?? '') ?>"
                             class="<?= $inputClass ?>">
                     </div>
+
                     <div class="sm:col-span-2 flex flex-wrap items-center gap-2.5 pt-2">
                         <button type="submit"
                             class="w-full sm:w-auto px-5 py-2.5 bg-navy-800 hover:bg-navy-950 text-white rounded-lg text-sm font-semibold transition">
@@ -205,34 +231,56 @@ $totalLaba = $totalMasuk - $totalKeluar;
                 <p class="text-center text-gray-400 text-sm py-12">Belum ada laporan tersimpan.</p>
                 <?php else: ?>
                 <div class="overflow-x-auto w-full">
-                    <table class="w-full text-xs sm:text-sm min-w-[620px]">
+                    <table class="w-full text-xs sm:text-sm min-w-[700px]">
                         <thead class="bg-gray-50 text-xs text-gray-500 font-semibold uppercase">
                             <tr>
-                                <th class="px-4 py-3 text-left">Judul & Catatan</th>
-                                <th class="px-4 py-3 text-left">Periode</th>
-                                <th class="px-4 py-3 text-right">Pemasukan</th>
-                                <th class="px-4 py-3 text-right">Pengeluaran</th>
-                                <th class="px-4 py-3 text-right">Laba/Rugi</th>
+                                <th class="px-4 py-3 text-left">Judul & Kategori</th>
+                                <th class="px-4 py-3 text-left">Periode Laporan</th>
+                                <th class="px-4 py-3 text-center">Status</th>
+                                <th class="px-4 py-3 text-left">Catatan Evaluasi</th>
+                                <th class="px-4 py-3 text-center">Dibuat</th>
                                 <th class="px-4 py-3 text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-50">
                             <?php foreach (array_reverse($_SESSION['laporan_tersimpan']) as $l): ?>
-                            <tr class="hover:bg-gray-50/70 transition <?= $l['id'] === $editId ? 'bg-navy-100/40' : '' ?>">
+                            <tr class="hover:bg-gray-50/70 transition <?= ($l['id'] ?? '') === $editId ? 'bg-navy-100/40' : '' ?>">
                                 <td class="px-4 py-3.5">
-                                    <p class="font-medium text-navy-900"><?= htmlspecialchars($l['judul']) ?></p>
-                                    <?php if ($l['catatan']): ?>
-                                    <p class="text-xs text-gray-400 mt-0.5"><?= htmlspecialchars($l['catatan']) ?></p>
+                                    <p class="font-semibold text-navy-900"><?= htmlspecialchars($l['judul'] ?? '') ?></p>
+                                    <span class="inline-block mt-1 text-[11px] font-medium px-2 py-0.5 rounded bg-navy-100/70 text-navy-800">
+                                        <?= htmlspecialchars($l['kategori'] ?? 'Evaluasi Bulanan') ?>
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3.5 text-gray-600 text-xs whitespace-nowrap">
+                                    <div class="flex items-center gap-1.5">
+                                        <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                        <span><?= !empty($l['tanggal_dari']) ? date('d M Y', strtotime($l['tanggal_dari'])) : '-' ?> — <?= !empty($l['tanggal_sampai']) ? date('d M Y', strtotime($l['tanggal_sampai'])) : '-' ?></span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3.5 text-center whitespace-nowrap">
+                                    <?php
+                                    $st = $l['status'] ?? 'Selesai';
+                                    if ($st === 'Selesai'): ?>
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Selesai
+                                        </span>
+                                    <?php elseif ($st === 'Dalam Tinjauan'): ?>
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Dalam Tinjauan
+                                        </span>
+                                    <?php else: ?>
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-200">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>Draft
+                                        </span>
                                     <?php endif; ?>
                                 </td>
-                                <td class="px-4 py-3.5 text-gray-500 text-xs whitespace-nowrap">
-                                    <?= date('d M Y', strtotime($l['tanggal_dari'])) ?> —
-                                    <?= date('d M Y', strtotime($l['tanggal_sampai'])) ?>
+                                <td class="px-4 py-3.5 text-xs text-gray-600 max-w-xs">
+                                    <p class="truncate" title="<?= htmlspecialchars($l['catatan'] ?? '-') ?>">
+                                        <?= htmlspecialchars(!empty($l['catatan']) ? $l['catatan'] : '-') ?>
+                                    </p>
                                 </td>
-                                <td class="px-4 py-3.5 text-right text-green-600 font-medium whitespace-nowrap">Rp <?= number_format($l['pemasukan'],   0, ',', '.') ?></td>
-                                <td class="px-4 py-3.5 text-right text-red-500 font-medium whitespace-nowrap">Rp <?= number_format($l['pengeluaran'], 0, ',', '.') ?></td>
-                                <td class="px-4 py-3.5 text-right font-semibold whitespace-nowrap <?= $l['laba'] >= 0 ? 'text-navy-800' : 'text-red-500' ?>">
-                                    <?= $l['laba'] >= 0 ? '+' : '' ?>Rp <?= number_format($l['laba'], 0, ',', '.') ?>
+                                <td class="px-4 py-3.5 text-center text-gray-500 text-xs whitespace-nowrap">
+                                    <?= !empty($l['dibuat']) ? date('d M Y', strtotime($l['dibuat'])) : '-' ?>
                                 </td>
                                 <td class="px-4 py-3.5 text-center whitespace-nowrap">
                                     <div class="flex items-center justify-center gap-3">
@@ -240,7 +288,7 @@ $totalLaba = $totalMasuk - $totalKeluar;
                                         <form method="POST" action="laporan.php" onsubmit="return confirm('Hapus arsip laporan ini?')">
                                             <input type="hidden" name="action" value="hapus">
                                             <input type="hidden" name="id" value="<?= $l['id'] ?>">
-                                            <button class="text-xs text-red-500 hover:text-red-700 font-semibold transition">Hapus</button>
+                                            <button type="submit" class="text-xs text-red-500 hover:text-red-700 font-semibold transition">Hapus</button>
                                         </form>
                                     </div>
                                 </td>
