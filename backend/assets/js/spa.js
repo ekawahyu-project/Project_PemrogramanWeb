@@ -66,9 +66,9 @@
             const linkPath = linkHref.split('?')[0];
 
             if (linkPath === path) {
-                link.className = 'flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition bg-white/15 text-white';
+                link.className = 'flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition bg-white/15 text-white';
             } else {
-                link.className = 'flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition text-white/65 hover:bg-white/10 hover:text-white';
+                link.className = 'flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition text-white/60 hover:bg-white/10 hover:text-white';
             }
         });
     }

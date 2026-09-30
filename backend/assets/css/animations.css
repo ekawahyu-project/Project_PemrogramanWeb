@@ -151,17 +151,21 @@ tr:hover span.rounded-md {
   transform: scale(1.05);
 }
 
-/* Sidebar item click & hover */
-aside nav a {
-  transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
-}
-aside nav a:active {
-  transform: scale(0.98);
+/* Sidebar: floating card entrance */
+aside > div {
+  animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* Tombol CTA umum */
-button:not(:disabled),
-a[class*="rounded"] {
+/* Sidebar nav item hover */
+aside nav a {
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.12s ease;
+}
+aside nav a:active {
+  transform: scale(0.97);
+}
+
+/* Tombol umum */
+button:not(:disabled) {
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 button:not(:disabled):active {
