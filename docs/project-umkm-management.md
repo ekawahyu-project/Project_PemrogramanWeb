@@ -116,6 +116,8 @@ Project_PemWeb/
 │       └── spa.js            ← Engine navigasi SPA & drawer sidebar responsif
 ├── docs/
 │   └── project-umkm-management.md ← Dokumentasi project
+├── img/
+│   └── background.jpg        ← Gambar background halaman login & register
 ├── includes/
 │   ├── init.php              ← Inisialisasi data session & variabel UI ($inputClass)
 │   └── sidebar.php           ← Komponen sidebar + topbar navigasi mobile responsif
