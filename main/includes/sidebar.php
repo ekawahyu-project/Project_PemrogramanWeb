@@ -94,6 +94,7 @@ $icons = [
 <!-- Global Assets -->
 <link rel="stylesheet" href="assets/css/animations.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 <script src="assets/js/animations.js"></script>
 <script src="assets/js/profil.js"></script>
 <script src="assets/js/spa.js"></script>

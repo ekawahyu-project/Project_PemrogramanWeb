@@ -187,7 +187,6 @@ $val = fn(string $k, $default = '') => htmlspecialchars($raw($k, $default));
     <title>Produk | AlpetBizz</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -210,6 +209,7 @@ $val = fn(string $k, $default = '') => htmlspecialchars($raw($k, $default));
     </script>
 </head>
 
+<body class="bg-gray-50 font-sans">
 <?php include __DIR__ . '/includes/sidebar.php'; ?>
 <main class="w-full min-h-screen lg:pl-64 flex flex-col transition-all duration-300">
     <div class="p-4 sm:p-6 lg:p-8 flex-1 space-y-6 max-w-7xl w-full mx-auto">
