@@ -72,15 +72,19 @@ $stats = [
     <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{navy:{'100':'#dbe8ff','700':'#1e4080','800':'#162e5e','900':'#0e1f42','950':'#080f21'}}}}}</script>
 </head>
 <body class="bg-gray-50 font-sans antialiased text-gray-800">
-    <?php include 'includes/sidebar.php'; ?>
+    <?php include __DIR__ . '/includes/sidebar.php'; ?>
 
     <main class="w-full min-h-screen lg:pl-64 flex flex-col transition-all duration-300">
-        <header class="bg-white border-b border-gray-100 px-4 sm:px-6 py-4">
-            <h2 class="font-bold text-lg sm:text-xl text-navy-900">Dashboard</h2>
-            <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Selamat datang, <span class="font-medium text-navy-800"><?= htmlspecialchars($user) ?></span></p>
-        </header>
-
         <div class="p-4 sm:p-6 lg:p-8 flex-1 space-y-6 max-w-7xl w-full mx-auto">
+            <!-- Floating Header Card -->
+            <header class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                    <h2 class="font-bold text-xl sm:text-2xl text-navy-900 tracking-tight">Dashboard</h2>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-1">
+                        Selamat datang, <span class="font-semibold text-navy-800"><?= htmlspecialchars($user) ?></span>
+                    </p>
+                </div>
+            </header>
             <!-- Stok rendah alert -->
             <?php if ($lowStock > 0): ?>
             <div class="bg-orange-50 border border-orange-200 rounded-xl p-3.5 sm:p-4 flex items-start sm:items-center gap-3">

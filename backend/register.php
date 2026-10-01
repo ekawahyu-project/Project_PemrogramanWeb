@@ -12,7 +12,7 @@ if (!isset($_SESSION['users'])) {
         'no_hp'      => '08123456789',
         'nama_usaha' => 'AlpetBizz Store',
         'kategori'   => 'Makanan & Minuman',
-        'alamat'     => 'Jl. Boulevard Raya No. 12, Jakarta',
+        'alamat'     => 'Malang',
     ];
 }
 

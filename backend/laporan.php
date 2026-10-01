@@ -106,15 +106,17 @@ $totalLaba = $totalMasuk - $totalKeluar;
     <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','sans-serif']},colors:{navy:{'100':'#dbe8ff','700':'#1e4080','800':'#162e5e','900':'#0e1f42','950':'#080f21'}}}}}</script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-gray-50 font-sans">
-    <?php include 'includes/sidebar.php'; ?>
+<body class="bg-gray-50 font-sans antialiased text-gray-800">
+    <?php include __DIR__ . '/includes/sidebar.php'; ?>
     <main class="w-full min-h-screen lg:pl-64 flex flex-col transition-all duration-300">
-        <header class="bg-white border-b border-gray-100 px-4 sm:px-6 py-4">
-            <h2 class="font-bold text-lg sm:text-xl text-navy-900">Laporan & Grafik</h2>
-            <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Grafik pemasukan/pengeluaran live + arsip laporan per periode.</p>
-        </header>
-
-        <div class="p-4 sm:p-6 lg:p-8 flex-1 space-y-6 w-full">
+        <div class="p-4 sm:p-6 lg:p-8 flex-1 space-y-6 max-w-7xl w-full mx-auto">
+            <!-- Floating Header Card -->
+            <header class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                    <h2 class="font-bold text-xl sm:text-2xl text-navy-900 tracking-tight">Laporan & Grafik</h2>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-1">Grafik pemasukan/pengeluaran live + arsip laporan per periode.</p>
+                </div>
+            </header>
             <!-- READ: Ringkasan Total (live) - Soft Pastel Tint (Clean) -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                 <div class="bg-emerald-50/70 border border-emerald-100/90 rounded-xl p-4 sm:p-5 shadow-sm flex flex-col justify-between">

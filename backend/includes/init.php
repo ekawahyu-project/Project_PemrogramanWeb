@@ -104,7 +104,7 @@ if (!isset($_SESSION['users'])) {
             'no_hp'      => '08123456789',
             'nama_usaha' => 'AlpetBizz Store',
             'kategori'   => 'Makanan & Minuman',
-            'alamat'     => 'Jl. Boulevard Raya No. 12, Jakarta',
+            'alamat'     => 'Malang',
         ]
     ];
 } else {
@@ -126,7 +126,7 @@ if (!isset($_SESSION['profil'])) {
         'no_hp'      => $curUser['no_hp']      ?? '08123456789',
         'nama_usaha' => $curUser['nama_usaha'] ?? 'AlpetBizz Store',
         'kategori'   => $curUser['kategori']   ?? 'Makanan & Minuman',
-        'alamat'     => $curUser['alamat']     ?? 'Jl. Boulevard Raya No. 12, Jakarta',
+        'alamat'     => $curUser['alamat']     ?? 'Malang',
     ];
 }
 

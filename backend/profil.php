@@ -119,13 +119,16 @@ $kategoriOptions = [
     <?php include __DIR__ . '/includes/sidebar.php'; ?>
 
     <main class="w-full min-h-screen lg:pl-64 flex flex-col transition-all duration-300">
-        <header class="bg-white border-b border-gray-100 px-4 sm:px-6 py-4">
-            <h2 class="font-bold text-lg sm:text-xl text-navy-900">Profil Saya</h2>
-            <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Kelola informasi akun pengguna dan identitas usaha Anda.</p>
-        </header>
+        <div class="p-4 sm:p-6 lg:p-8 flex-1 space-y-6 max-w-7xl w-full mx-auto">
+            <!-- Floating Header Card -->
+            <header class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                    <h2 class="font-bold text-xl sm:text-2xl text-navy-900 tracking-tight">Profil Saya</h2>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-1">Kelola informasi akun pengguna dan identitas usaha Anda.</p>
+                </div>
+            </header>
 
-        <div class="p-4 sm:p-6 lg:p-8 flex-1 w-full">
-            <div class="w-full bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="w-full bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <!-- Profile Top Banner -->
                 <div class="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4 px-4 sm:px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-navy-50/50 to-white">
                     <div class="w-16 h-16 rounded-full bg-gradient-to-br from-navy-800 to-navy-950

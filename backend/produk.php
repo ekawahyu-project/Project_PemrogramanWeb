@@ -210,14 +210,16 @@ $val = fn(string $k, $default = '') => htmlspecialchars($raw($k, $default));
     </script>
 </head>
 
-<?php include 'includes/sidebar.php'; ?>
+<?php include __DIR__ . '/includes/sidebar.php'; ?>
 <main class="w-full min-h-screen lg:pl-64 flex flex-col transition-all duration-300">
-    <header class="bg-white border-b border-gray-100 px-4 sm:px-6 py-4">
-        <h2 class="font-bold text-lg sm:text-xl text-navy-900">Manajemen Produk</h2>
-        <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Kelola data katalog produk tambah, update, atau hapus produk.</p>
-    </header>
-
-    <div class="p-4 sm:p-6 lg:p-8 flex-1 space-y-6 w-full">
+    <div class="p-4 sm:p-6 lg:p-8 flex-1 space-y-6 max-w-7xl w-full mx-auto">
+        <!-- Floating Header Card -->
+        <header class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+                <h2 class="font-bold text-xl sm:text-2xl text-navy-900 tracking-tight">Manajemen Produk</h2>
+                <p class="text-xs sm:text-sm text-gray-500 mt-1">Kelola data katalog produk: tambah, update, atau hapus produk.</p>
+            </div>
+        </header>
         <?php if ($errors): ?>
             <div class="bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm rounded-xl p-4">
                 <p class="font-semibold mb-1">Periksa kembali formulir:</p>
