@@ -6,6 +6,8 @@ if (!isset($_SESSION['user'])) {
 }
 require_once 'includes/init.php';
 
+/** @var string $inputClass dari includes/init.php */
+
 $currentPage = 'produk';
 $kategoriOpt = ['Makanan', 'Minuman', 'Fashion', 'Kecantikan', 'Bahan Baku', 'Kesehatan & Herbal', 'Perlengkapan Rumah Tangga', 'Lainnya'];
 $satuanOpt   = ['pcs', 'pack', 'kg', 'gram', 'liter', 'ml', 'box', 'lusin', 'meter', 'lembar'];
