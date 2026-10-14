@@ -13,11 +13,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // CREATE — catat pergerakan stok & update produk.stok
     if ($action === 'catat') {
         $produk_id = $_POST['produk_id'] ?? '';
-        $jenis     = $_POST['jenis']     ?? 'Masuk';
+        $jenis     = in_array($_POST['jenis'] ?? '', ['Masuk', 'Keluar'], true) ? $_POST['jenis'] : 'Masuk';
         $jumlah    = (int) ($_POST['jumlah'] ?? 0);
         $ket       = trim($_POST['keterangan'] ?? '');
 
-        if ($produk_id && $jumlah > 0) {
+        if ($produk_id && $jumlah > 0 && getProdukById($produk_id)) {
             $valid = true;
             foreach ($_SESSION['produk'] as &$p) {
                 if ($p['id'] === $produk_id) {
@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'update_log') {
         $id        = $_POST['id'] ?? '';
         $produk_id = $_POST['produk_id'] ?? '';
-        $jenis     = $_POST['jenis'] ?? 'Masuk';
+        $jenis     = in_array($_POST['jenis'] ?? '', ['Masuk', 'Keluar'], true) ? $_POST['jenis'] : 'Masuk';
         $jumlah    = (int) ($_POST['jumlah'] ?? 0);
         $tanggal   = $_POST['tanggal'] ?? date('Y-m-d');
         $ket       = trim($_POST['keterangan'] ?? '');
@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        if ($oldLogIndex !== null && $produk_id && $jumlah > 0) {
+        if ($oldLogIndex !== null && $produk_id && $jumlah > 0 && getProdukById($produk_id)) {
             $oldLog       = $_SESSION['stok_log'][$oldLogIndex];
             $produkBackup = $_SESSION['produk'];
 
@@ -177,7 +177,7 @@ $lowStock = array_filter($_SESSION['produk'], fn($p) => $p['stok'] <= $p['stok_m
                 <span class="text-orange-500 text-lg flex-shrink-0">⚠</span>
                 <p class="text-xs sm:text-sm text-orange-800 font-medium leading-relaxed">
                     <?= count($lowStock) ?> produk stok menipis/habis:
-                    <span class="font-normal text-orange-950"><?= implode(', ', array_column($lowStock, 'nama')) ?></span>
+                    <span class="font-normal text-orange-950"><?= htmlspecialchars(implode(', ', array_column($lowStock, 'nama'))) ?></span>
                 </p>
             </div>
             <?php endif; ?>
@@ -206,9 +206,9 @@ $lowStock = array_filter($_SESSION['produk'], fn($p) => $p['stok'] <= $p['stok_m
                             <tr class="hover:bg-gray-50/70 transition">
                                 <td class="px-4 sm:px-5 py-3.5 font-medium text-navy-900">
                                     <?= htmlspecialchars($p['nama']) ?>
-                                    <span class="text-gray-400 text-xs font-normal">/<?= $p['satuan'] ?></span>
+                                    <span class="text-gray-400 text-xs font-normal">/<?= htmlspecialchars($p['satuan']) ?></span>
                                 </td>
-                                <td class="px-4 sm:px-5 py-3.5 text-gray-500 text-xs"><?= $p['kategori'] ?></td>
+                                <td class="px-4 sm:px-5 py-3.5 text-gray-500 text-xs"><?= htmlspecialchars($p['kategori']) ?></td>
                                 <td class="px-4 sm:px-5 py-3.5 text-center">
                                     <div class="flex items-center justify-center gap-2">
                                         <span class="font-semibold text-navy-900 w-7 text-right"><?= $p['stok'] ?></span>
@@ -251,7 +251,7 @@ $lowStock = array_filter($_SESSION['produk'], fn($p) => $p['stok'] <= $p['stok_m
                             <option value="">-- Pilih Produk --</option>
                             <?php foreach ($_SESSION['produk'] as $p): ?>
                             <option value="<?= $p['id'] ?>" <?= ($editLog && $editLog['produk_id'] === $p['id']) ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($p['nama']) ?> (Sisa: <?= $p['stok'] ?> <?= $p['satuan'] ?>)
+                                <?= htmlspecialchars($p['nama']) ?> (Sisa: <?= $p['stok'] ?> <?= htmlspecialchars($p['satuan']) ?>)
                             </option>
                             <?php endforeach; ?>
                         </select>
