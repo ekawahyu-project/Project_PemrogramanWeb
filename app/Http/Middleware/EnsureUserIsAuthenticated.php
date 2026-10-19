@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnsureUserIsAuthenticated
@@ -15,7 +16,8 @@ class EnsureUserIsAuthenticated
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (! session()->has('user')) {
+        // Periksa apakah pengguna sudah login menggunakan Auth Laravel
+        if (! Auth::check()) {
             return redirect('/login');
         }
 

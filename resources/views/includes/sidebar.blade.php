@@ -32,8 +32,9 @@ $icons = [
         </button>
         <span class="font-bold text-navy-900 text-base tracking-tight">AlpetBizz</span>
     </div>
+    <!-- Menggunakan Auth::user()->nama / Auth::user()->username -->
     <span class="text-xs font-semibold px-2.5 py-1 bg-navy-100 text-navy-800 rounded-lg truncate max-w-[120px]">
-        <?= htmlspecialchars(session('user', 'User')) ?>
+        {{ Auth::user()->nama ?? Auth::user()->username ?? 'User' }}
     </span>
 </header>
 

@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
 class AuthController extends Controller
@@ -13,7 +16,8 @@ class AuthController extends Controller
      */
     public function showLogin(Request $request): View|RedirectResponse
     {
-        if (session()->has('user')) {
+        // Ganti pengecekan session session()->has('user') dengan Auth::check()
+        if (Auth::check()) {
             return redirect('/dashboard');
         }
 
@@ -39,34 +43,28 @@ class AuthController extends Controller
     }
 
     /**
-     * Proses login pengguna.
+     * Proses login pengguna menggunakan database.
      */
     protected function login(Request $request): RedirectResponse
     {
         $id = trim((string) $request->input('username', ''));
         $pw = (string) $request->input('password', '');
 
-        $users = session('users', []);
+        if (empty($id) || empty($pw)) {
+            return redirect('/login')
+                ->withInput($request->only('username'))
+                ->with('error', 'Username/Email dan kata sandi wajib diisi.')
+                ->with('tab', 'login');
+        }
 
-        foreach ($users as $uname => $data) {
-            $emailMatch = strtolower((string) ($data['email'] ?? '')) === strtolower($id);
-            $unameMatch = (string) $uname === $id;
+        // Tentukan apakah input berupa email atau username
+        $fieldType = filter_var($id, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
-            if (($unameMatch || $emailMatch) && (string) ($data['password'] ?? '') === $pw) {
-                session([
-                    'user' => $uname,
-                    'user_nama' => $data['nama'] ?? 'User',
-                    'profil' => [
-                        'no_hp' => $data['no_hp'] ?? '',
-                        'nama_usaha' => $data['nama_usaha'] ?? '',
-                        'kategori' => $data['kategori'] ?? '',
-                        'alamat' => $data['alamat'] ?? '',
-                        'foto' => $data['foto'] ?? '',
-                    ],
-                ]);
+        // Coba autentikasi menggunakan Laravel Auth
+        if (Auth::attempt([$fieldType => $id, 'password' => $pw])) {
+            $request->session()->regenerate();
 
-                return redirect('/dashboard');
-            }
+            return redirect()->intended('/dashboard');
         }
 
         return redirect('/login')
@@ -76,7 +74,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Proses pendaftaran akun pengguna baru.
+     * Proses pendaftaran akun pengguna baru ke database.
      */
     protected function register(Request $request): RedirectResponse
     {
@@ -90,7 +88,7 @@ class AuthController extends Controller
         $pw = (string) $request->input('password', '');
         $pw2 = (string) $request->input('password2', '');
 
-        $users = session('users', []);
+        $error = '';
 
         if (! $nama || ! $uname || ! $email || ! $pw) {
             $error = 'Nama lengkap, username, email, dan kata sandi wajib diisi.';
@@ -98,16 +96,10 @@ class AuthController extends Controller
             $error = 'Konfirmasi kata sandi tidak cocok.';
         } elseif (strlen($pw) < 6) {
             $error = 'Kata sandi minimal 6 karakter.';
-        } elseif (isset($users[$uname])) {
+        } elseif (User::where('username', $uname)->exists()) {
             $error = 'Username sudah terdaftar.';
-        } else {
-            $error = '';
-            foreach ($users as $u) {
-                if (strtolower((string) ($u['email'] ?? '')) === strtolower($email)) {
-                    $error = 'Email sudah terdaftar.';
-                    break;
-                }
-            }
+        } elseif (User::where('email', $email)->exists()) {
+            $error = 'Email sudah terdaftar.';
         }
 
         if ($error !== '') {
@@ -117,7 +109,8 @@ class AuthController extends Controller
                 ->with('tab', 'register');
         }
 
-        $users[$uname] = [
+        // Simpan user baru ke database dengan password yang di-hash
+        User::create([
             'nama' => $nama,
             'username' => $uname,
             'email' => $email,
@@ -125,11 +118,9 @@ class AuthController extends Controller
             'nama_usaha' => $nama_usaha,
             'kategori' => $kategori,
             'alamat' => $alamat,
-            'password' => $pw,
+            'password' => Hash::make($pw),
             'foto' => '',
-        ];
-
-        session(['users' => $users]);
+        ]);
 
         return redirect('/login')
             ->with('success', 'Akun berhasil didaftarkan! Silakan masuk.')
@@ -139,9 +130,12 @@ class AuthController extends Controller
     /**
      * Proses logout pengguna.
      */
-    public function logout(): RedirectResponse
+    public function logout(Request $request): RedirectResponse
     {
-        session()->forget(['user', 'user_nama']);
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return redirect('/login');
     }

@@ -42,23 +42,7 @@ class EnsureAppInitialized
      */
     protected function initializeData(): void
     {
-        // 1. Users
-        if (! session()->has('users')) {
-            session([
-                'users' => [
-                    'admin' => [
-                        'nama' => 'Administrator',
-                        'username' => 'admin',
-                        'email' => 'admin@gmail.com',
-                        'password' => 'admin123',
-                        'no_hp' => '08123456789',
-                        'nama_usaha' => 'AlpetBizz Store',
-                        'kategori' => 'Makanan & Minuman',
-                        'alamat' => 'Malang',
-                    ],
-                ],
-            ]);
-        }
+        // Catatan: Inisialisasi 'users' dihapus karena sudah beralih sepenuhnya ke Database (Tabel users).
 
         // 2. Produk
         $produkFile = storage_path('app/produk.json');
@@ -80,7 +64,7 @@ class EnsureAppInitialized
                     ['id' => 't1',  'tanggal' => '2026-07-15', 'keterangan' => 'Penjualan Kopi Arabika',  'jenis' => 'Pemasukan',   'jumlah' => 385000, 'produk_id' => 'p1'],
                     ['id' => 't2',  'tanggal' => '2026-07-20', 'keterangan' => 'Biaya Sewa Tempat',        'jenis' => 'Pengeluaran', 'jumlah' => 500000, 'produk_id' => null],
                     ['id' => 't3',  'tanggal' => '2026-07-25', 'keterangan' => 'Penjualan Sabun Herbal',   'jenis' => 'Pemasukan',   'jumlah' => 120000, 'produk_id' => 'p5'],
-                    ['id' => 't4',  'tanggal' => '2026-08-05', 'keterangan' => 'Penjualan Tas Kanvas',     'jenis' => 'Pemasukan',   'jumlah' => 315000, 'produk_id' => 'p4'],
+                    ['id' => 't4',  'tanggal' => '2026-08-05', 'keterangan' => 'Penjualan Tas Kanvas',    'jenis' => 'Pemasukan',   'jumlah' => 315000, 'produk_id' => 'p4'],
                     ['id' => 't5',  'tanggal' => '2026-08-12', 'keterangan' => 'Beli Bahan Baku',          'jenis' => 'Pengeluaran', 'jumlah' => 300000, 'produk_id' => null],
                     ['id' => 't6',  'tanggal' => '2026-08-20', 'keterangan' => 'Penjualan Kopi Arabika',   'jenis' => 'Pemasukan',   'jumlah' => 440000, 'produk_id' => 'p1'],
                     ['id' => 't7',  'tanggal' => '2026-08-28', 'keterangan' => 'Biaya Listrik',            'jenis' => 'Pengeluaran', 'jumlah' => 150000, 'produk_id' => null],
@@ -89,7 +73,7 @@ class EnsureAppInitialized
                     ['id' => 't10', 'tanggal' => '2026-09-18', 'keterangan' => 'Beli Bahan Baku',          'jenis' => 'Pengeluaran', 'jumlah' => 200000, 'produk_id' => null],
                     ['id' => 't11', 'tanggal' => '2026-09-22', 'keterangan' => 'Penjualan Sabun Herbal',   'jenis' => 'Pemasukan',   'jumlah' => 75000,  'produk_id' => 'p5'],
                     ['id' => 't12', 'tanggal' => '2026-09-25', 'keterangan' => 'Biaya Operasional',        'jenis' => 'Pengeluaran', 'jumlah' => 80000,  'produk_id' => null],
-                    ['id' => 't13', 'tanggal' => '2026-09-28', 'keterangan' => 'Penjualan Tas Kanvas',     'jenis' => 'Pemasukan',   'jumlah' => 225000, 'produk_id' => 'p4'],
+                    ['id' => 't13', 'tanggal' => '2026-09-28', 'keterangan' => 'Penjualan Tas Kanvas',    'jenis' => 'Pemasukan',   'jumlah' => 225000, 'produk_id' => 'p4'],
                 ],
             ]);
         }
@@ -123,22 +107,6 @@ class EnsureAppInitialized
                 'catatan_rekomendasi' => [
                     ['id' => 'cr1', 'judul' => 'Tingkatkan stok Kopi Arabika', 'isi' => 'Produk terlaris. Tambah minimal 50 pack/bulan untuk hindari kehabisan.', 'prioritas' => 'Tinggi', 'dibuat' => '2026-09-28'],
                     ['id' => 'cr2', 'judul' => 'Promosi Teh Hijau',            'isi' => 'Stok menipis, jarang terjual. Pertimbangkan diskon atau bundle promo.',  'prioritas' => 'Sedang', 'dibuat' => '2026-09-29'],
-                ],
-            ]);
-        }
-
-        // 7. Profil
-        if (! session()->has('profil')) {
-            $curUname = session('user', 'admin');
-            $users = session('users', []);
-            $curUser = $users[$curUname] ?? [];
-            session([
-                'profil' => [
-                    'no_hp' => $curUser['no_hp'] ?? '08123456789',
-                    'nama_usaha' => $curUser['nama_usaha'] ?? 'AlpetBizz Store',
-                    'kategori' => $curUser['kategori'] ?? 'Makanan & Minuman',
-                    'alamat' => $curUser['alamat'] ?? 'Malang',
-                    'foto' => $curUser['foto'] ?? '',
                 ],
             ]);
         }
