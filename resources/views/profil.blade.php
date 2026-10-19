@@ -146,8 +146,8 @@
                         <p
                             class="text-xs sm:text-sm text-gray-500 mt-0.5 truncate"
                         >
-                            @{{ $username }}
-                            •
+                            {{ $username }}
+                            |
                             {{ $email ?: 'Belum ada email' }}
                         </p>
 

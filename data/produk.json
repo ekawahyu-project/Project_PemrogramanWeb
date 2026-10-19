@@ -1,0 +1,52 @@
+[
+    {
+        "id": "p4",
+        "nama": "Tas Kanvas Polos",
+        "kategori": "Fashion",
+        "harga_beli": 25000,
+        "harga_jual": 45000,
+        "satuan": "pcs",
+        "stok": 11,
+        "stok_min": 3
+    },
+    {
+        "id": "p5",
+        "nama": "Sabun Herbal",
+        "kategori": "Kecantikan",
+        "harga_beli": 8000,
+        "harga_jual": 15000,
+        "satuan": "pcs",
+        "stok": 30,
+        "stok_min": 10
+    },
+    {
+        "id": "p6abb8f36521d7",
+        "nama": "Scarlett",
+        "kategori": "Kecantikan",
+        "harga_beli": 12000,
+        "harga_jual": 13000,
+        "satuan": "pcs",
+        "stok": 8,
+        "stok_min": 5
+    },
+    {
+        "id": "p6abb8fe5f1e02",
+        "nama": "Cetaphil",
+        "kategori": "Kecantikan",
+        "harga_beli": 11000,
+        "harga_jual": 12000,
+        "satuan": "ml",
+        "stok": 3,
+        "stok_min": 5
+    },
+    {
+        "id": "p6abdf1153eec2",
+        "nama": "Fresh Care",
+        "kategori": "Kesehatan & Herbal",
+        "harga_beli": 10000,
+        "harga_jual": 12000,
+        "satuan": "pcs",
+        "stok": 9,
+        "stok_min": 5
+    }
+]
