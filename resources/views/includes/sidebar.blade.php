@@ -78,8 +78,9 @@ $icons = [
 
         <!-- Keluar -->
         <div class="px-3 py-4 border-t border-white/10">
-            <form method="POST" action="/logout">
+            <form method="POST" action="/logout" data-spa-ignore="true">
                 @csrf
+                <input type="hidden" name="action" value="logout">
                 <button type="submit"
                     class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium
                            text-white/60 hover:bg-red-500/80 hover:text-white transition">

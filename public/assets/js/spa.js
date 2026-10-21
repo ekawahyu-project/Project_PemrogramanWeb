@@ -189,16 +189,17 @@
         const form = e.target;
         if (!form || form.tagName !== 'FORM') return;
 
-        // Abaikan form logout di sidebar agar keluar secara bersih
+        // Abaikan form logout dan form bertanda data-spa-ignore agar reload/redirect secara native
+        if (form.hasAttribute('data-spa-ignore')) return;
         const actionInput = form.querySelector('input[name="action"]');
         if (actionInput && actionInput.value === 'logout') return;
 
         const actionUrl = form.getAttribute('action') || window.location.href;
         const targetUrl = new URL(actionUrl, window.location.href);
 
-        // Hanya intercept form internal
+        // Hanya intercept form internal dan bukan auth (login/logout/register)
         if (targetUrl.origin !== window.location.origin) return;
-        if (actionUrl.includes('login.php') || actionUrl.includes('register.php')) return;
+        if (actionUrl.includes('login') || actionUrl.includes('logout') || actionUrl.includes('register')) return;
 
         e.preventDefault();
         startProgress();
@@ -213,7 +214,7 @@
                 headers: { 'X-Requested-With': 'SPA-Fetch' }
             });
 
-            if (res.redirected && res.url.includes('login.php')) {
+            if (res.redirected && (res.url.includes('login') || res.url.includes('login.php'))) {
                 window.location.href = res.url;
                 return;
             }

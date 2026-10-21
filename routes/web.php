@@ -16,7 +16,7 @@ Route::get('/', fn () => redirect('/login'));
 // Auth routes (tanpa auth middleware)
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'handle'])->name('login.handle');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Register (redirect ke /login?tab=register)
 Route::get('/register', fn () => redirect('/login?tab=register'))->name('register');

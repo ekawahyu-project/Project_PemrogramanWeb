@@ -27,11 +27,13 @@ class EnsureAppInitialized
 
         $response = $next($request);
 
-        // Sync back any changes made directly to $_SESSION
-        if (isset($_SESSION) && is_array($_SESSION)) {
+        // Sync back any changes made directly to $_SESSION (only if user is still logged in)
+        if (session()->has('user') && isset($_SESSION) && is_array($_SESSION)) {
             foreach ($_SESSION as $key => $val) {
                 session([$key => $val]);
             }
+        } elseif (! session()->has('user') && isset($_SESSION)) {
+            unset($_SESSION['user'], $_SESSION['user_nama'], $_SESSION['profil']);
         }
 
         return $response;
