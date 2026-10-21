@@ -100,6 +100,14 @@ class TransactionController extends Controller
         $jenis = (string) $request->input('jenis', 'Pemasukan');
         $produkId = (string) $request->input('produk_id', '') ?: null;
 
+        if ($keterangan === '') {
+            return redirect('/transaksi?edit='.$id)->with('flash', ['type' => 'danger', 'msg' => 'Keterangan tidak boleh kosong.']);
+        }
+
+        if ($jumlah <= 0) {
+            return redirect('/transaksi?edit='.$id)->with('flash', ['type' => 'danger', 'msg' => 'Jumlah nominal harus lebih dari 0.']);
+        }
+
         $transaksiList = session('transaksi', []);
         $found = false;
 
