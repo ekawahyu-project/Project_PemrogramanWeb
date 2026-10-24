@@ -22,21 +22,7 @@ class EnsureAppInitialized
         $inputClass = 'w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm outline-none focus:border-navy-700 focus:ring-2 focus:ring-navy-100 transition';
         View::share('inputClass', $inputClass);
 
-        // Sync with global $_SESSION array for backward compatibility
-        $_SESSION = session()->all();
-
-        $response = $next($request);
-
-        // Sync back any changes made directly to $_SESSION (only if user is still logged in)
-        if (session()->has('user') && isset($_SESSION) && is_array($_SESSION)) {
-            foreach ($_SESSION as $key => $val) {
-                session([$key => $val]);
-            }
-        } elseif (! session()->has('user') && isset($_SESSION)) {
-            unset($_SESSION['user'], $_SESSION['user_nama'], $_SESSION['profil']);
-        }
-
-        return $response;
+        return $next($request);
     }
 
     /**

@@ -21,8 +21,9 @@ if ($errorsList) {
     ];
 }
 
+// {{ }} di Blade sudah meng-escape, jadi $val tidak perlu htmlspecialchars lagi
 $raw = fn(string $k, $default = '') => (string) (old($k, $editPrd[$k] ?? $default));
-$val = fn(string $k, $default = '') => htmlspecialchars($raw($k, $default));
+$val = fn(string $k, $default = '') => $raw($k, $default);
 @endphp
 <!DOCTYPE html>
 <html lang="id">
@@ -55,6 +56,22 @@ $val = fn(string $k, $default = '') => htmlspecialchars($raw($k, $default));
     @include('includes.sidebar')
 
     <main class="w-full min-h-screen lg:pl-64 flex flex-col transition-all duration-300">
+        <!-- Menghilangkan panah atas-bawah pada input harga -->
+        <style>
+            .no-spinner::-webkit-outer-spin-button,
+            .no-spinner::-webkit-inner-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
+            .no-spinner {
+                -moz-appearance: textfield;
+                appearance: textfield;
+            }
+            
+            .swal-toast-satu-baris { white-space: nowrap; }
+
+        </style>
+
         <div class="p-4 sm:p-6 lg:p-8 flex-1 space-y-6 max-w-7xl w-full mx-auto">
             <!-- Floating Header Card -->
             <header class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -113,18 +130,6 @@ $val = fn(string $k, $default = '') => htmlspecialchars($raw($k, $default));
                         <input type="number" name="harga_beli" required min="0" step="1" placeholder="0"
                             value="{{ $val('harga_beli') }}" class="no-spinner {{ $inputClass }}">
                     </div>
-
-                    <style>
-                        .no-spinner::-webkit-outer-spin-button,
-                        .no-spinner::-webkit-inner-spin-button {
-                            -webkit-appearance: none;
-                            margin: 0;
-                        }
-                        .no-spinner {
-                            -moz-appearance: textfield;
-                            appearance: textfield;
-                        }
-                    </style>
                     <div>
                         <label class="block text-xs font-semibold text-gray-600 mb-1.5">Harga Jual (Rp)</label>
                         <input type="number" name="harga_jual" required min="1" step="1" placeholder="0"
@@ -179,7 +184,6 @@ $val = fn(string $k, $default = '') => htmlspecialchars($raw($k, $default));
                             <tbody class="divide-y divide-gray-50">
                                 @foreach (session('produk', []) as $p)
                                     @php
-                                    $stokOk = ($p['stok'] ?? 0) > ($p['stok_min'] ?? 0);
                                     $stokLow = ($p['stok'] ?? 0) > 0 && ($p['stok'] ?? 0) <= ($p['stok_min'] ?? 0);
                                     $stokEmpty = ($p['stok'] ?? 0) === 0;
                                     @endphp
@@ -224,28 +228,50 @@ $val = fn(string $k, $default = '') => htmlspecialchars($raw($k, $default));
             </div>
         </div>
 
+        <!-- Konfirmasi hapus -->
         <script>
-            window.konfirmasiHapus = function(btn) {
+            window.konfirmasiHapus = function (btn) {
                 const form = btn.closest('form');
                 Swal.fire({
                     title: 'DELETE!',
-                    text: 'Hapus produk ' + btn.dataset.nama + '?' ,
+                    text: 'Hapus produk ' + btn.dataset.nama + '?',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Ya, hapus',
                     cancelButtonText: 'Tidak',
                     confirmButtonColor: '#dc2626',
                     reverseButtons: true
-                }).then(function(result) {
+                }).then(function (result) {
                     if (result.isConfirmed) form.submit();
                 });
             };
         </script>
 
+        <!-- Notifikasi: sukses = toast 3 detik, selain itu = dialog -->
         @if ($notif)
             <script>
-                var _notif = {!! json_encode($notif) !!};
-                Swal.fire(_notif);
+                (function () {
+                    var notif = @json($notif);
+
+                    if (notif.icon === 'success') {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: notif.text || notif.title,
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                            customClass: { title: 'swal-toast-satu-baris' },
+                            didOpen: function (toast) {
+                                toast.addEventListener('mouseenter', Swal.stopTimer);
+                                toast.addEventListener('mouseleave', Swal.resumeTimer);
+                            }
+                        });
+                    } else {
+                        Swal.fire(notif);
+                    }
+                })();
             </script>
         @endif
     </main>
