@@ -21,5 +21,6 @@ class DatabaseSeeder extends Seeder
                 'alamat_usaha'   => 'Malang',
             ]
         );
+        $this->call(ProductSeeder::class);
     }
 }
