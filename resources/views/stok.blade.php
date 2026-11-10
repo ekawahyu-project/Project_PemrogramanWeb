@@ -85,7 +85,6 @@ $lowStock = array_filter($produkList, fn($p) => ($p['stok'] ?? 0) <= ($p['stok_m
                                 $stokMin = $p['stok_min'] ?? 0;
                                 $pct = $stokMin > 0 ? min(100, ($stok / max($stokMin * 2, 1)) * 100) : 100;
                                 $barColor = $stok === 0 ? 'bg-gray-300' : ($stok <= $stokMin ? 'bg-orange-400' : 'bg-green-400');
-                                $pctStyle = 'width:' . $pct . '%';
                                 @endphp
                             <tr class="hover:bg-gray-50/70 transition">
                                 <td class="px-4 sm:px-5 py-3.5 font-medium text-navy-900">
@@ -97,7 +96,7 @@ $lowStock = array_filter($produkList, fn($p) => ($p['stok'] ?? 0) <= ($p['stok_m
                                     <div class="flex items-center justify-center gap-2">
                                         <span class="font-semibold text-navy-900 w-7 text-right">{{ $stok }}</span>
                                         <div class="w-16 sm:w-20 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                                            <div class="h-full {{ $barColor }} rounded-full" style="{{ $pctStyle }}"></div>
+                                            <div class="h-full {{ $barColor }} rounded-full" @style(['width: ' . $pct . '%'])></div>
                                         </div>
                                     </div>
                                 </td>
@@ -238,10 +237,11 @@ $lowStock = array_filter($produkList, fn($p) => ($p['stok'] ?? 0) <= ($p['stok_m
     </main>
 
     @if ($flash)
-    <script>
-        var _flash = {!! json_encode($flash) !!};
+        <div id="flash-data" data-flash="{{ json_encode($flash) }}" hidden></div>
+        <script>
+        var _flash = JSON.parse(document.getElementById('flash-data').dataset.flash);
         Swal.fire(_flash);
-    </script>
-    @endif
+</script>
+@endif
 </body>
 </html>
