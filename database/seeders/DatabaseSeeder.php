@@ -27,7 +27,6 @@ class DatabaseSeeder extends Seeder
                 'alamat_usaha' => 'Malang',
             ]
         );
-
         $productsData = [
             'p1' => ['nama' => 'Kopi Arabika 250g', 'kategori' => 'Minuman', 'harga_beli' => 30000, 'harga_jual' => 55000, 'satuan' => 'pack', 'stok' => 25, 'stok_min' => 5],
             'p2' => ['nama' => 'Teh Hijau 100g', 'kategori' => 'Minuman', 'harga_beli' => 12000, 'harga_jual' => 20000, 'satuan' => 'pack', 'stok' => 8, 'stok_min' => 10],

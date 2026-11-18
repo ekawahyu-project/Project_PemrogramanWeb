@@ -408,8 +408,9 @@
             </div>
         </div>
 
+        <!-- Konfirmasi hapus -->
         <script>
-            window.konfirmasiHapus = function(btn) {
+            window.konfirmasiHapus = function (btn) {
                 const form = btn.closest('form');
                 Swal.fire({
                     title: 'Hapus Produk?',
@@ -423,16 +424,42 @@
                     confirmButtonColor: '#ef4444',
                     cancelButtonColor: '#252f1b',
                     reverseButtons: true
-                }).then(function(result) {
+                }).then(function (result) {
                     if (result.isConfirmed) form.submit();
                 });
             };
         </script>
 
+        <!-- Notifikasi: sukses = toast 3 detik, selain itu = dialog -->
         @if ($notif)
+            <div id="notif-data" data-notif="{{ json_encode($notif) }}" hidden></div>
             <script>
-                var _notif = Object.assign({ background: '#12170D', color: '#F4F7F0', confirmButtonColor: '#252f1b' }, @json($notif));
-                Swal.fire(_notif);
+                (function () {
+                    var notif = Object.assign(
+                        { background: '#12170D', color: '#F4F7F0', confirmButtonColor: '#252f1b' },
+                        JSON.parse(document.getElementById('notif-data').dataset.notif)
+                    );
+
+                    if (notif.icon === 'success') {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: notif.text || notif.title,
+                            background: '#12170D',
+                            color: '#F4F7F0',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                            didOpen: function (toast) {
+                                toast.addEventListener('mouseenter', Swal.stopTimer);
+                                toast.addEventListener('mouseleave', Swal.resumeTimer);
+                            }
+                        });
+                    } else {
+                        Swal.fire(notif);
+                    }
+                })();
             </script>
         @endif
     </main>

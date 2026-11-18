@@ -303,7 +303,7 @@
                                             <div class="flex items-center justify-center gap-3">
                                                 <span class="font-bold text-white w-8 text-right tabular-nums">{{ $p->stok }}</span>
                                                 <div class="w-24 sm:w-32 h-2 bg-[#181F11] rounded-full overflow-hidden border border-white/[0.06]">
-                                                    <div class="h-full {{ $barColor }} rounded-full" style="{{ $pctStyle }}"></div>
+                                                    <div class="h-full {{ $barColor }} rounded-full" @style([$pctStyle])></div>
                                                 </div>
                                             </div>
                                         </td>
@@ -395,8 +395,12 @@
     </main>
 
     @if ($flash)
+    <div id="flash-data" data-flash="{{ json_encode($flash) }}" hidden></div>
     <script>
-        var _flash = Object.assign({ background: '#12170D', color: '#F4F7F0', confirmButtonColor: '#252f1b' }, @json($flash));
+        var _flash = Object.assign(
+            { background: '#12170D', color: '#F4F7F0', confirmButtonColor: '#252f1b' },
+            JSON.parse(document.getElementById('flash-data').dataset.flash)
+        );
         Swal.fire(_flash);
     </script>
     @endif
