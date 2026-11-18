@@ -1,511 +1,324 @@
 <!DOCTYPE html>
-<html lang="id">
-
+<html lang="id" class="dark">
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profil | AlpetBizz</title>
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-        rel="stylesheet"
-    >
-
     <script src="https://cdn.tailwindcss.com"></script>
-
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif']
-                    },
-                    colors: {
-                        navy: {
-                            '100': '#dbe8ff',
-                            '700': '#1e4080',
-                            '800': '#162e5e',
-                            '900': '#0e1f42',
-                            '950': '#080f21'
-                        }
+                        sans: ['Poppins', 'sans-serif'],
+                        mono: ['Poppins', 'sans-serif']
                     }
                 }
             }
-        }
+        };
     </script>
-
 </head>
-
-<body class="bg-gray-50 font-sans antialiased text-gray-800">
-
+<body class="bento-body font-sans antialiased text-[#F4F7F0]">
     @include('includes.sidebar')
 
-    <main
-        class="w-full min-h-screen lg:pl-64 flex flex-col transition-all duration-300"
-    >
+    @php
+        $filledFields = collect([$nama, $email, $noHp, $namaUsaha, $kategori, $alamat])->filter(fn ($v) => ! empty($v))->count();
+        $completePct = round(($filledFields / 6) * 100);
+    @endphp
 
-        <div
-            class="p-4 sm:p-6 lg:p-8 flex-1 space-y-6 max-w-7xl w-full mx-auto"
-        >
+    <main class="w-full min-h-screen lg:pl-64 flex flex-col transition-all duration-300">
+        <div class="p-4 sm:p-6 lg:p-8 flex-1 max-w-[1380px] w-full mx-auto space-y-5">
 
-            <!-- Header -->
-
-            <header
-                class="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
-            >
-
-                <div>
-
-                    <h2
-                        class="font-bold text-xl sm:text-2xl text-navy-900 tracking-tight"
-                    >
-                        Profil Saya
-                    </h2>
-
-                    <p class="text-xs sm:text-sm text-gray-500 mt-1">
-                        Kelola informasi akun pengguna dan identitas usaha Anda.
-                    </p>
-
+            <!-- Web3Bento Top Status Bar -->
+            <nav class="flex flex-wrap items-center justify-between gap-3 px-1" aria-label="Profil Header">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-xs sm:text-sm uppercase tracking-wider text-[#9AA68E]">Workspace /</span>
+                    <h2 class="text-base sm:text-lg font-semibold text-white">Profil Saya</h2>
                 </div>
+            </nav>
 
-            </header>
-
-            <!-- Main Profile Card -->
-
-            <div
-                class="w-full bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
-            >
-
-                <!-- Profile Top Banner -->
-
-                <div
-                    class="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4 px-4 sm:px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-navy-100/50 to-white"
-                >
-
-                    <!-- FOTO + TOMBOL UBAH FOTO -->
-                    <div
-                        class="flex flex-col items-center gap-2 flex-shrink-0"
-                    >
-                        @if (!empty($fotoUrl))
-                            <img
-                                src="{{ $fotoUrl }}"
-                                alt="Foto Profil"
-                                class="w-16 h-16 rounded-full object-cover shadow-md"
-                            >
-                        @else
-                            <div
-                                class="w-16 h-16 rounded-full bg-gradient-to-br from-navy-800 to-navy-950 flex items-center justify-center text-white text-2xl font-bold shadow-md"
-                            >
-                                {{ $initial }}
-                            </div>
-                        @endif
-                        <!-- Tombol Ubah Foto -->
-                        <label
-                            for="foto_profil"
-                            class="cursor-pointer inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-gray-200 hover:bg-gray-50 text-navy-800 rounded-lg text-xs font-semibold transition"
-                        >
-                            <svg
-                                class="w-3.5 h-3.5"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M3 7h4l2-3h6l2 3h4a2 2 0 012 2v10a2 2 0 01-2 2H3a2 2 0 01-2-2V9a2 2 0 012-2z"
-                                />
-                                <circle
-                                    cx="12"
-                                    cy="14"
-                                    r="3"
-                                    stroke-width="2"
-                                />
-                            </svg>
-                            Ubah Foto
-                        </label>
-                    </div>
-
-                    <!-- Informasi Profil -->
-
-                    <div class="flex-1 min-w-0">
-
-                        <p
-                            class="font-bold text-base sm:text-lg text-navy-900 truncate"
-                        >
-                            {{ $nama ?: 'Profil Pemilik' }}
-                        </p>
-
-                        <p
-                            class="text-xs sm:text-sm text-gray-500 mt-0.5 truncate"
-                        >
-                            {{ $username }}
-                            |
-                            {{ $email ?: 'Belum ada email' }}
-                        </p>
-
-                        <div
-                            class="flex flex-wrap items-center justify-center sm:justify-start gap-1.5 mt-2"
-                        >
-
-                            <span
-                                class="inline-flex items-center px-2.5 py-0.5 bg-navy-100 text-navy-800 text-xs font-semibold rounded-md"
-                            >
-                                Pemilik Usaha UMKM
-                            </span>
-
-                            @if (!empty($namaUsaha))
-
-                                <span
-                                    class="inline-flex items-center px-2.5 py-0.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-md"
-                                >
-                                    {{ $namaUsaha }}
-                                </span>
-
-                            @endif
-
-                            @if (!empty($kategori))
-
-                                <span
-                                    class="inline-flex items-center px-2.5 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 text-xs font-medium rounded-md"
-                                >
-                                    {{ $kategori }}
-                                </span>
-
-                            @endif
-
-                        </div>
-
-                    </div>
-
+            <!-- Pesan Flash -->
+            @if (! empty($flash))
+                <div class="px-5 py-4 rounded-[22px] text-sm font-medium
+                    {{ ($flash['type'] ?? '') === 'success'
+                        ? 'bg-[#C4FF0D]/10 text-[#C4FF0D] border border-[#C4FF0D]/30'
+                        : 'bg-rose-500/10 text-rose-300 border border-rose-500/30' }}">
+                    {{ $flash['message'] ?? '' }}
                 </div>
+            @endif
 
-                <!-- Pesan Flash -->
+            <!-- ══════════════════════════════════════════════════════════
+                 WEB3BENTO 12-COLUMN RESPONSIVE GRID — PROFIL
+                 ══════════════════════════════════════════════════════════ -->
+            <div class="grid grid-cols-1 gap-4 xl:grid-cols-12 items-start">
 
-                @if (session('flash'))
-                    @php $flash = session('flash'); @endphp
-                    <div
-                        class="mx-4 sm:mx-6 mt-4 px-4 py-3 rounded-xl text-xs sm:text-sm font-medium
-                        {{ ($flash['type'] ?? '') === 'success'
-                            ? 'bg-green-50 text-green-700 border border-green-200'
-                            : 'bg-red-50 text-red-600 border border-red-200' }}"
-                    >
-                        {{ $flash['message'] ?? '' }}
-                    </div>
-                @endif
+                <!-- LEFT COLUMN (xl:col-span-4): Digital Identity Card + Solid Lime Completeness Tile -->
+                <div class="xl:col-span-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 gap-4">
 
-                <!-- Form -->
+                    <!-- 1. DIGITAL MERCHANT PASS TILE -->
+                    <section class="bento-tile justify-between relative overflow-hidden">
+                        <div class="pointer-events-none absolute -top-12 -right-12 w-36 h-36 rounded-full bg-[#C4FF0D]/15 blur-2xl"></div>
 
-                <form
-                    method="POST"
-                    action="/profil"
-                    id="profileForm"
-                    enctype="multipart/form-data"
-                    class="px-4 sm:px-6 py-5 space-y-6"
-                >
+                        <div>
+                            <header class="flex items-center justify-between mb-4">
+                                <span class="text-xs font-semibold uppercase tracking-wider text-[#9AA68E]">Merchant ID</span>
+                            </header>
 
-                    @csrf
+                            <div class="flex flex-col items-center text-center py-2">
+                                @if (! empty($fotoUrl))
+                                    <img
+                                        src="{{ $fotoUrl }}"
+                                        alt="Foto Profil"
+                                        class="w-24 h-24 rounded-full object-cover ring-2 ring-[#C4FF0D] shadow-[0_0_28px_rgba(196,255,13,0.3)]"
+                                    >
+                                @else
+                                    <div class="w-24 h-24 rounded-full bg-[#C4FF0D] flex items-center justify-center text-[#152208] text-3xl font-extrabold shadow-[0_0_28px_rgba(196,255,13,0.3)]">
+                                        {{ $initial }}
+                                    </div>
+                                @endif
 
-                    <input
-                        type="hidden"
-                        name="action"
-                        value="save"
-                    >
-
-                    <!-- INPUT FOTO -->
-
-                    <input
-                        type="file"
-                        id="foto_profil"
-                        name="foto_profil"
-                        accept="image/jpeg,image/png,image/webp"
-                        class="hidden"
-                    >
-
-                    <!-- Informasi Akun -->
-
-                    <div>
-
-                        <div
-                            class="flex items-center justify-between mb-3.5"
-                        >
-                            <h3
-                                class="text-sm font-bold text-navy-900 flex items-center gap-2"
-                            >
-                                <svg
-                                    class="w-4 h-4 text-navy-800"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                                    />
-                                </svg>
-                                Informasi Akun Pengguna
-                            </h3>
-                            <span
-                                class="text-[11px] text-gray-400"
-                            >
-                                Klik kolom untuk mengubah
-                            </span>
-                        </div>
-                        <div
-                            class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4"
-                        >
-                            <!-- Nama -->
-                            <div>
-                                <label
-                                    for="nama"
-                                    class="block text-xs font-semibold text-gray-600 mb-1.5"
-                                >
-                                    Nama Lengkap
-                                    <span class="text-red-500">*</span>
-                                </label>
-                                <input
-                                    type="text"
-                                    id="nama"
-                                    name="nama"
-                                    placeholder="Masukkan nama lengkap"
-                                    value="{{ $nama }}"
-                                    class="{{ $inputClass }}"
-                                    required
-                                >
-                            </div>
-                            <!-- Username -->
-                            <div>
-                                <label
-                                    for="username"
-                                    class="block text-xs font-semibold text-gray-600 mb-1.5"
-                                >
-                                    Username
-                                    <span class="text-gray-400 font-normal">
-                                        (ID Akun)
-                                    </span>
-                                </label>
-                                <input
-                                    type="text"
-                                    id="username"
-                                    name="username"
-                                    value="{{ $username }}"
-                                    readonly
-                                    class="{{ $inputClass }} bg-gray-100 text-gray-500 cursor-not-allowed"
-                                >
-                                <p
-                                    class="text-[11px] text-gray-400 mt-1"
-                                >
-                                    Username digunakan sebagai tanda pengenal login tetap.
+                                <h3 class="mt-4 font-bold text-xl text-white truncate max-w-full">
+                                    {{ $nama ?: 'Profil Pemilik' }}
+                                </h3>
+                                <p class="text-sm text-[#9AA68E] mt-1 truncate max-w-full">
+                                    {{ '@' . $username }} • {{ $email ?: 'Belum ada email' }}
                                 </p>
+
+                                <div class="flex flex-wrap items-center justify-center gap-2 mt-3.5">
+                                    <span class="px-3 py-1 bg-[#C4FF0D]/15 text-[#C4FF0D] border border-[#C4FF0D]/30 text-xs font-semibold rounded-full">
+                                        Pemilik Usaha UMKM
+                                    </span>
+                                    @if (! empty($namaUsaha))
+                                        <span class="px-3 py-1 bg-[#181F11] text-white border border-white/10 text-xs font-medium rounded-full">
+                                            {{ $namaUsaha }}
+                                        </span>
+                                    @endif
+                                    @if (! empty($kategori))
+                                        <span class="px-3 py-1 bg-[#C084FC]/15 text-[#C084FC] border border-[#C084FC]/30 text-xs font-medium rounded-full">
+                                            {{ $kategori }}
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
-                            <!-- Email -->
-
-                            <div>
-
-                                <label
-                                    for="email"
-                                    class="block text-xs font-semibold text-gray-600 mb-1.5"
-                                >
-                                    Alamat Email
-                                    <span class="text-red-500">*</span>
-                                </label>
-
-                                <input
-                                    type="email"
-                                    id="email"
-                                    name="email"
-                                    placeholder="Masukkan email aktif"
-                                    value="{{ $email }}"
-                                    class="{{ $inputClass }}"
-                                    required
-                                >
-
-                            </div>
-
-                            <!-- Nomor HP -->
-
-                            <div>
-
-                                <label
-                                    for="no_hp"
-                                    class="block text-xs font-semibold text-gray-600 mb-1.5"
-                                >
-                                    Nomor WhatsApp / HP
-                                </label>
-
-                                <input
-                                    type="tel"
-                                    id="no_hp"
-                                    name="no_hp"
-                                    placeholder="Contoh: 08123456789"
-                                    value="{{ $noHp }}"
-                                    class="{{ $inputClass }}"
-                                >
-
-                            </div>
-
                         </div>
 
-                    </div>
-
-                    <!-- Informasi Usaha -->
-
-                    <div>
-
-                        <div
-                            class="flex items-center justify-between mb-3.5"
-                        >
-
-                            <h3
-                                class="text-sm font-bold text-navy-900 flex items-center gap-2"
+                        <div class="mt-6 pt-4 border-t border-white/[0.08]">
+                            <label
+                                for="foto_profil"
+                                class="cursor-pointer w-full btn-ghost-dark text-sm justify-center hover:border-[#C4FF0D]/50 hover:text-white"
                             >
-
-                                <svg
-                                    class="w-4 h-4 text-navy-800"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                                    />
-
+                                <svg class="w-4 h-4 text-[#C4FF0D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 7h4l2-3h6l2 3h4a2 2 0 012 2v10a2 2 0 01-2 2H3a2 2 0 01-2-2V9a2 2 0 012-2z" />
+                                    <circle cx="12" cy="14" r="3" stroke-width="2" />
                                 </svg>
-
-                                Informasi Usaha UMKM
-
-                            </h3>
-
-                            <span
-                                class="text-[11px] text-gray-400"
-                            >
-                                Data profil operasional bisnis
-                            </span>
-
+                                Ubah Foto Profil
+                            </label>
                         </div>
+                    </section>
 
-                        <div
-                            class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4"
-                        >
+                    <!-- 2. SOLID LIME ACCENT TILE: Kelengkapan Identitas -->
+                    <section class="bento-tile-accent justify-between">
+                        <div>
+                            <header class="flex items-center justify-between">
+                                <h3 class="text-sm font-bold opacity-85">Skor Identitas</h3>
+                                <span class="rounded-full px-3 py-1 text-xs font-semibold"
+                                      style="background: rgba(21, 34, 8, 0.14);">
+                                    {{ $filledFields }}/6 Data
+                                </span>
+                            </header>
 
-                            <!-- Nama Usaha -->
+                            <p class="mt-4 text-4xl sm:text-5xl font-bold leading-none tracking-[-0.04em]">
+                                {{ $completePct }}<span class="text-2xl">%</span>
+                            </p>
+                            <p class="mt-1.5 text-xs sm:text-sm font-medium opacity-80">Kelengkapan Profil &amp; Toko</p>
 
-                            <div>
-
-                                <label
-                                    for="nama_usaha"
-                                    class="block text-xs font-semibold text-gray-600 mb-1.5"
-                                >
-                                    Nama Usaha / Toko
-                                </label>
-
-                                <input
-                                    type="text"
-                                    id="nama_usaha"
-                                    name="nama_usaha"
-                                    placeholder="Masukkan nama usaha / toko"
-                                    value="{{ $namaUsaha }}"
-                                    class="{{ $inputClass }}"
-                                >
-
+                            <div class="mt-5 rounded-2xl p-3.5" style="background: rgba(21, 34, 8, 0.1);">
+                                <div class="flex items-baseline justify-between text-xs sm:text-sm font-semibold">
+                                    <span class="opacity-80">Status Verifikasi</span>
+                                    <span>{{ $completePct === 100 ? 'Lengkap' : 'Sebagian' }}</span>
+                                </div>
+                                <div class="mt-2 h-2 overflow-hidden rounded-full" style="background: rgba(21, 34, 8, 0.16);">
+                                    <div class="h-full rounded-full bg-[#152208]" style="width: {{ $completePct }}%;"></div>
+                                </div>
                             </div>
 
-                            <!-- Kategori -->
-
-                            <div>
-
-                                <label
-                                    for="kategori"
-                                    class="block text-xs font-semibold text-gray-600 mb-1.5"
-                                >
-                                    Kategori Bidang Usaha
-                                </label>
-
-                                <select
-                                    id="kategori"
-                                    name="kategori"
-                                    class="{{ $inputClass }} cursor-pointer"
-                                >
-
-                                    @foreach ($kategoriOptions as $opt)
-
-                                        <option
-                                            value="{{ $opt }}"
-                                            {{ $kategori === $opt ? 'selected' : '' }}
-                                        >
-                                            {{ $opt ?: '-- Pilih kategori usaha --' }}
-                                        </option>
-
-                                    @endforeach
-
-                                </select>
-
-                            </div>
-
-                            <!-- Alamat -->
-
-                            <div class="sm:col-span-2">
-
-                                <label
-                                    for="alamat"
-                                    class="block text-xs font-semibold text-gray-600 mb-1.5"
-                                >
-                                    Alamat Lengkap Usaha
-                                </label>
-
-                                <textarea
-                                    id="alamat"
-                                    name="alamat"
-                                    rows="3"
-                                    placeholder="Masukkan alamat lokasi usaha"
-                                    class="{{ $inputClass }} resize-y"
-                                >{{ $alamat }}</textarea>
-                            </div>
+                            <ul class="mt-4 space-y-2 text-xs sm:text-sm">
+                                <li class="flex justify-between">
+                                    <span class="opacity-80">Akun &amp; Email</span>
+                                    <span class="font-bold">{{ (! empty($nama) && ! empty($email)) ? '✓ Aktif' : 'Belum' }}</span>
+                                </li>
+                                <li class="flex justify-between">
+                                    <span class="opacity-80">Kontak WhatsApp</span>
+                                    <span class="font-bold">{{ ! empty($noHp) ? '✓ Terisi' : 'Kosong' }}</span>
+                                </li>
+                                <li class="flex justify-between">
+                                    <span class="opacity-80">Identitas Toko</span>
+                                    <span class="font-bold">{{ ! empty($namaUsaha) ? '✓ Terisi' : 'Kosong' }}</span>
+                                </li>
+                            </ul>
                         </div>
+                    </section>
 
-                    </div>
+                </div>
 
-                    <!-- Actions -->
-
-                    <div
-                        class="flex flex-col sm:flex-row items-center gap-3 pt-4 border-t border-gray-100"
+                <!-- RIGHT COLUMN (xl:col-span-8): Bento Profile & Merchant Settings Form -->
+                <section class="bento-tile bento-tile-lg xl:col-span-8 justify-between">
+                    <form
+                        method="POST"
+                        action="/profil"
+                        id="profileForm"
+                        enctype="multipart/form-data"
+                        class="space-y-6"
                     >
-
-                        <button
-                            type="submit"
-                            id="saveButton"
-                            class="w-full sm:w-auto px-6 py-2.5 bg-navy-800 hover:bg-navy-950 text-white rounded-lg text-sm font-semibold transition shadow-sm hover:shadow"
+                        @csrf
+                        <input type="hidden" name="action" value="save">
+                        <input
+                            type="file"
+                            id="foto_profil"
+                            name="foto_profil"
+                            accept="image/jpeg,image/png,image/webp"
+                            class="hidden"
                         >
-                            Simpan Perubahan
-                        </button>
 
-                        <button
-                            type="reset"
-                            id="resetButton"
-                            class="w-full sm:w-auto text-center px-6 py-2.5 border border-gray-200 text-gray-600 hover:bg-gray-50 rounded-lg text-sm font-medium transition"
-                        >
-                            Reset Formulir
-                        </button>
+                        <!-- Sub-Bento 1: Informasi Akun Pengguna -->
+                        <div class="rounded-2xl bg-[#181F11] border border-white/[0.07] p-5 sm:p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                    Informasi Akun Pengguna
+                                </h3>
+                                <span class="text-xs text-[#9AA68E]">Kredensial Utama</span>
+                            </div>
 
-                    </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="nama" class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">
+                                        Nama Lengkap <span class="text-[#C4FF0D]">*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="nama"
+                                        name="nama"
+                                        placeholder="Masukkan nama lengkap"
+                                        value="{{ $nama }}"
+                                        class="{{ $inputClass }}"
+                                        required
+                                    >
+                                </div>
+                                <div>
+                                    <label for="username" class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">
+                                        Username <span class="text-[#9AA68E]/60 font-normal">(ID Akun Tetap)</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="username"
+                                        name="username"
+                                        value="{{ $username }}"
+                                        readonly
+                                        class="{{ $inputClass }} opacity-60 cursor-not-allowed"
+                                    >
+                                </div>
+                                <div>
+                                    <label for="email" class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">
+                                        Alamat Email <span class="text-[#C4FF0D]">*</span>
+                                    </label>
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        name="email"
+                                        placeholder="Masukkan email aktif"
+                                        value="{{ $email }}"
+                                        class="{{ $inputClass }}"
+                                        required
+                                    >
+                                </div>
+                                <div>
+                                    <label for="no_hp" class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">
+                                        Nomor WhatsApp / HP
+                                    </label>
+                                    <input
+                                        type="tel"
+                                        id="no_hp"
+                                        name="no_hp"
+                                        placeholder="Contoh: 08123456789"
+                                        value="{{ $noHp }}"
+                                        class="{{ $inputClass }}"
+                                    >
+                                </div>
+                            </div>
+                        </div>
 
-                </form>
+                        <!-- Sub-Bento 2: Informasi Usaha UMKM -->
+                        <div class="rounded-2xl bg-[#181F11] border border-white/[0.07] p-5 sm:p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                    Informasi Usaha UMKM
+                                </h3>
+                                <span class="text-xs text-[#9AA68E]">Operasional Bisnis</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="nama_usaha" class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">
+                                        Nama Usaha / Toko
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="nama_usaha"
+                                        name="nama_usaha"
+                                        placeholder="Masukkan nama usaha / toko"
+                                        value="{{ $namaUsaha }}"
+                                        class="{{ $inputClass }}"
+                                    >
+                                </div>
+                                <div>
+                                    <label for="kategori" class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">
+                                        Kategori Bidang Usaha
+                                    </label>
+                                    <select
+                                        id="kategori"
+                                        name="kategori"
+                                        class="{{ $inputClass }} cursor-pointer"
+                                    >
+                                        @foreach ($kategoriOptions as $opt)
+                                            <option value="{{ $opt }}" {{ $kategori === $opt ? 'selected' : '' }}>
+                                                {{ $opt ?: '-- Pilih kategori usaha --' }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <label for="alamat" class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">
+                                        Alamat Lengkap Usaha
+                                    </label>
+                                    <textarea
+                                        id="alamat"
+                                        name="alamat"
+                                        rows="3"
+                                        placeholder="Masukkan alamat lokasi usaha"
+                                        class="{{ $inputClass }} resize-y"
+                                    >{{ $alamat }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+                            <p class="text-xs sm:text-sm text-[#9AA68E]">Perubahan profil akan langsung diperbarui pada sesi aktif.</p>
+                            <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+                                <button type="reset" id="resetButton" class="w-full sm:w-auto btn-ghost-dark">
+                                    Reset Formulir
+                                </button>
+                                <button type="submit" id="saveButton" class="w-full sm:w-auto btn-lime">
+                                    Simpan Perubahan
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </section>
 
             </div>
-
         </div>
     </main>
     <script src="{{ asset('assets/js/profil.js') }}"></script>

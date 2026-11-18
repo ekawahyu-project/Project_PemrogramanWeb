@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
+use App\Models\Recommendation;
+use App\Models\Transaction;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class RecommendationController extends Controller
@@ -14,20 +19,49 @@ class RecommendationController extends Controller
     public function index(Request $request): View
     {
         $currentPage = 'rekomendasi';
-        $editId = $request->query('edit');
-        $editCat = null;
-        $catatan = session('catatan_rekomendasi', []);
+        $prioritasOpt = Recommendation::PRIORITIES;
 
-        if ($editId) {
-            foreach ($catatan as $c) {
-                if (($c['id'] ?? '') === $editId) {
-                    $editCat = $c;
-                    break;
-                }
+        $incomeTransactions = Transaction::income()
+            ->whereNotNull('product_id')
+            ->with('product')
+            ->get();
+
+        $produkStats = [];
+        foreach ($incomeTransactions as $trx) {
+            $pid = $trx->product_id;
+            if (! isset($produkStats[$pid])) {
+                $produkStats[$pid] = [
+                    'count' => 0,
+                    'revenue' => 0,
+                    'nama' => $trx->product?->nama ?? 'Dihapus',
+                ];
             }
+
+            $produkStats[$pid]['count']++;
+            $produkStats[$pid]['revenue'] += $trx->jumlah;
         }
 
-        return view('rekomendasi', compact('currentPage', 'editId', 'editCat'));
+        uasort($produkStats, fn (array $a, array $b): int => $b['count'] <=> $a['count']);
+
+        $lowStock = Product::lowStock()->orderBy('id')->get();
+        $unsoldProd = Product::whereDoesntHave('transactions', fn ($query) => $query->income())
+            ->orderBy('id')
+            ->get();
+
+        $catatanList = Recommendation::orderByDesc('id')->get();
+        $editId = $request->query('edit');
+        $editCat = $editId ? Recommendation::find($editId) : null;
+
+        return view('rekomendasi', compact(
+            'currentPage',
+            'prioritasOpt',
+            'produkStats',
+            'lowStock',
+            'unsoldProd',
+            'catatanList',
+            'editId',
+            'editCat'
+        ));
     }
 
     /**
@@ -57,21 +91,24 @@ class RecommendationController extends Controller
      */
     protected function store(Request $request): RedirectResponse
     {
-        $judul = trim((string) $request->input('judul', ''));
-        $isi = trim((string) $request->input('isi', ''));
-        $prioritas = (string) $request->input('prioritas', 'Sedang');
+        $validator = Validator::make($request->all(), [
+            'judul' => ['required', 'string', 'max:255'],
+            'isi' => ['required', 'string'],
+            'prioritas' => ['required', Rule::in(Recommendation::PRIORITIES)],
+        ]);
 
-        if ($judul && $isi) {
-            $catatanList = session('catatan_rekomendasi', []);
-            $catatanList[] = [
-                'id' => uniqid('cr'),
-                'judul' => $judul,
-                'isi' => $isi,
-                'prioritas' => $prioritas,
-                'dibuat' => date('Y-m-d'),
-            ];
-            session(['catatan_rekomendasi' => $catatanList]);
+        if ($validator->fails()) {
+            return redirect('/rekomendasi');
         }
+
+        $validated = $validator->validated();
+
+        Recommendation::create([
+            'judul' => trim($validated['judul']),
+            'isi' => trim($validated['isi']),
+            'prioritas' => $validated['prioritas'],
+            'dibuat' => now()->toDateString(),
+        ]);
 
         return redirect('/rekomendasi');
     }
@@ -81,20 +118,29 @@ class RecommendationController extends Controller
      */
     protected function update(Request $request): RedirectResponse
     {
-        $id = (string) $request->input('id', '');
-        $catatanList = session('catatan_rekomendasi', []);
+        $recommendation = Recommendation::find($request->input('id'));
 
-        foreach ($catatanList as &$c) {
-            if (($c['id'] ?? '') === $id) {
-                $c['judul'] = trim((string) $request->input('judul', $c['judul'] ?? ''));
-                $c['isi'] = trim((string) $request->input('isi', $c['isi'] ?? ''));
-                $c['prioritas'] = (string) $request->input('prioritas', $c['prioritas'] ?? 'Sedang');
-                break;
-            }
+        if (! $recommendation) {
+            return redirect('/rekomendasi');
         }
-        unset($c);
 
-        session(['catatan_rekomendasi' => $catatanList]);
+        $validator = Validator::make($request->all(), [
+            'judul' => ['required', 'string', 'max:255'],
+            'isi' => ['required', 'string'],
+            'prioritas' => ['required', Rule::in(Recommendation::PRIORITIES)],
+        ]);
+
+        if ($validator->fails()) {
+            return redirect('/rekomendasi?edit='.$recommendation->id);
+        }
+
+        $validated = $validator->validated();
+
+        $recommendation->update([
+            'judul' => trim($validated['judul']),
+            'isi' => trim($validated['isi']),
+            'prioritas' => $validated['prioritas'],
+        ]);
 
         return redirect('/rekomendasi');
     }
@@ -104,11 +150,7 @@ class RecommendationController extends Controller
      */
     protected function destroy(Request $request): RedirectResponse
     {
-        $id = (string) $request->input('id', '');
-        $catatanList = session('catatan_rekomendasi', []);
-
-        $catatanList = array_values(array_filter($catatanList, fn ($c) => ($c['id'] ?? '') !== $id));
-        session(['catatan_rekomendasi' => $catatanList]);
+        Recommendation::find($request->input('id'))?->delete();
 
         return redirect('/rekomendasi');
     }

@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator as ValidationValidator;
 use Illuminate\View\View;
 
 class ProductController extends Controller
@@ -11,9 +15,43 @@ class ProductController extends Controller
     /**
      * Tampilkan halaman data produk.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
-        return view('produk');
+        $currentPage = 'produk';
+        $kategoriOpt = Product::CATEGORIES;
+        $satuanOpt = Product::UNITS;
+        $produkList = Product::orderBy('id')->get();
+
+        $editId = $request->query('edit');
+        $editPrd = $editId ? Product::find($editId) : null;
+
+        $errorsList = session('errors_list', []);
+        $notif = session('flash');
+
+        if (! empty($errorsList)) {
+            $daftar = implode('', array_map(
+                fn (string $e): string => '<li style="margin-bottom:4px">• '.e($e).'</li>',
+                $errorsList
+            ));
+
+            $notif = [
+                'icon' => 'error',
+                'title' => 'Gagal!',
+                'html' => '<ul style="text-align:left;list-style:none;padding:0;font-size:14px">'.$daftar.'</ul>',
+                'confirmButtonText' => 'Coba lagi',
+            ];
+        }
+
+        return view('produk', compact(
+            'currentPage',
+            'kategoriOpt',
+            'satuanOpt',
+            'produkList',
+            'editId',
+            'editPrd',
+            'errorsList',
+            'notif'
+        ));
     }
 
     /**
@@ -39,102 +77,98 @@ class ProductController extends Controller
      */
     protected function storeOrUpdate(Request $request): RedirectResponse
     {
-        $action = $request->input('action');
-        $id = $action === 'update' ? $request->input('id') : null;
-
-        $kategoriOpt = ['Makanan', 'Minuman', 'Fashion', 'Kecantikan', 'Bahan Baku', 'Kesehatan & Herbal', 'Perlengkapan Rumah Tangga', 'Lainnya'];
-        $satuanOpt = ['pcs', 'pack', 'kg', 'gram', 'liter', 'ml', 'box', 'lusin', 'meter', 'lembar'];
+        $action = (string) $request->input('action');
+        $isUpdate = $action === 'update';
+        $id = $isUpdate ? $request->input('id') : null;
+        $product = $isUpdate ? Product::find($id) : null;
         $maxAngka = 1000000000;
 
         $nama = trim((string) $request->input('nama', ''));
-        $kategori = (string) $request->input('kategori', '');
-        $satuan = (string) $request->input('satuan', '');
-        $beli = filter_var($request->input('harga_beli'), FILTER_VALIDATE_INT);
-        $jual = filter_var($request->input('harga_jual'), FILTER_VALIDATE_INT);
-        $stok = filter_var($request->input('stok'), FILTER_VALIDATE_INT);
-        $stokMin = filter_var($request->input('stok_min'), FILTER_VALIDATE_INT);
 
-        $errors = [];
-        $produkList = session('produk', []);
-
-        if ($nama === '') {
-            $errors[] = 'Nama produk wajib diisi.';
-        } elseif (mb_strlen($nama) > 100) {
-            $errors[] = 'Nama produk maksimal 100 karakter.';
-        } else {
-            foreach ($produkList as $p) {
-                if (($p['id'] ?? '') !== $id && mb_strtolower((string) ($p['nama'] ?? '')) === mb_strtolower($nama)) {
-                    $errors[] = 'Nama produk sudah digunakan.';
-                    break;
-                }
-            }
-        }
-
-        if (! in_array($kategori, $kategoriOpt, true)) {
-            $errors[] = 'Kategori tidak valid.';
-        }
-        if (! in_array($satuan, $satuanOpt, true)) {
-            $errors[] = 'Satuan tidak valid.';
-        }
-
-        if ($beli === false || $beli < 0) {
-            $errors[] = 'Harga beli harus berupa angka bulat 0 atau lebih.';
-        }
-        if ($jual === false || $jual <= 0) {
-            $errors[] = 'Harga jual harus berupa angka bulat lebih dari 0.';
-        }
-        if ($beli !== false && $jual !== false && $jual < $beli) {
-            $errors[] = 'Harga jual tidak boleh lebih rendah dari harga beli.';
-        }
-        if (($beli !== false && $beli > $maxAngka) || ($jual !== false && $jual > $maxAngka)) {
-            $errors[] = 'Harga terlalu besar.';
-        }
-
-        if ($stok === false || $stok < 0) {
-            $errors[] = 'Stok harus berupa angka bulat 0 atau lebih.';
-        }
-        if ($stokMin === false || $stokMin < 0) {
-            $errors[] = 'Stok minimum harus berupa angka bulat 0 atau lebih.';
-        }
-        if (($stok !== false && $stok > $maxAngka) || ($stokMin !== false && $stokMin > $maxAngka)) {
-            $errors[] = 'Nilai stok terlalu besar.';
-        }
-
-        if ($action === 'update' && getProdukById((string) $id) === null) {
-            $errors[] = 'Produk yang diedit tidak ditemukan.';
-        }
-
-        if (! empty($errors)) {
-            return redirect('/produk'.($action === 'update' ? '?edit='.$id : ''))
-                ->withInput()
-                ->with('errors_list', $errors);
-        }
-
-        $data = [
+        $validator = Validator::make([
             'nama' => $nama,
-            'kategori' => $kategori,
-            'harga_beli' => (int) $beli,
-            'harga_jual' => (int) $jual,
-            'satuan' => $satuan,
-            'stok' => (int) $stok,
-            'stok_min' => (int) $stokMin,
+            'kategori' => $request->input('kategori'),
+            'satuan' => $request->input('satuan'),
+            'harga_beli' => $request->input('harga_beli'),
+            'harga_jual' => $request->input('harga_jual'),
+            'stok' => $request->input('stok'),
+            'stok_min' => $request->input('stok_min'),
+        ], [
+            'nama' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('products', 'nama')->ignore($product?->id),
+            ],
+            'kategori' => ['required', Rule::in(Product::CATEGORIES)],
+            'satuan' => ['required', Rule::in(Product::UNITS)],
+            'harga_beli' => ['required', 'integer', 'min:0', "max:{$maxAngka}"],
+            'harga_jual' => ['required', 'integer', 'min:1', "max:{$maxAngka}"],
+            'stok' => ['required', 'integer', 'min:0', "max:{$maxAngka}"],
+            'stok_min' => ['required', 'integer', 'min:0', "max:{$maxAngka}"],
+        ], [
+            'nama.required' => 'Nama produk wajib diisi.',
+            'nama.max' => 'Nama produk maksimal 100 karakter.',
+            'nama.unique' => 'Nama produk sudah digunakan.',
+            'kategori.required' => 'Kategori tidak valid.',
+            'kategori.in' => 'Kategori tidak valid.',
+            'satuan.required' => 'Satuan tidak valid.',
+            'satuan.in' => 'Satuan tidak valid.',
+            'harga_beli.required' => 'Harga beli harus berupa angka bulat 0 atau lebih.',
+            'harga_beli.integer' => 'Harga beli harus berupa angka bulat 0 atau lebih.',
+            'harga_beli.min' => 'Harga beli harus berupa angka bulat 0 atau lebih.',
+            'harga_beli.max' => 'Harga terlalu besar.',
+            'harga_jual.required' => 'Harga jual harus berupa angka bulat lebih dari 0.',
+            'harga_jual.integer' => 'Harga jual harus berupa angka bulat lebih dari 0.',
+            'harga_jual.min' => 'Harga jual harus berupa angka bulat lebih dari 0.',
+            'harga_jual.max' => 'Harga terlalu besar.',
+            'stok.required' => 'Stok harus berupa angka bulat 0 atau lebih.',
+            'stok.integer' => 'Stok harus berupa angka bulat 0 atau lebih.',
+            'stok.min' => 'Stok harus berupa angka bulat 0 atau lebih.',
+            'stok.max' => 'Nilai stok terlalu besar.',
+            'stok_min.required' => 'Stok minimum harus berupa angka bulat 0 atau lebih.',
+            'stok_min.integer' => 'Stok minimum harus berupa angka bulat 0 atau lebih.',
+            'stok_min.min' => 'Stok minimum harus berupa angka bulat 0 atau lebih.',
+            'stok_min.max' => 'Nilai stok terlalu besar.',
+        ]);
+
+        $validator->after(function (ValidationValidator $validator) use ($isUpdate, $product, $request): void {
+            if ($isUpdate && ! $product) {
+                $validator->errors()->add('id', 'Produk yang diedit tidak ditemukan.');
+            }
+
+            $beli = filter_var($request->input('harga_beli'), FILTER_VALIDATE_INT);
+            $jual = filter_var($request->input('harga_jual'), FILTER_VALIDATE_INT);
+
+            if ($beli !== false && $jual !== false && $jual < $beli) {
+                $validator->errors()->add('harga_jual', 'Harga jual tidak boleh lebih rendah dari harga beli.');
+            }
+        });
+
+        if ($validator->fails()) {
+            return redirect('/produk'.($isUpdate ? '?edit='.$id : ''))
+                ->withInput()
+                ->with('errors_list', $validator->errors()->all());
+        }
+
+        $validated = $validator->validated();
+        $data = [
+            'nama' => $validated['nama'],
+            'kategori' => $validated['kategori'],
+            'harga_beli' => (int) $validated['harga_beli'],
+            'harga_jual' => (int) $validated['harga_jual'],
+            'satuan' => $validated['satuan'],
+            'stok' => (int) $validated['stok'],
+            'stok_min' => (int) $validated['stok_min'],
         ];
 
-        if ($action === 'tambah') {
-            $produkList[] = ['id' => uniqid('p')] + $data;
-            $pesan = 'Produk berhasil ditambahkan.';
-        } else {
-            foreach ($produkList as $i => $p) {
-                if (($p['id'] ?? '') === $id) {
-                    $produkList[$i] = ['id' => $id] + $data;
-                    break;
-                }
-            }
+        if ($isUpdate && $product) {
+            $product->update($data);
             $pesan = 'Produk berhasil diperbarui.';
+        } else {
+            Product::create($data);
+            $pesan = 'Produk berhasil ditambahkan.';
         }
-
-        session(['produk' => $produkList]);
-        simpanProduk();
 
         return redirect('/produk')->with('flash', [
             'icon' => 'success',
@@ -149,24 +183,8 @@ class ProductController extends Controller
      */
     protected function destroy(Request $request): RedirectResponse
     {
-        $id = $request->input('id', '');
-        $produkList = session('produk', []);
-        $transaksiList = session('transaksi', []);
-
-        $produkList = array_values(array_filter($produkList, fn ($p) => ($p['id'] ?? '') !== $id));
-
-        foreach ($transaksiList as &$t) {
-            if (($t['produk_id'] ?? '') === $id) {
-                $t['produk_id'] = null;
-            }
-        }
-        unset($t);
-
-        session([
-            'produk' => $produkList,
-            'transaksi' => $transaksiList,
-        ]);
-        simpanProduk();
+        $product = Product::find($request->input('id'));
+        $product?->delete();
 
         return redirect('/produk')->with('flash', [
             'icon' => 'success',

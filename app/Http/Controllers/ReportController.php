@@ -2,20 +2,101 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Report;
+use App\Models\Transaction;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class ReportController extends Controller
 {
     /**
+     * @var array<string, string>
+     */
+    private const MONTH_NAMES = [
+        '01' => 'Jan',
+        '02' => 'Feb',
+        '03' => 'Mar',
+        '04' => 'Apr',
+        '05' => 'Mei',
+        '06' => 'Jun',
+        '07' => 'Jul',
+        '08' => 'Agu',
+        '09' => 'Sep',
+        '10' => 'Okt',
+        '11' => 'Nov',
+        '12' => 'Des',
+    ];
+
+    /**
      * Tampilkan halaman laporan analitik dan laporan tersimpan.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
         $currentPage = 'laporan';
 
-        return view('laporan', compact('currentPage'));
+        $transaksiList = Transaction::orderBy('tanggal')->get();
+
+        $bulanData = [];
+        $totalMasuk = 0;
+        $totalKeluar = 0;
+        $pemasukanCount = 0;
+        $pengeluaranCount = 0;
+
+        foreach ($transaksiList as $t) {
+            $key = $t->tanggal->format('Y-m');
+            if (! isset($bulanData[$key])) {
+                $bulanData[$key] = ['pemasukan' => 0, 'pengeluaran' => 0];
+            }
+
+            if ($t->isIncome()) {
+                $bulanData[$key]['pemasukan'] += $t->jumlah;
+                $totalMasuk += $t->jumlah;
+                $pemasukanCount++;
+            } else {
+                $bulanData[$key]['pengeluaran'] += $t->jumlah;
+                $totalKeluar += $t->jumlah;
+                $pengeluaranCount++;
+            }
+        }
+
+        ksort($bulanData);
+
+        $labels = array_map(function (string $key): string {
+            [$year, $month] = explode('-', $key);
+
+            return (self::MONTH_NAMES[$month] ?? $month).' '.$year;
+        }, array_keys($bulanData));
+
+        $pemasukanData = array_column(array_values($bulanData), 'pemasukan');
+        $pengeluaranData = array_column(array_values($bulanData), 'pengeluaran');
+        $totalLaba = $totalMasuk - $totalKeluar;
+
+        $laporanTersimpan = Report::orderByDesc('id')->get();
+        $editId = $request->query('edit');
+        $editLap = $editId ? Report::find($editId) : null;
+
+        $kategoriOptions = Report::CATEGORIES;
+        $statusOptions = Report::STATUSES;
+
+        return view('laporan', compact(
+            'currentPage',
+            'totalMasuk',
+            'totalKeluar',
+            'totalLaba',
+            'pemasukanCount',
+            'pengeluaranCount',
+            'labels',
+            'pemasukanData',
+            'pengeluaranData',
+            'laporanTersimpan',
+            'editId',
+            'editLap',
+            'kategoriOptions',
+            'statusOptions'
+        ));
     }
 
     /**
@@ -45,28 +126,31 @@ class ReportController extends Controller
      */
     protected function store(Request $request): RedirectResponse
     {
-        $judul = trim((string) $request->input('judul', ''));
-        $kategori = trim((string) $request->input('kategori', 'Evaluasi Bulanan'));
-        $dari = (string) $request->input('tanggal_dari', '');
-        $sampai = (string) $request->input('tanggal_sampai', '');
-        $status = trim((string) $request->input('status', 'Selesai'));
-        $catatan = trim((string) $request->input('catatan', ''));
+        $validator = Validator::make($request->all(), [
+            'judul' => ['required', 'string', 'max:255'],
+            'kategori' => ['required', Rule::in(Report::CATEGORIES)],
+            'tanggal_dari' => ['required', 'date'],
+            'tanggal_sampai' => ['required', 'date', 'after_or_equal:tanggal_dari'],
+            'status' => ['required', Rule::in(Report::STATUSES)],
+            'catatan' => ['nullable', 'string'],
+        ]);
 
-        if ($judul && $dari && $sampai && $dari <= $sampai) {
-            $laporanList = session('laporan_tersimpan', []);
-            $laporanList[] = [
-                'id' => uniqid('l'),
-                'judul' => $judul,
-                'kategori' => $kategori,
-                'tanggal_dari' => $dari,
-                'tanggal_sampai' => $sampai,
-                'status' => $status,
-                'catatan' => $catatan,
-                'dibuat' => date('Y-m-d'),
-                'pembuat' => session('user_nama', session('user', 'Admin')),
-            ];
-            session(['laporan_tersimpan' => $laporanList]);
+        if ($validator->fails()) {
+            return redirect('/laporan');
         }
+
+        $validated = $validator->validated();
+
+        Report::create([
+            'user_id' => $request->user()?->id,
+            'judul' => trim($validated['judul']),
+            'kategori' => $validated['kategori'],
+            'tanggal_dari' => $validated['tanggal_dari'],
+            'tanggal_sampai' => $validated['tanggal_sampai'],
+            'status' => $validated['status'],
+            'catatan' => trim((string) ($validated['catatan'] ?? '')) ?: null,
+            'pembuat' => $request->user()?->nama ?? 'Admin',
+        ]);
 
         return redirect('/laporan');
     }
@@ -76,23 +160,35 @@ class ReportController extends Controller
      */
     protected function update(Request $request): RedirectResponse
     {
-        $id = (string) $request->input('id', '');
-        $laporanList = session('laporan_tersimpan', []);
+        $report = Report::find($request->input('id'));
 
-        foreach ($laporanList as &$l) {
-            if (($l['id'] ?? '') === $id) {
-                $l['judul'] = trim((string) $request->input('judul', $l['judul'] ?? ''));
-                $l['kategori'] = trim((string) $request->input('kategori', $l['kategori'] ?? 'Evaluasi Bulanan'));
-                $l['tanggal_dari'] = (string) $request->input('tanggal_dari', $l['tanggal_dari'] ?? '');
-                $l['tanggal_sampai'] = (string) $request->input('tanggal_sampai', $l['tanggal_sampai'] ?? '');
-                $l['status'] = trim((string) $request->input('status', $l['status'] ?? 'Selesai'));
-                $l['catatan'] = trim((string) $request->input('catatan', $l['catatan'] ?? ''));
-                break;
-            }
+        if (! $report) {
+            return redirect('/laporan');
         }
-        unset($l);
 
-        session(['laporan_tersimpan' => $laporanList]);
+        $validator = Validator::make($request->all(), [
+            'judul' => ['required', 'string', 'max:255'],
+            'kategori' => ['required', Rule::in(Report::CATEGORIES)],
+            'tanggal_dari' => ['required', 'date'],
+            'tanggal_sampai' => ['required', 'date', 'after_or_equal:tanggal_dari'],
+            'status' => ['required', Rule::in(Report::STATUSES)],
+            'catatan' => ['nullable', 'string'],
+        ]);
+
+        if ($validator->fails()) {
+            return redirect('/laporan?edit='.$report->id);
+        }
+
+        $validated = $validator->validated();
+
+        $report->update([
+            'judul' => trim($validated['judul']),
+            'kategori' => $validated['kategori'],
+            'tanggal_dari' => $validated['tanggal_dari'],
+            'tanggal_sampai' => $validated['tanggal_sampai'],
+            'status' => $validated['status'],
+            'catatan' => trim((string) ($validated['catatan'] ?? '')) ?: null,
+        ]);
 
         return redirect('/laporan');
     }
@@ -102,11 +198,7 @@ class ReportController extends Controller
      */
     protected function destroy(Request $request): RedirectResponse
     {
-        $id = (string) $request->input('id', '');
-        $laporanList = session('laporan_tersimpan', []);
-
-        $laporanList = array_values(array_filter($laporanList, fn ($l) => ($l['id'] ?? '') !== $id));
-        session(['laporan_tersimpan' => $laporanList]);
+        Report::find($request->input('id'))?->delete();
 
         return redirect('/laporan');
     }

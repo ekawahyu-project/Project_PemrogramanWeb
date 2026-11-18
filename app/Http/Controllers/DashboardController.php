@@ -2,84 +2,133 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Debt;
+use App\Models\Product;
+use App\Models\Transaction;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
     /**
-     * Tampilkan halaman dashboard utama.
+     * Tampilkan halaman dashboard utama bergaya Web3Bento tanpa duplikasi metrik.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
         $currentPage = 'dashboard';
-        $user = session('user_nama', session('user', 'Administrator'));
-        $transaksi = session('transaksi', []);
-        $produk = session('produk', []);
+        $user = $request->user()?->nama ?? 'Administrator';
 
-        $pemasukan = 0;
-        $pengeluaran = 0;
-        foreach ($transaksi as $t) {
-            if (($t['jenis'] ?? '') === 'Pemasukan') {
-                $pemasukan += (int) ($t['jumlah'] ?? 0);
-            } else {
-                $pengeluaran += (int) ($t['jumlah'] ?? 0);
+        $pemasukan = (int) Transaction::income()->sum('jumlah');
+        $pengeluaran = (int) Transaction::expense()->sum('jumlah');
+        $transaksiPemasukanCount = Transaction::income()->count();
+        $transaksiPengeluaranCount = Transaction::expense()->count();
+
+        $products = Product::all();
+        $jmlStok = $products->count();
+        $totalUnitStok = (int) $products->sum('stok');
+        $lowStock = Product::lowStock()->count();
+        $laba = $pemasukan - $pengeluaran;
+        $marginPct = $pemasukan > 0 ? round(($laba / $pemasukan) * 100, 1) : 0.0;
+        $stockHealthScore = $jmlStok > 0
+            ? round((max(0, $jmlStok - $lowStock) / $jmlStok) * 100, 1)
+            : 100.0;
+
+        // 1. Data unik untuk Vault Cards: Valuasi Aset Inventaris Gudang
+        $nilaiJualStok = (int) $products->sum(fn (Product $p): int => $p->harga_jual * $p->stok);
+        $modalStok = (int) $products->sum(fn (Product $p): int => $p->harga_beli * $p->stok);
+        $potensiLabaStok = max(0, $nilaiJualStok - $modalStok);
+
+        // 2. Data unik untuk AllocationTile: Kontribusi Omzet per Kategori Produk
+        $incomeWithProduct = Transaction::income()->with('product')->whereNotNull('product_id')->get();
+        $categoryRevenue = [];
+        foreach ($incomeWithProduct as $trx) {
+            $cat = $trx->product?->kategori ?? 'Lainnya';
+            $categoryRevenue[$cat] = ($categoryRevenue[$cat] ?? 0) + $trx->jumlah;
+        }
+        arsort($categoryRevenue);
+
+        if (empty($categoryRevenue)) {
+            foreach ($products->groupBy('kategori') as $cat => $items) {
+                $categoryRevenue[$cat] = (int) $items->sum(fn (Product $p): int => $p->harga_jual * max($p->stok, 1));
             }
+            arsort($categoryRevenue);
         }
 
-        $laba = $pemasukan - $pengeluaran;
-        $jmlStok = count($produk);
-        $lowStock = count(array_filter($produk, fn ($p) => ($p['stok'] ?? 0) <= ($p['stok_min'] ?? 0)));
-
-        $transaksiPemasukanCount = count(array_filter($transaksi, fn ($t) => ($t['jenis'] ?? '') === 'Pemasukan'));
-        $transaksiPengeluaranCount = count(array_filter($transaksi, fn ($t) => ($t['jenis'] ?? '') === 'Pengeluaran'));
+        // 3. Data unik untuk Solid Lime Tile: Ringkasan Hutang & Piutang (Kasbon)
+        $debts = Debt::all();
+        $piutangTotal = (int) $debts->where('jenis', Debt::TYPE_RECEIVABLE)->sum('jumlah');
+        $piutangCair = (int) $debts->where('jenis', Debt::TYPE_RECEIVABLE)->sum('dibayar');
+        $sisaPiutang = max(0, $piutangTotal - $piutangCair);
+        $sisaHutang = (int) $debts->where('jenis', Debt::TYPE_PAYABLE)->sum(fn (Debt $d): int => $d->remainingAmount());
+        $activeDebtCount = $debts->where('status', '!=', Debt::STATUS_PAID)->count();
+        $kolektibilitasPct = $piutangTotal > 0 ? round(($piutangCair / $piutangTotal) * 100, 1) : 100.0;
 
         $stats = [
             [
                 'label' => 'Total Pemasukan',
                 'value' => 'Rp '.number_format($pemasukan, 0, ',', '.'),
                 'sub' => $transaksiPemasukanCount.' transaksi',
-                'cardClass' => 'bg-emerald-50/70 border border-emerald-100/90',
-                'labelClass' => 'text-emerald-900/70',
-                'valueClass' => 'text-emerald-700',
-                'subClass' => 'text-emerald-700/70 border-t border-emerald-100',
+                'cardClass' => 'bento-tile',
+                'labelClass' => 'text-[#8E9882]',
+                'valueClass' => 'text-[#C4FF0D]',
+                'subClass' => 'text-[#8E9882] border-t border-white/[0.08]',
             ],
             [
                 'label' => 'Total Pengeluaran',
                 'value' => 'Rp '.number_format($pengeluaran, 0, ',', '.'),
                 'sub' => $transaksiPengeluaranCount.' transaksi',
-                'cardClass' => 'bg-rose-50/70 border border-rose-100/90',
-                'labelClass' => 'text-rose-900/70',
-                'valueClass' => 'text-rose-700',
-                'subClass' => 'text-rose-700/70 border-t border-rose-100',
-            ],
-            [
-                'label' => 'Produk',
-                'value' => $jmlStok.' item',
-                'sub' => $lowStock > 0 ? $lowStock.' stok menipis' : 'Semua aman',
-                'cardClass' => 'bg-sky-50/70 border border-sky-100/90',
-                'labelClass' => 'text-sky-900/70',
-                'valueClass' => 'text-sky-700',
-                'subClass' => 'text-sky-700/70 border-t border-sky-100',
+                'cardClass' => 'bento-tile',
+                'labelClass' => 'text-[#8E9882]',
+                'valueClass' => 'text-[#C084FC]',
+                'subClass' => 'text-[#8E9882] border-t border-white/[0.08]',
             ],
             [
                 'label' => 'Laba Bersih',
                 'value' => 'Rp '.number_format(abs($laba), 0, ',', '.'),
                 'sub' => $laba >= 0 ? 'Surplus (Untung)' : 'Defisit (Rugi)',
-                'cardClass' => $laba >= 0 ? 'bg-indigo-50/70 border border-indigo-100/90' : 'bg-rose-50/70 border border-rose-100/90',
-                'labelClass' => $laba >= 0 ? 'text-indigo-900/70' : 'text-rose-900/70',
-                'valueClass' => $laba >= 0 ? 'text-indigo-700' : 'text-rose-700',
-                'subClass' => $laba >= 0 ? 'text-indigo-700/70 border-t border-indigo-100' : 'text-rose-700/70 border-t border-rose-100',
+                'cardClass' => 'bento-tile',
+                'labelClass' => 'text-[#8E9882]',
+                'valueClass' => $laba >= 0 ? 'text-[#C4FF0D]' : 'text-rose-400',
+                'subClass' => 'text-[#8E9882] border-t border-white/[0.08]',
             ],
         ];
 
-        $transaksiTerbaru = array_slice(array_reverse($transaksi), 0, 5);
+        $shortcuts = [
+            ['href' => '/transaksi', 'label' => 'Transaksi', 'desc' => 'Catat pemasukan & pengeluaran'],
+            ['href' => '/produk', 'label' => 'Produk', 'desc' => 'Kelola katalog data produk'],
+            ['href' => '/stok', 'label' => 'Stok', 'desc' => 'Pantau & catat pergerakan barang'],
+            ['href' => '/hutang-piutang', 'label' => 'Hutang & Piutang', 'desc' => 'Kelola kasbon pelanggan & supplier'],
+            ['href' => '/laporan', 'label' => 'Laporan', 'desc' => 'Grafik analitik & laporan bulanan'],
+            ['href' => '/profil', 'label' => 'Profil', 'desc' => 'Informasi akun & profil usaha'],
+        ];
+
+        $transaksiTerbaru = Transaction::orderByDesc('tanggal')
+            ->orderByDesc('id')
+            ->limit(5)
+            ->get();
 
         return view('dashboard', compact(
             'currentPage',
             'user',
             'stats',
+            'shortcuts',
             'lowStock',
-            'transaksiTerbaru'
+            'transaksiTerbaru',
+            'pemasukan',
+            'pengeluaran',
+            'laba',
+            'jmlStok',
+            'totalUnitStok',
+            'marginPct',
+            'stockHealthScore',
+            'nilaiJualStok',
+            'modalStok',
+            'potensiLabaStok',
+            'categoryRevenue',
+            'sisaPiutang',
+            'sisaHutang',
+            'activeDebtCount',
+            'kolektibilitasPct'
         ));
     }
 }

@@ -1,91 +1,102 @@
-<?php
-$nav = [
-    ['href' => '/dashboard',   'label' => 'Dashboard',    'page' => 'dashboard'],
-    ['href' => '/transaksi',   'label' => 'Transaksi',    'page' => 'transaksi'],
-    ['href' => '/produk',      'label' => 'Produk',       'page' => 'produk'],
-    ['href' => '/stok',        'label' => 'Stok',         'page' => 'stok'],
-    ['href' => '/laporan',     'label' => 'Laporan',      'page' => 'laporan'],
-    ['href' => '/rekomendasi', 'label' => 'Rekomendasi',  'page' => 'rekomendasi'],
-    ['href' => '/profil',      'label' => 'Profil',       'page' => 'profil'],
-];
-
-$icons = [
-    'dashboard'   => '<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke-width="2"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke-width="2"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke-width="2"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke-width="2"/></svg>',
-    'transaksi'   => '<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>',
-    'produk'      => '<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>',
-    'stok'        => '<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>',
-    'laporan'     => '<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>',
-    'rekomendasi' => '<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>',
-    'profil'      => '<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>',
-    'logout'      => '<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>',
-];
-?>
+<!-- Fonts: Poppins -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <!-- Mobile Topbar (hanya tampil < lg) -->
-<header class="lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-white border-b border-gray-100 shadow-sm">
+<header class="lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-[#0A0D07]/90 backdrop-blur-xl border-b border-white/[0.08]">
     <div class="flex items-center gap-2.5">
         <button type="button" id="sidebar-toggle" aria-label="Buka Menu"
-            class="p-2 -ml-1 text-gray-600 hover:bg-gray-100 rounded-xl focus:outline-none transition">
+            class="p-2 -ml-1 text-[#8E9882] hover:text-white hover:bg-white/[0.06] rounded-xl focus:outline-none transition">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
             </svg>
         </button>
-        <span class="font-bold text-navy-900 text-base tracking-tight">AlpetBizz</span>
+        <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-lg bg-[#C4FF0D] text-[#152208] font-extrabold text-xs grid place-items-center">A</span>
+            <span class="font-bold text-white text-base tracking-tight">AlpetBizz</span>
+        </div>
     </div>
-    <span class="text-xs font-semibold px-2.5 py-1 bg-navy-100 text-navy-800 rounded-lg truncate max-w-[120px]">
-        <?= htmlspecialchars(session('user', 'User')) ?>
-    </span>
+    <div class="flex items-center gap-2">
+        <span class="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-[#12170D] px-2.5 py-1 font-mono text-[11px] font-medium text-[#F4F7F0] truncate max-w-[140px]">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#C4FF0D] shrink-0"></span>
+            {{ auth()->user()?->username ?? 'User' }}
+        </span>
+    </div>
 </header>
 
 <!-- Backdrop overlay mobile -->
-<div id="sidebar-backdrop" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-40 hidden lg:hidden transition-opacity"></div>
+<div id="sidebar-backdrop" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 hidden lg:hidden transition-opacity"></div>
 
-<!-- Sidebar Floating Card -->
+<!-- Sidebar Floating Bento Card -->
 <aside id="app-sidebar"
     class="fixed left-0 top-0 h-screen w-64 z-50 p-3 flex flex-col
            transition-transform duration-300 ease-in-out
            -translate-x-full lg:translate-x-0">
 
-    <div class="h-full bg-navy-950 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+    <div class="h-full bg-[#12170D] border border-white/[0.08] rounded-[26px] shadow-2xl flex flex-col overflow-hidden relative">
+        <!-- Subtle top lime glow inside sidebar -->
+        <div class="pointer-events-none absolute -top-16 -left-16 w-44 h-44 rounded-full bg-[#C4FF0D]/10 blur-3xl"></div>
 
         <!-- Brand / Logo -->
-        <div class="px-5 py-5 border-b border-white/10">
+        <div class="relative px-5 py-5 border-b border-white/[0.08] flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center
-                            text-white font-bold text-base">
+                <div class="w-9 h-9 rounded-xl bg-[#C4FF0D] flex items-center justify-center
+                            text-[#152208] font-extrabold text-base shadow-[0_0_24px_rgba(196,255,13,0.3)]">
                     A
                 </div>
                 <div>
-                    <h1 class="font-bold text-white text-base tracking-tight leading-tight">AlpetBizz</h1>
-                    <p class="text-[11px] text-white/40 font-medium">UMKM Manager</p>
+                    <h1 class="font-bold text-white text-base tracking-[-0.02em] leading-tight">AlpetBizz</h1>
                 </div>
             </div>
+            <button type="button" id="sidebar-close" aria-label="Tutup Menu"
+                class="lg:hidden p-1.5 text-[#8E9882] hover:text-white rounded-lg hover:bg-white/[0.06] transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
         </div>
 
         <!-- Navigasi -->
-        <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-            <?php foreach ($nav as $item): ?>
-            <a href="<?= $item['href'] ?>"
-               class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition
-                      <?= ($currentPage ?? '') === $item['page']
-                            ? 'bg-white/15 text-white'
-                            : 'text-white/60 hover:bg-white/10 hover:text-white' ?>">
-                <?= $icons[$item['page']] ?>
-                <span><?= $item['label'] ?></span>
+        <nav class="relative flex-1 px-3 py-4 space-y-1.5 overflow-y-auto" aria-label="Menu Utama">
+            <p class="px-3.5 pb-1.5 font-mono text-xs uppercase tracking-wider text-[#8E9882]/70">Workspace</p>
+            @foreach ($sidebarNav as $item)
+            @php $isActive = ($currentPage ?? '') === $item['page']; @endphp
+            <a href="{{ $item['href'] }}"
+               data-nav-page="{{ $item['page'] }}"
+               class="flex items-center justify-between gap-3 px-4 py-3 rounded-2xl text-sm font-medium transition
+                      {{ $isActive
+                            ? 'bg-[#C4FF0D] text-[#152208] font-semibold shadow-[0_6px_20px_-4px_rgba(196,255,13,0.35)]'
+                            : 'text-[#9AA68E] hover:bg-white/[0.05] hover:text-white' }}">
+                <span class="flex items-center gap-3">
+                    {!! $sidebarIcons[$item['page']] !!}
+                    <span>{{ $item['label'] }}</span>
+                </span>
+                @if ($isActive)
+                <span class="w-1.5 h-1.5 rounded-full bg-[#152208]"></span>
+                @endif
             </a>
-            <?php endforeach; ?>
+            @endforeach
         </nav>
 
-        <!-- Keluar -->
-        <div class="px-3 py-4 border-t border-white/10">
+        <!-- Account Mini Card + Keluar -->
+        <div class="relative p-3 border-t border-white/[0.08] space-y-2">
+            <div class="px-4 py-3 rounded-2xl bg-[#181F11] border border-white/[0.06] flex items-center justify-between gap-2">
+                <div class="min-w-0">
+                    <p class="text-sm font-semibold text-white truncate">{{ auth()->user()?->nama ?? 'Administrator' }}</p>
+                    <p class="font-mono text-xs text-[#9AA68E] truncate">{{ '@' . (auth()->user()?->username ?? 'admin') }}</p>
+                </div>
+                <span class="shrink-0 rounded-full bg-[#C4FF0D]/15 px-2.5 py-0.5 font-mono text-xs font-semibold text-[#C4FF0D]">PRO</span>
+            </div>
+
             <form method="POST" action="/logout" data-spa-ignore="true">
                 @csrf
                 <input type="hidden" name="action" value="logout">
                 <button type="submit"
-                    class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium
-                           text-white/60 hover:bg-red-500/80 hover:text-white transition">
-                    <?= $icons['logout'] ?>
-                    <span>Keluar</span>
+                    class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium
+                           text-[#9AA68E] hover:bg-rose-500/15 hover:text-rose-300 border border-transparent hover:border-rose-500/25 transition">
+                    {!! $sidebarIcons['logout'] !!}
+                    <span>Keluar Sesi</span>
                 </button>
             </form>
         </div>

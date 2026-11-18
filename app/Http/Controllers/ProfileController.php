@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -13,116 +16,82 @@ class ProfileController extends Controller
      */
     public function index(Request $request): View
     {
-        $usernameLogin = session('user');
-        $users = session('users', []);
+        /** @var User $user */
+        $user = $request->user();
 
-        /** @var array<string,mixed> $akun */
-        $akun = $users[$usernameLogin] ?? [];
-
-        // Inisialisasi profil di session jika belum ada
-        if (! session()->has('profil')) {
-            session(['profil' => [
-                'no_hp' => $akun['no_hp'] ?? '',
-                'nama_usaha' => $akun['nama_usaha'] ?? '',
-                'kategori' => $akun['kategori'] ?? '',
-                'alamat' => $akun['alamat'] ?? '',
-                'foto' => $akun['foto'] ?? '',
-            ]]);
-        }
-
-        $profil = session('profil', []);
-
-        return view('profil', $this->buildViewData($akun, $profil, $usernameLogin));
+        return view('profil', $this->buildViewData($user));
     }
 
     /**
-     * Handle profile save and password change.
+     * Handle profile save action.
      */
-    public function handle(Request $request): RedirectResponse|View
+    public function handle(Request $request): RedirectResponse
     {
-        $usernameLogin = session('user');
-        $users = session('users', []);
-
-        /** @var array<string,mixed> $akun */
-        $akun = $users[$usernameLogin] ?? [];
-        $profil = session('profil', []);
-
         $action = $request->input('action', 'save');
 
         if ($action === 'save') {
-            return $this->handleSave($request, $usernameLogin, $akun, $profil);
+            return $this->handleSave($request);
         }
 
         return redirect('/profil');
     }
 
     /**
-     * Process the "save" profile action.
-     *
-     * @param  array<string,mixed>  $akun
-     * @param  array<string,mixed>  $profil
+     * Process the "save" profile action and persist to database via User model.
      */
-    private function handleSave(
-        Request $request,
-        string $usernameLogin,
-        array $akun,
-        array $profil
-    ): RedirectResponse {
-        $nama = trim($request->input('nama', ''));
-        $email = trim($request->input('email', ''));
-        $noHp = trim($request->input('no_hp', ''));
-        $namaUsaha = trim($request->input('nama_usaha', ''));
-        $kategori = trim($request->input('kategori', ''));
-        $alamat = trim($request->input('alamat', ''));
+    private function handleSave(Request $request): RedirectResponse
+    {
+        /** @var User $user */
+        $user = $request->user();
 
-        if (! $nama || ! $email) {
-            return redirect('/profil')
-                ->with('flash', [
-                    'type' => 'error',
-                    'message' => 'Nama lengkap dan alamat email wajib diisi.',
-                ]);
+        $nama = trim((string) $request->input('nama', ''));
+        $email = trim((string) $request->input('email', ''));
+
+        if ($nama === '' || $email === '') {
+            return redirect('/profil')->with('flash', [
+                'type' => 'error',
+                'message' => 'Nama lengkap dan alamat email wajib diisi.',
+            ]);
         }
 
-        // Cek duplikasi email
-        $users = session('users', []);
+        $validator = Validator::make([
+            'nama' => $nama,
+            'email' => $email,
+            'no_hp' => trim((string) $request->input('no_hp', '')),
+            'nama_usaha' => trim((string) $request->input('nama_usaha', '')),
+            'kategori' => trim((string) $request->input('kategori', '')),
+            'alamat' => trim((string) $request->input('alamat', '')),
+            'foto_profil' => $request->file('foto_profil'),
+        ], [
+            'nama' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'no_hp' => ['nullable', 'string', 'max:20'],
+            'nama_usaha' => ['nullable', 'string', 'max:100'],
+            'kategori' => ['nullable', 'string', 'max:50'],
+            'alamat' => ['nullable', 'string'],
+            'foto_profil' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+        ], [
+            'email.email' => 'Format alamat email tidak valid.',
+            'email.unique' => 'Alamat email sudah digunakan oleh akun lain.',
+            'foto_profil.image' => 'File foto profil tidak valid.',
+            'foto_profil.mimes' => 'Format foto harus JPG, JPEG, PNG, atau WEBP.',
+            'foto_profil.max' => 'Ukuran foto maksimal 2 MB.',
+        ]);
 
-        foreach ($users as $uKey => $uData) {
-            if (
-                $uKey !== $usernameLogin &&
-                strtolower($uData['email'] ?? '') === strtolower($email)
-            ) {
-                return redirect('/profil')
-                    ->with('flash', [
-                        'type' => 'error',
-                        'message' => 'Alamat email sudah digunakan oleh akun lain.',
-                    ]);
-            }
+        if ($validator->fails()) {
+            return redirect('/profil')->with('flash', [
+                'type' => 'error',
+                'message' => $validator->errors()->first(),
+            ]);
         }
 
-        // Proses upload foto profil
+        $validated = $validator->validated();
+        $fotoPath = $user->foto;
+
         if ($request->hasFile('foto_profil') && $request->file('foto_profil')->isValid()) {
             $file = $request->file('foto_profil');
             $ext = strtolower($file->getClientOriginalExtension());
-
-            $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
-
-            if (! in_array($ext, $allowedExtensions, true)) {
-                return redirect('/profil')
-                    ->with('flash', [
-                        'type' => 'error',
-                        'message' => 'Format foto harus JPG, JPEG, PNG, atau WEBP.',
-                    ]);
-            }
-
-            if ($file->getSize() > 2 * 1024 * 1024) {
-                return redirect('/profil')
-                    ->with('flash', [
-                        'type' => 'error',
-                        'message' => 'Ukuran foto maksimal 2 MB.',
-                    ]);
-            }
-
-            $safeUsername = preg_replace('/[^a-zA-Z0-9_-]/', '', $usernameLogin);
+            $safeUsername = preg_replace('/[^a-zA-Z0-9_-]/', '', $user->username);
             $newFileName = 'profile_'.$safeUsername.'_'.bin2hex(random_bytes(8)).'.'.$ext;
             $uploadDir = public_path('uploads');
 
@@ -130,100 +99,54 @@ class ProfileController extends Controller
                 mkdir($uploadDir, 0777, true);
             }
 
-            // Hapus foto lama
-            $oldFoto = $users[$usernameLogin]['foto'] ?? '';
-
             if (
-                ! empty($oldFoto) &&
-                str_starts_with($oldFoto, 'uploads/') &&
-                file_exists(public_path($oldFoto))
+                ! empty($user->foto) &&
+                str_starts_with($user->foto, 'uploads/') &&
+                file_exists(public_path($user->foto))
             ) {
-                unlink(public_path($oldFoto));
+                unlink(public_path($user->foto));
             }
 
             $file->move($uploadDir, $newFileName);
-
-            $newFotoPath = 'uploads/'.$newFileName;
-            $users[$usernameLogin]['foto'] = $newFotoPath;
-            $profil['foto'] = $newFotoPath;
+            $fotoPath = 'uploads/'.$newFileName;
         }
 
-        // Update data akun
-        $users[$usernameLogin]['nama'] = $nama;
-        $users[$usernameLogin]['email'] = $email;
-        $users[$usernameLogin]['no_hp'] = $noHp;
-        $users[$usernameLogin]['nama_usaha'] = $namaUsaha;
-        $users[$usernameLogin]['kategori'] = $kategori;
-        $users[$usernameLogin]['alamat'] = $alamat;
-
-        // Update profil session
-        $profil['no_hp'] = $noHp;
-        $profil['nama_usaha'] = $namaUsaha;
-        $profil['kategori'] = $kategori;
-        $profil['alamat'] = $alamat;
-
-        session([
-            'users' => $users,
-            'user_nama' => $nama,
-            'profil' => $profil,
+        $user->update([
+            'nama' => $validated['nama'],
+            'email' => $validated['email'],
+            'no_hp' => $validated['no_hp'] ?: null,
+            'nama_usaha' => $validated['nama_usaha'] ?: null,
+            'kategori_usaha' => $validated['kategori'] ?: null,
+            'alamat_usaha' => $validated['alamat'] ?: null,
+            'foto' => $fotoPath,
         ]);
 
-        return redirect('/profil')
-            ->with('flash', [
-                'type' => 'success',
-                'message' => 'Profil dan informasi usaha berhasil diperbarui!',
-            ]);
+        return redirect('/profil')->with('flash', [
+            'type' => 'success',
+            'message' => 'Profil dan informasi usaha berhasil diperbarui!',
+        ]);
     }
 
     /**
      * Build data array for the profile view.
      *
-     * @param  array<string,mixed>  $akun
-     * @param  array<string,mixed>  $profil
-     * @return array<string,mixed>
+     * @return array<string, mixed>
      */
-    private function buildViewData(array $akun, array $profil, string $usernameLogin): array
+    private function buildViewData(User $user): array
     {
-        $nama = $akun['nama'] ?? (session('user_nama') ?? '');
-        $username = $akun['username'] ?? $usernameLogin;
-        $email = $akun['email'] ?? '';
-        $noHp = ! empty($akun['no_hp']) ? $akun['no_hp'] : ($profil['no_hp'] ?? '');
-        $namaUsaha = ! empty($akun['nama_usaha']) ? $akun['nama_usaha'] : ($profil['nama_usaha'] ?? '');
-        $kategori = ! empty($akun['kategori']) ? $akun['kategori'] : ($profil['kategori'] ?? '');
-        $alamat = ! empty($akun['alamat']) ? $akun['alamat'] : ($profil['alamat'] ?? '');
-        $foto = ! empty($akun['foto']) ? $akun['foto'] : ($profil['foto'] ?? '');
-
-        $fotoUrl = '';
-
-        if (! empty($foto) && file_exists(public_path($foto))) {
-            $fotoUrl = asset($foto).'?v='.filemtime(public_path($foto));
-        }
-
-        $initial = ! empty($nama) ? strtoupper(mb_substr($nama, 0, 1)) : '?';
-
-        $kategoriOptions = [
-            '',
-            'Makanan & Minuman',
-            'Fashion',
-            'Kerajinan',
-            'Jasa',
-            'Kecantikan',
-            'Elektronik',
-            'Lainnya',
-        ];
-
         return [
             'currentPage' => 'profil',
-            'nama' => $nama,
-            'username' => $username,
-            'email' => $email,
-            'noHp' => $noHp,
-            'namaUsaha' => $namaUsaha,
-            'kategori' => $kategori,
-            'alamat' => $alamat,
-            'fotoUrl' => $fotoUrl,
-            'initial' => $initial,
-            'kategoriOptions' => $kategoriOptions,
+            'flash' => session('flash'),
+            'nama' => $user->nama,
+            'username' => $user->username,
+            'email' => $user->email,
+            'noHp' => $user->no_hp ?? '',
+            'namaUsaha' => $user->nama_usaha ?? '',
+            'kategori' => $user->kategori_usaha ?? '',
+            'alamat' => $user->alamat_usaha ?? '',
+            'fotoUrl' => $user->photoUrl(),
+            'initial' => $user->initials(),
+            'kategoriOptions' => array_merge([''], User::BUSINESS_CATEGORIES),
         ];
     }
 }

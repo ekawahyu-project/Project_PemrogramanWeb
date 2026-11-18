@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
+use App\Models\Transaction;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class TransactionController extends Controller
@@ -14,20 +18,25 @@ class TransactionController extends Controller
     public function index(Request $request): View
     {
         $currentPage = 'transaksi';
+        $flash = session('flash');
         $editId = $request->query('edit');
-        $editTrx = null;
-        $transaksi = session('transaksi', []);
+        $editTrx = $editId ? Transaction::find($editId) : null;
 
-        if ($editId) {
-            foreach ($transaksi as $t) {
-                if (($t['id'] ?? '') === $editId) {
-                    $editTrx = $t;
-                    break;
-                }
-            }
-        }
+        $transaksiList = Transaction::with('product')
+            ->orderByDesc('tanggal')
+            ->orderByDesc('id')
+            ->get();
 
-        return view('transaksi', compact('currentPage', 'editId', 'editTrx'));
+        $produkList = Product::orderBy('nama')->get();
+
+        return view('transaksi', compact(
+            'currentPage',
+            'flash',
+            'editId',
+            'editTrx',
+            'transaksiList',
+            'produkList'
+        ));
     }
 
     /**
@@ -57,12 +66,11 @@ class TransactionController extends Controller
      */
     protected function store(Request $request): RedirectResponse
     {
-        $jumlahStr = (string) $request->input('jumlah', '0');
-        $jumlah = (int) preg_replace('/\D/', '', $jumlahStr);
+        $jumlah = (int) preg_replace('/\D/', '', (string) $request->input('jumlah', '0'));
         $keterangan = trim((string) $request->input('keterangan', ''));
         $tanggal = (string) $request->input('tanggal', date('Y-m-d'));
-        $jenis = (string) $request->input('jenis', 'Pemasukan');
-        $produkId = (string) $request->input('produk_id', '') ?: null;
+        $jenis = (string) $request->input('jenis', Transaction::TYPE_INCOME);
+        $productId = $request->input('produk_id') ?: null;
 
         if ($keterangan === '') {
             return redirect('/transaksi')->with('flash', ['type' => 'danger', 'msg' => 'Keterangan tidak boleh kosong.']);
@@ -72,17 +80,27 @@ class TransactionController extends Controller
             return redirect('/transaksi')->with('flash', ['type' => 'danger', 'msg' => 'Jumlah nominal harus lebih dari 0.']);
         }
 
-        $transaksiList = session('transaksi', []);
-        $transaksiList[] = [
-            'id' => uniqid('t'),
+        $validator = Validator::make([
+            'tanggal' => $tanggal,
+            'jenis' => $jenis,
+            'product_id' => $productId,
+        ], [
+            'tanggal' => ['required', 'date'],
+            'jenis' => ['required', Rule::in(Transaction::TYPES)],
+            'product_id' => ['nullable', 'integer', 'exists:products,id'],
+        ]);
+
+        if ($validator->fails()) {
+            return redirect('/transaksi')->with('flash', ['type' => 'danger', 'msg' => $validator->errors()->first()]);
+        }
+
+        Transaction::create([
             'tanggal' => $tanggal,
             'keterangan' => $keterangan,
             'jenis' => $jenis,
             'jumlah' => $jumlah,
-            'produk_id' => $produkId,
-        ];
-
-        session(['transaksi' => $transaksiList]);
+            'product_id' => $productId ? (int) $productId : null,
+        ]);
 
         return redirect('/transaksi')->with('flash', ['type' => 'success', 'msg' => 'Transaksi berhasil ditambahkan.']);
     }
@@ -92,39 +110,43 @@ class TransactionController extends Controller
      */
     protected function update(Request $request): RedirectResponse
     {
-        $id = (string) $request->input('id', '');
-        $jumlahStr = (string) $request->input('jumlah', '0');
-        $jumlah = (int) preg_replace('/\D/', '', $jumlahStr);
+        $transaction = Transaction::find($request->input('id'));
+
+        if (! $transaction) {
+            return redirect('/transaksi')->with('flash', ['type' => 'danger', 'msg' => 'Transaksi tidak ditemukan.']);
+        }
+
+        $jumlah = (int) preg_replace('/\D/', '', (string) $request->input('jumlah', '0'));
         $keterangan = trim((string) $request->input('keterangan', ''));
         $tanggal = (string) $request->input('tanggal', date('Y-m-d'));
-        $jenis = (string) $request->input('jenis', 'Pemasukan');
-        $produkId = (string) $request->input('produk_id', '') ?: null;
+        $jenis = (string) $request->input('jenis', Transaction::TYPE_INCOME);
+        $productId = $request->input('produk_id') ?: null;
 
-        $transaksiList = session('transaksi', []);
-        $found = false;
+        $validator = Validator::make([
+            'keterangan' => $keterangan,
+            'tanggal' => $tanggal,
+            'jenis' => $jenis,
+            'product_id' => $productId,
+        ], [
+            'keterangan' => ['required', 'string', 'max:255'],
+            'tanggal' => ['required', 'date'],
+            'jenis' => ['required', Rule::in(Transaction::TYPES)],
+            'product_id' => ['nullable', 'integer', 'exists:products,id'],
+        ]);
 
-        foreach ($transaksiList as &$t) {
-            if (($t['id'] ?? '') === $id) {
-                $t['tanggal'] = $tanggal;
-                $t['keterangan'] = $keterangan;
-                $t['jenis'] = $jenis;
-                $t['produk_id'] = $produkId;
-                if ($jumlah > 0) {
-                    $t['jumlah'] = $jumlah;
-                }
-                $found = true;
-                break;
-            }
-        }
-        unset($t);
-
-        if ($found) {
-            session(['transaksi' => $transaksiList]);
-
-            return redirect('/transaksi')->with('flash', ['type' => 'success', 'msg' => 'Transaksi berhasil diperbarui.']);
+        if ($validator->fails()) {
+            return redirect('/transaksi')->with('flash', ['type' => 'danger', 'msg' => $validator->errors()->first()]);
         }
 
-        return redirect('/transaksi')->with('flash', ['type' => 'danger', 'msg' => 'Transaksi tidak ditemukan.']);
+        $transaction->update([
+            'tanggal' => $tanggal,
+            'keterangan' => $keterangan,
+            'jenis' => $jenis,
+            'product_id' => $productId ? (int) $productId : null,
+            'jumlah' => $jumlah > 0 ? $jumlah : $transaction->jumlah,
+        ]);
+
+        return redirect('/transaksi')->with('flash', ['type' => 'success', 'msg' => 'Transaksi berhasil diperbarui.']);
     }
 
     /**
@@ -132,18 +154,14 @@ class TransactionController extends Controller
      */
     protected function destroy(Request $request): RedirectResponse
     {
-        $id = (string) $request->input('id', '');
-        $transaksiList = session('transaksi', []);
-        $before = count($transaksiList);
+        $transaction = Transaction::find($request->input('id'));
 
-        $transaksiList = array_values(array_filter($transaksiList, fn ($t) => ($t['id'] ?? '') !== $id));
-
-        session(['transaksi' => $transaksiList]);
-
-        if (count($transaksiList) < $before) {
-            return redirect('/transaksi')->with('flash', ['type' => 'danger', 'msg' => 'Transaksi berhasil dihapus.']);
+        if (! $transaction) {
+            return redirect('/transaksi')->with('flash', ['type' => 'danger', 'msg' => 'Transaksi tidak ditemukan.']);
         }
 
-        return redirect('/transaksi')->with('flash', ['type' => 'danger', 'msg' => 'Transaksi tidak ditemukan.']);
+        $transaction->delete();
+
+        return redirect('/transaksi')->with('flash', ['type' => 'danger', 'msg' => 'Transaksi berhasil dihapus.']);
     }
 }

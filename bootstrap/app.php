@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Middleware\EnsureAppInitialized;
 use App\Http\Middleware\EnsureUserIsAuthenticated;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -14,9 +13,6 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->web(append: [
-            EnsureAppInitialized::class,
-        ]);
         $middleware->alias([
             'auth.custom' => EnsureUserIsAuthenticated::class,
         ]);

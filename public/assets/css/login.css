@@ -1,225 +1,137 @@
-/* login.css — AlpetBizz Auth Pages (Login & Register) */
+/* login.css — VaultoryHero × AlpetBizz Auth Theme */
 
-/* ── Base Reset & Typography ───────────────────────── */
-html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    overflow: hidden;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+:root {
+    --vault-bg-1: #1A1F0F;
+    --vault-bg-2: #2D3A1A;
+    --vault-lime: #C4FF0D;
+    --vault-lime-2: #8BC34A;
+    --vault-card: #12170D;
+    --vault-input: #1A2212;
+    color-scheme: dark;
 }
 
 *, ::before, ::after {
     box-sizing: border-box;
-    font-family: inherit;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* ── Hero: Fullscreen Scroll-Scrub Video ───────────── */
-#hero-section {
-    position: fixed;
-    inset: 0;
-    background: #1a0f0a;
+html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    background-color: var(--vault-bg-1);
+    color: #ffffff;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+}
+
+/* ── Vaultory Hero Section ─────────────────────────── */
+.vaultory-hero {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
     overflow: hidden;
-    z-index: 1;
-}
-
-#hero-video {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0;
-    transition: opacity .6s ease;
-}
-
-#hero-vignette {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        180deg,
-        rgba(26,15,10,.35),
-        rgba(26,15,10,0) 30%,
-        rgba(26,15,10,.2) 70%,
-        rgba(26,15,10,.6)
-    );
-    pointer-events: none;
-    z-index: 3;
-}
-
-/* ── Hero Overlays ─────────────────────────────────── */
-#hero-brand {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 8% 22vh;
-    text-align: center;
-    opacity: 0;
-    pointer-events: none;
-    z-index: 1;
-    will-change: opacity, transform;
-}
-
-#hero-brand span {
-    font-weight: 800;
-    font-size: clamp(48px, 11vw, 180px);
-    line-height: 1.05;
-    letter-spacing: -.02em;
-    color: #fff4e8;
-    text-shadow: 0 6px 40px rgba(0,0,0,.5);
-}
-
-#hero-title {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 6%;
-    text-align: center;
-    pointer-events: none;
-    z-index: 3;
-    will-change: opacity, transform;
-}
-
-#hero-title span {
-    font-weight: 800;
-    font-size: clamp(24px, 5vw, 60px);
-    line-height: 1.25;
-    letter-spacing: -.02em;
-    color: #fff4e8;
-    text-shadow: 0 3px 20px rgba(0,0,0,.55);
-}
-
-#hero-skyline {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0;
-    pointer-events: none;
-    z-index: 2;
-    will-change: opacity;
-}
-
-/* ── Scroll Hint ───────────────────────────────────── */
-#hero-scroll-hint {
-    position: absolute;
-    left: 50%;
-    bottom: clamp(18px, 5vh, 44px);
-    transform: translateX(-50%);
+    background: linear-gradient(180deg, #1A1F0F 0%, #2D3A1A 50%, #1A1F0F 100%);
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 7px;
-    color: rgba(255,244,232,.8);
-    font-size: clamp(10px, 1.3vw, 12px);
-    font-weight: 700;
-    letter-spacing: .3em;
-    transition: opacity .3s ease;
-    pointer-events: none;
-    z-index: 5;
+    justify-content: space-between;
 }
 
-@keyframes hero-bounce {
-    0%, 100% { transform: translateY(0);   opacity: .5; }
-    50%       { transform: translateY(5px); opacity: 1;  }
-}
-#hero-scroll-hint svg { animation: hero-bounce 1.6s ease-in-out infinite; }
-
-/* ── Progress Bar ──────────────────────────────────── */
-#hero-progress-track {
+/* Radial Glow Effect */
+.vaultory-glow {
     position: absolute;
-    left: 0; right: 0; bottom: 0;
-    height: 3px;
-    background: rgba(255,244,232,.15);
-    z-index: 5;
-}
-
-#hero-progress-bar {
-    height: 100%;
-    width: 100%;
-    background: linear-gradient(90deg, #c96a1e, #f59e0b, #fff4e8);
-    transform: scaleX(0);
-    transform-origin: left center;
-    will-change: transform;
-}
-
-/* ── Pill Navbar ───────────────────────────────────── */
-#site-nav {
-    position: fixed;
-    top: clamp(14px, 3vh, 28px);
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    align-items: center;
-    gap: clamp(10px, 1.8vw, 18px);
-    padding: .5rem .5rem .5rem 1.25rem;
-    border-radius: 9999px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.7);
-    box-shadow: 0 10px 30px -5px rgba(0,0,0,.15), 0 0 0 1px rgba(0,0,0,.04);
-    z-index: 20;
-    white-space: nowrap;
-}
-
-.nav-brand {
-    font-weight: 800;
-    font-size: clamp(13px, 1.3vw, 15px);
-    color: #111827;
-    letter-spacing: -.02em;
-}
-
-.nav-sep {
-    width: 1px;
-    height: 14px;
-    background: #e5e7eb;
-    display: inline-block;
-}
-
-.nav-sub {
-    font-weight: 500;
-    font-size: clamp(11px, 1.1vw, 13px);
-    color: #6b7280;
-}
-
-#nav-login-btn {
-    display: flex;
-    align-items: center;
-    gap: .4rem;
-    padding: .45rem 1.1rem;
-    background: linear-gradient(135deg, #c96a1e, #a84f0e);
-    color: #ffffff;
-    border: none;
-    border-radius: 9999px;
-    font-size: clamp(11px, 1.2vw, 13px);
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 2px 10px rgba(168, 79, 14, .35);
-    white-space: nowrap;
-    opacity: 0;
+    top: 16%;
+    left: 28%;
+    width: min(800px, 90vw);
+    height: min(800px, 90vw);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(196, 255, 13, 0.16) 0%, transparent 70%);
+    filter: blur(90px);
     pointer-events: none;
-    transition: background .2s, box-shadow .2s, transform .12s, opacity .45s ease;
+    animation: vaultGlowPulse 8s ease-in-out infinite;
 }
 
-#nav-login-btn.visible {
-    opacity: 1;
-    pointer-events: auto;
+@keyframes vaultGlowPulse {
+    0%, 100% { transform: scale(1); opacity: 0.35; }
+    50% { transform: scale(1.18); opacity: 0.55; }
 }
 
-#nav-login-btn:hover {
-    background: linear-gradient(135deg, #d97822, #b85c12);
-    box-shadow: 0 4px 16px rgba(168, 79, 14, .5);
+/* Entrance & Floating Keyframes */
+@keyframes vaultFadeLeft {
+    from { opacity: 0; transform: translateX(-32px); }
+    to { opacity: 1; transform: translateX(0); }
 }
 
-#nav-login-btn:active { transform: scale(.96); }
+@keyframes vaultFadeRight {
+    from { opacity: 0; transform: translateX(32px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes vaultFadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes vaultCoinFloat {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    25% { transform: translateY(-14px) rotate(7deg); }
+    50% { transform: translateY(-22px) rotate(0deg); }
+    75% { transform: translateY(-10px) rotate(-7deg); }
+}
+
+.anim-fade-left {
+    animation: vaultFadeLeft 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+}
+
+.anim-fade-right {
+    animation: vaultFadeRight 0.85s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+}
+
+.anim-fade-up {
+    animation: vaultFadeUp 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both;
+}
+
+/* Floating Crypto / Finance Coins */
+.vault-coin {
+    position: absolute;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #C4FF0D 0%, #8BC34A 100%);
+    box-shadow: 0 10px 40px rgba(196, 255, 13, 0.4);
+    color: #0b0e08;
+    font-weight: 800;
+    user-select: none;
+    z-index: 20;
+    animation: vaultCoinFloat 4s ease-in-out infinite;
+}
+
+.vault-coin-1 { animation-duration: 3.4s; animation-delay: 0s; }
+.vault-coin-2 { animation-duration: 4.1s; animation-delay: 0.3s; }
+.vault-coin-3 { animation-duration: 3.8s; animation-delay: 0.6s; }
+.vault-coin-4 { animation-duration: 4.5s; animation-delay: 0.9s; }
+
+/* Center Glass Wallet Card */
+.vault-wallet-card {
+    width: min(340px, 88vw);
+    border-radius: 24px;
+    background: rgba(18, 23, 13, 0.78);
+    border: 1px solid rgba(196, 255, 13, 0.32);
+    box-shadow: 0 0 80px rgba(196, 255, 13, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    padding: 1.5rem;
+    position: relative;
+    z-index: 10;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease;
+}
+
+.vault-wallet-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(196, 255, 13, 0.55);
+}
 
 /* ── Modal Overlay (Scrim) ─────────────────────────── */
 #login-panel {
@@ -229,32 +141,34 @@ html, body {
     align-items: center;
     justify-content: center;
     padding: 1rem;
-    z-index: 30;
+    z-index: 60;
     pointer-events: none;
-    background: rgba(0, 0, 0, 0);
+    background: rgba(6, 9, 4, 0);
     overflow-y: auto;
-    transition: background .35s ease;
+    transition: background 0.32s ease;
 }
 
 #login-panel.open {
     pointer-events: auto;
-    background: rgba(0, 0, 0, 0.45);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    background: rgba(6, 9, 4, 0.78);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
-/* ── Modal Card (Clean White) ──────────────────────── */
+/* ── Modal Card (Dark Vaultory Bento) ──────────────── */
 #login-panel-card {
     width: 100%;
-    max-width: 400px;
-    background: #ffffff;
-    border-radius: 1.375rem;
-    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    max-width: 420px;
+    background: #12170D;
+    border: 1px solid rgba(196, 255, 13, 0.22);
+    border-radius: 26px;
+    box-shadow: 0 28px 70px -15px rgba(0, 0, 0, 0.8), 0 0 50px -15px rgba(196, 255, 13, 0.15);
     padding: clamp(1.5rem, 4vw, 2.25rem);
     opacity: 0;
-    transform: translateY(24px) scale(.97);
-    transition: transform .38s cubic-bezier(.16, 1, .3, 1), opacity .32s ease, max-width .35s ease;
+    transform: translateY(20px) scale(0.97);
+    transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease, max-width 0.32s ease;
     margin: auto;
+    color: #F4F7F0;
 }
 
 #login-panel.open #login-panel-card {
@@ -263,7 +177,7 @@ html, body {
 }
 
 #login-panel-card.card-wide {
-    max-width: 560px;
+    max-width: 580px;
 }
 
 /* ── Panel Header ──────────────────────────────────── */
@@ -275,212 +189,302 @@ html, body {
 }
 
 .panel-title {
-    margin: 0 0 .25rem;
-    font-size: 1.3rem;
+    margin: 0 0 0.25rem;
+    font-size: 1.35rem;
     font-weight: 800;
-    color: #111827;
-    letter-spacing: -.02em;
+    color: #FFFFFF;
+    letter-spacing: -0.02em;
 }
 
 .panel-sub {
     margin: 0;
-    font-size: .8rem;
-    color: #6b7280;
-    line-height: 1.4;
+    font-size: 0.8125rem;
+    color: #8E9882;
+    line-height: 1.45;
 }
 
 .panel-close {
     flex-shrink: 0;
-    margin-left: .75rem;
-    padding: .4rem;
-    background: #f3f4f6;
-    border: 1px solid #e5e7eb;
-    border-radius: .5rem;
-    color: #6b7280;
+    margin-left: 0.75rem;
+    padding: 0.45rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.65rem;
+    color: #8E9882;
     cursor: pointer;
     line-height: 0;
-    transition: background .15s, color .15s, transform .1s;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 
 .panel-close:hover {
-    background: #e5e7eb;
-    color: #111827;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(196, 255, 13, 0.3);
+    color: #FFFFFF;
 }
-
-.panel-close:active { transform: scale(.92); }
 
 /* ── Alerts ────────────────────────────────────────── */
 .login-error {
     display: flex;
     align-items: center;
-    gap: .5rem;
-    background: #fef2f2;
-    border: 1px solid #fecaca;
-    border-radius: .75rem;
-    padding: .65rem .875rem;
+    gap: 0.55rem;
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 0.85rem;
+    padding: 0.7rem 0.9rem;
     margin-bottom: 1rem;
 }
-.login-error svg  { width: 1.1rem; height: 1.1rem; flex-shrink: 0; color: #ef4444; }
-.login-error span { font-size: .78rem; font-weight: 500; color: #b91c1c; }
+.login-error svg  { width: 1.1rem; height: 1.1rem; flex-shrink: 0; color: #f87171; }
+.login-error span { font-size: 0.8rem; font-weight: 500; color: #fca5a5; }
 
 .login-success {
     display: flex;
     align-items: center;
-    gap: .5rem;
-    background: #f0fdf4;
-    border: 1px solid #bbf7d0;
-    border-radius: .75rem;
-    padding: .65rem .875rem;
+    gap: 0.55rem;
+    background: rgba(196, 255, 13, 0.12);
+    border: 1px solid rgba(196, 255, 13, 0.35);
+    border-radius: 0.85rem;
+    padding: 0.7rem 0.9rem;
     margin-bottom: 1rem;
 }
-.login-success svg  { width: 1.1rem; height: 1.1rem; flex-shrink: 0; color: #16a34a; }
-.login-success span { font-size: .78rem; font-weight: 500; color: #15803d; }
+.login-success svg  { width: 1.1rem; height: 1.1rem; flex-shrink: 0; color: #C4FF0D; }
+.login-success span { font-size: 0.8rem; font-weight: 500; color: #e2ff85; }
 
 /* ── Form Controls ─────────────────────────────────── */
 .auth-form {
     display: flex;
     flex-direction: column;
-    gap: .95rem;
+    gap: 0.95rem;
 }
 
 .field-label {
     display: block;
-    font-size: .7rem;
+    font-size: 0.7rem;
     font-weight: 700;
-    color: #374151;
-    margin-bottom: .35rem;
-    letter-spacing: .04em;
+    color: #A3B196;
+    margin-bottom: 0.35rem;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
 }
 
 .field-input {
     width: 100%;
-    padding: .65rem .875rem;
-    background: #f9fafb;
-    border: 1px solid #d1d5db;
-    border-radius: .75rem;
-    color: #111827;
-    font-size: .875rem;
+    padding: 0.7rem 0.9rem;
+    background: #1A2212;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 0.75rem;
+    color: #FFFFFF;
+    font-size: 0.875rem;
     outline: none;
-    transition: border-color .15s, box-shadow .15s, background .15s;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
 }
 
 .field-input.has-icon { padding-right: 2.75rem; }
 
 .field-input:focus {
-    border-color: #c96a1e;
-    box-shadow: 0 0 0 3px rgba(201, 106, 30, 0.15);
-    background: #ffffff;
+    border-color: #C4FF0D;
+    box-shadow: 0 0 0 3px rgba(196, 255, 13, 0.16);
+    background: #1E2815;
 }
 
-::placeholder { color: #9ca3af; }
+.field-input::placeholder { color: rgba(255, 255, 255, 0.32); }
 
 .field-wrap { position: relative; }
 
 .pw-toggle {
     position: absolute;
-    right: .65rem;
+    right: 0.65rem;
     top: 50%;
     transform: translateY(-50%);
-    padding: .35rem;
-    color: #9ca3af;
+    padding: 0.35rem;
+    color: #8E9882;
     background: none;
     border: none;
     cursor: pointer;
-    border-radius: .4rem;
+    border-radius: 0.4rem;
     display: flex;
     align-items: center;
-    transition: color .15s;
+    transition: color 0.15s;
 }
-.pw-toggle:hover { color: #374151; }
+.pw-toggle:hover { color: #C4FF0D; }
 .pw-toggle svg   { width: 1.1rem; height: 1.1rem; }
 
 /* ── Register Specific Grid ────────────────────────── */
 .reg-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: .8rem;
+    gap: 0.8rem;
 }
 
-@media (max-width: 520px) {
+@media (max-width: 540px) {
     .reg-grid { grid-template-columns: 1fr; }
 }
 
 .reg-full { grid-column: 1 / -1; }
 
 .section-label {
-    font-size: .7rem;
+    font-size: 0.7rem;
     font-weight: 700;
-    color: #9ca3af;
+    color: #C4FF0D;
     text-transform: uppercase;
-    letter-spacing: .06em;
-    padding-bottom: .4rem;
-    border-bottom: 1px solid #f3f4f6;
-    margin-top: .3rem;
-    margin-bottom: .2rem;
+    letter-spacing: 0.06em;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin-top: 0.3rem;
+    margin-bottom: 0.2rem;
     grid-column: 1 / -1;
 }
 
-select.field-input {
-    cursor: pointer;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-    background-position: right .75rem center;
-    background-repeat: no-repeat;
-    background-size: 1.25em 1.25em;
-    padding-right: 2.5rem;
+.bento-select-wrapper {
+    position: relative;
+    width: 100%;
 }
 
-/* ── Primary Submit Button ─────────────────────────── */
+.bento-select-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.75rem 0.95rem;
+    background-color: #1A2212;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 0.75rem;
+    color: #FFFFFF;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.bento-select-trigger:hover {
+    border-color: rgba(196, 255, 13, 0.45);
+    background-color: #1E2815;
+}
+
+.bento-select-wrapper.open .bento-select-trigger {
+    border-color: #C4FF0D;
+    box-shadow: 0 0 0 3px rgba(196, 255, 13, 0.16);
+    background-color: #1E2815;
+}
+
+.bento-select-chevron {
+    width: 1.1rem;
+    height: 1.1rem;
+    color: #C4FF0D;
+    flex-shrink: 0;
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bento-select-wrapper.open .bento-select-chevron {
+    transform: rotate(180deg);
+}
+
+.bento-select-menu {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 6px);
+    z-index: 90;
+    background-color: #151c0f;
+    border: 1px solid rgba(196, 255, 13, 0.28);
+    border-radius: 0.9rem;
+    padding: 0.35rem;
+    box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.85);
+    max-height: 210px;
+    overflow-y: auto;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px) scale(0.98);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+}
+
+.bento-select-wrapper.open .bento-select-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.bento-select-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    border-radius: 0.6rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #d5decb;
+    background: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.bento-select-option:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}
+
+.bento-select-option.selected {
+    background-color: rgba(196, 255, 13, 0.15);
+    color: #C4FF0D;
+    font-weight: 600;
+}
+
+/* ── Primary Submit Button (Vaultory Lime) ─────────── */
 .btn-submit {
     width: 100%;
-    padding: .75rem 1rem;
-    background: linear-gradient(135deg, #c96a1e, #a84f0e);
-    color: #ffffff;
+    padding: 0.8rem 1rem;
+    background: #C4FF0D;
+    color: #000000;
     border: none;
-    border-radius: .75rem;
-    font-size: .9rem;
+    border-radius: 0.75rem;
+    font-size: 0.9rem;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 4px 16px rgba(168, 79, 14, .32);
-    letter-spacing: .01em;
-    transition: background .18s, box-shadow .18s, transform .1s;
-    margin-top: .4rem;
+    box-shadow: 0 6px 24px rgba(196, 255, 13, 0.28);
+    letter-spacing: 0.01em;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+    margin-top: 0.4rem;
 }
 
 .btn-submit:hover {
-    background: linear-gradient(135deg, #d97822, #b85c12);
-    box-shadow: 0 6px 22px rgba(168, 79, 14, .45);
+    filter: brightness(1.06);
+    box-shadow: 0 8px 28px rgba(196, 255, 13, 0.42);
+    transform: translateY(-1px);
 }
 
-.btn-submit:active { transform: scale(.98); }
+.btn-submit:active { transform: scale(0.98); }
 
 /* ── Panel Footer ──────────────────────────────────── */
 .panel-footer {
     margin-top: 1.15rem;
-    padding-top: .95rem;
-    border-top: 1px solid #f3f4f6;
+    padding-top: 0.95rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
     text-align: center;
 }
 
 .panel-footer-text {
-    font-size: .8rem;
-    color: #6b7280;
+    font-size: 0.8rem;
+    color: #8E9882;
 }
 
 .panel-footer a, .panel-footer button.tab-link {
-    font-size: .8rem;
+    font-size: 0.8rem;
     font-weight: 700;
-    color: #c96a1e;
+    color: #C4FF0D;
     text-decoration: none;
     background: none;
     border: none;
     padding: 0;
     cursor: pointer;
-    transition: color .15s;
+    transition: opacity 0.15s;
 }
 
 .panel-footer a:hover, .panel-footer button.tab-link:hover {
-    color: #a84f0e;
+    opacity: 0.85;
     text-decoration: underline;
 }

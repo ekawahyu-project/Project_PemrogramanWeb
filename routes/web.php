@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DebtController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RecommendationController;
@@ -37,6 +38,9 @@ Route::middleware('auth.custom')->group(function () {
 
     Route::get('/laporan', [ReportController::class, 'index'])->name('laporan');
     Route::post('/laporan', [ReportController::class, 'handle'])->name('laporan.handle');
+
+    Route::get('/hutang-piutang', [DebtController::class, 'index'])->name('hutang-piutang');
+    Route::post('/hutang-piutang', [DebtController::class, 'handle'])->name('hutang-piutang.handle');
 
     Route::get('/rekomendasi', [RecommendationController::class, 'index'])->name('rekomendasi');
     Route::post('/rekomendasi', [RecommendationController::class, 'handle'])->name('rekomendasi.handle');

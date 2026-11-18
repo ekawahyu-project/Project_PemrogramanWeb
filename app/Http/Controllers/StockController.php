@@ -2,32 +2,49 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
+use App\Models\StockLog;
+use App\Services\StockMovementService;
+use DomainException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class StockController extends Controller
 {
+    public function __construct(private StockMovementService $stockService) {}
+
     /**
      * Tampilkan halaman mutasi stok.
      */
     public function index(Request $request): View
     {
         $currentPage = 'stok';
+        $error = session('error', '');
+        $flash = session('flash');
+
+        $produkList = Product::orderBy('id')->get();
+        $lowStock = Product::lowStock()->orderBy('id')->get();
+        $stokLogList = StockLog::with('product')
+            ->orderByDesc('tanggal')
+            ->orderByDesc('id')
+            ->get();
+
         $editId = $request->query('edit');
-        $editLog = null;
-        $stokLog = session('stok_log', []);
+        $editLog = $editId ? StockLog::find($editId) : null;
 
-        if ($editId) {
-            foreach ($stokLog as $l) {
-                if (($l['id'] ?? '') === $editId) {
-                    $editLog = $l;
-                    break;
-                }
-            }
-        }
-
-        return view('stok', compact('currentPage', 'editId', 'editLog'));
+        return view('stok', compact(
+            'currentPage',
+            'error',
+            'flash',
+            'produkList',
+            'lowStock',
+            'stokLogList',
+            'editId',
+            'editLog'
+        ));
     }
 
     /**
@@ -57,52 +74,31 @@ class StockController extends Controller
      */
     protected function store(Request $request): RedirectResponse
     {
-        $produkId = (string) $request->input('produk_id', '');
-        $jenis = (string) $request->input('jenis', 'Masuk');
-        $jumlah = (int) $request->input('jumlah', 0);
-        $ket = trim((string) $request->input('keterangan', ''));
-        $tanggal = (string) $request->input('tanggal', date('Y-m-d'));
+        $validator = Validator::make($request->all(), [
+            'produk_id' => ['required', 'integer', 'exists:products,id'],
+            'jenis' => ['required', Rule::in(StockLog::TYPES)],
+            'jumlah' => ['required', 'integer', 'min:1'],
+            'tanggal' => ['required', 'date'],
+            'keterangan' => ['nullable', 'string', 'max:255'],
+        ]);
 
-        if (! $produkId || $jumlah <= 0) {
+        if ($validator->fails()) {
             return redirect('/stok')->with('error', 'Pilih produk dan masukkan jumlah lebih dari 0.');
         }
 
-        $produkList = session('produk', []);
-        $stokLogList = session('stok_log', []);
-        $valid = true;
-        $errorMessage = '';
+        $validated = $validator->validated();
 
-        foreach ($produkList as &$p) {
-            if (($p['id'] ?? '') === $produkId) {
-                if ($jenis === 'Keluar' && ($p['stok'] ?? 0) < $jumlah) {
-                    $errorMessage = "Stok {$p['nama']} tidak mencukupi (tersedia: {$p['stok']}).";
-                    $valid = false;
-                } else {
-                    $p['stok'] = $jenis === 'Masuk' ? ($p['stok'] ?? 0) + $jumlah : ($p['stok'] ?? 0) - $jumlah;
-                }
-                break;
-            }
+        try {
+            $this->stockService->record(
+                (int) $validated['produk_id'],
+                $validated['jenis'],
+                (int) $validated['jumlah'],
+                $validated['tanggal'],
+                trim((string) ($validated['keterangan'] ?? ''))
+            );
+        } catch (DomainException $e) {
+            return redirect('/stok')->with('error', $e->getMessage());
         }
-        unset($p);
-
-        if (! $valid) {
-            return redirect('/stok')->with('error', $errorMessage);
-        }
-
-        $stokLogList[] = [
-            'id' => uniqid('sl'),
-            'tanggal' => $tanggal,
-            'produk_id' => $produkId,
-            'jenis' => $jenis,
-            'jumlah' => $jumlah,
-            'keterangan' => $ket,
-        ];
-
-        session([
-            'produk' => $produkList,
-            'stok_log' => $stokLogList,
-        ]);
-        simpanProduk();
 
         return redirect('/stok')->with('flash', [
             'icon' => 'success',
@@ -117,77 +113,34 @@ class StockController extends Controller
     protected function update(Request $request): RedirectResponse
     {
         $id = (string) $request->input('id', '');
-        $produkId = (string) $request->input('produk_id', '');
-        $jenis = (string) $request->input('jenis', 'Masuk');
-        $jumlah = (int) $request->input('jumlah', 0);
-        $tanggal = (string) $request->input('tanggal', date('Y-m-d'));
-        $ket = trim((string) $request->input('keterangan', ''));
+        $stockLog = StockLog::find($id);
 
-        $stokLogList = session('stok_log', []);
-        $produkList = session('produk', []);
+        $validator = Validator::make($request->all(), [
+            'produk_id' => ['required', 'integer', 'exists:products,id'],
+            'jenis' => ['required', Rule::in(StockLog::TYPES)],
+            'jumlah' => ['required', 'integer', 'min:1'],
+            'tanggal' => ['required', 'date'],
+            'keterangan' => ['nullable', 'string', 'max:255'],
+        ]);
 
-        $oldLogIndex = null;
-        foreach ($stokLogList as $idx => $l) {
-            if (($l['id'] ?? '') === $id) {
-                $oldLogIndex = $idx;
-                break;
-            }
-        }
-
-        if ($oldLogIndex === null || ! $produkId || $jumlah <= 0) {
+        if (! $stockLog || $validator->fails()) {
             return redirect('/stok')->with('error', 'Data mutasi tidak valid.');
         }
 
-        $oldLog = $stokLogList[$oldLogIndex];
-        $produkBackup = $produkList;
+        $validated = $validator->validated();
 
-        // Balikkan efek log lama
-        foreach ($produkList as &$p) {
-            if (($p['id'] ?? '') === ($oldLog['produk_id'] ?? '')) {
-                $p['stok'] = ($oldLog['jenis'] ?? '') === 'Masuk'
-                    ? max(0, ($p['stok'] ?? 0) - (int) ($oldLog['jumlah'] ?? 0))
-                    : ($p['stok'] ?? 0) + (int) ($oldLog['jumlah'] ?? 0);
-                break;
-            }
+        try {
+            $this->stockService->update(
+                $stockLog,
+                (int) $validated['produk_id'],
+                $validated['jenis'],
+                (int) $validated['jumlah'],
+                $validated['tanggal'],
+                trim((string) ($validated['keterangan'] ?? ''))
+            );
+        } catch (DomainException $e) {
+            return redirect('/stok?edit='.$id)->with('error', $e->getMessage());
         }
-        unset($p);
-
-        // Terapkan efek log baru
-        $valid = true;
-        $errorMessage = '';
-        foreach ($produkList as &$p) {
-            if (($p['id'] ?? '') === $produkId) {
-                if ($jenis === 'Keluar' && ($p['stok'] ?? 0) < $jumlah) {
-                    $errorMessage = "Stok {$p['nama']} tidak mencukupi untuk mutasi ini (tersedia: {$p['stok']}).";
-                    $valid = false;
-                } else {
-                    $p['stok'] = $jenis === 'Masuk' ? ($p['stok'] ?? 0) + $jumlah : ($p['stok'] ?? 0) - $jumlah;
-                }
-                break;
-            }
-        }
-        unset($p);
-
-        if (! $valid) {
-            session(['produk' => $produkBackup]);
-
-            return redirect('/stok?edit='.$id)->with('error', $errorMessage);
-        }
-
-        $stokLogList[$oldLogIndex] = [
-            'id' => $id,
-            'tanggal' => $tanggal,
-            'produk_id' => $produkId,
-            'jenis' => $jenis,
-            'jumlah' => $jumlah,
-            'keterangan' => $ket,
-        ];
-
-        session([
-            'produk' => $produkList,
-            'stok_log' => $stokLogList,
-        ]);
-        simpanProduk();
 
         return redirect('/stok')->with('flash', [
             'icon' => 'success',
@@ -201,32 +154,11 @@ class StockController extends Controller
      */
     protected function destroy(Request $request): RedirectResponse
     {
-        $id = (string) $request->input('id', '');
-        $stokLogList = session('stok_log', []);
-        $produkList = session('produk', []);
+        $stockLog = StockLog::find($request->input('id'));
 
-        foreach ($stokLogList as $log) {
-            if (($log['id'] ?? '') === $id) {
-                foreach ($produkList as &$p) {
-                    if (($p['id'] ?? '') === ($log['produk_id'] ?? '')) {
-                        $p['stok'] = ($log['jenis'] ?? '') === 'Masuk'
-                            ? max(0, ($p['stok'] ?? 0) - (int) ($log['jumlah'] ?? 0))
-                            : ($p['stok'] ?? 0) + (int) ($log['jumlah'] ?? 0);
-                        break;
-                    }
-                }
-                unset($p);
-                break;
-            }
+        if ($stockLog) {
+            $this->stockService->reverseAndDelete($stockLog);
         }
-
-        $stokLogList = array_values(array_filter($stokLogList, fn ($l) => ($l['id'] ?? '') !== $id));
-
-        session([
-            'produk' => $produkList,
-            'stok_log' => $stokLogList,
-        ]);
-        simpanProduk();
 
         return redirect('/stok')->with('flash', [
             'icon' => 'success',
