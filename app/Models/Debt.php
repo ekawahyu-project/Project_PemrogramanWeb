@@ -8,8 +8,10 @@ use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
+    'user_id',
     'nama_pihak',
     'no_hp',
     'jenis',
@@ -63,6 +65,16 @@ class Debt extends Model
             'tanggal' => 'date',
             'jatuh_tempo' => 'date',
         ];
+    }
+
+    /**
+     * Pemilik (pengguna yang login) dari catatan hutang / piutang ini.
+     *
+     * @return BelongsTo<User, $this>
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     /**

@@ -70,7 +70,7 @@
                     <div class="flex flex-wrap items-start justify-between gap-4">
                         <div class="min-w-0">
                             <p class="text-2xl sm:text-3xl font-semibold leading-[1.15] tracking-[-0.03em] text-white">
-                                <span class="text-[#C4FF0D]">{{ $user }}</span>
+                                Selamat Datang <span class="text-[#C4FF0D]">{{ $user }}</span>
                             </p>
                             <p class="mt-1.5 text-sm text-[#9AA68E]">
                                 Ringkasan arus kas &amp; laba bersih usaha Anda.

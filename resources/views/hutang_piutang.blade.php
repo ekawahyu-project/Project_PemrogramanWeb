@@ -250,14 +250,14 @@
                             <div class="sm:col-span-2">
                                 <label class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Jenis Catatan</label>
                                 <select name="jenis" class="{{ $inputClass }}">
-                                    <option value="Piutang" {{ ($editDebt?->jenis ?? 'Piutang') === 'Piutang' ? 'selected' : '' }}>Piutang Pelanggan (Kasbon)</option>
-                                    <option value="Hutang"  {{ ($editDebt?->jenis ?? '') === 'Hutang' ? 'selected' : '' }}>Hutang ke Supplier</option>
+                                    <option value="Piutang" {{ old('jenis', $editDebt?->jenis ?? 'Piutang') === 'Piutang' ? 'selected' : '' }}>Piutang Pelanggan (Kasbon)</option>
+                                    <option value="Hutang"  {{ old('jenis', $editDebt?->jenis ?? '') === 'Hutang' ? 'selected' : '' }}>Hutang ke Supplier</option>
                                 </select>
                             </div>
 
                             <div>
                                 <label class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Nama Pelanggan / Supplier *</label>
-                                <input type="text" name="nama_pihak" required maxlength="100"
+                                <input type="text" name="nama_pihak" required minlength="2" maxlength="100"
                                     placeholder="Contoh: Warung Kopi Senja"
                                     value="{{ old('nama_pihak', $editDebt?->nama_pihak ?? '') }}"
                                     class="{{ $inputClass }}">
@@ -265,7 +265,9 @@
 
                             <div>
                                 <label class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">No. WhatsApp / HP</label>
-                                <input type="text" name="no_hp" maxlength="30"
+                                <input type="tel" name="no_hp" maxlength="16" inputmode="numeric"
+                                    pattern="(\+62|62|0)[0-9]{8,13}"
+                                    title="Nomor HP diawali 0, 62, atau +62 dan berisi 9–16 digit angka"
                                     placeholder="08123456789"
                                     value="{{ old('no_hp', $editDebt?->no_hp ?? '') }}"
                                     class="{{ $inputClass }}">
@@ -273,27 +275,27 @@
 
                             <div>
                                 <label class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Total Nominal (Rp) *</label>
-                                <input type="number" name="jumlah" required min="1" placeholder="0"
+                                <input type="number" name="jumlah" required min="1" max="10000000000" step="1" placeholder="0"
                                     value="{{ old('jumlah', $editDebt?->jumlah ?? '') }}"
                                     class="no-spinner {{ $inputClass }}">
                             </div>
                             <div>
                                 <label class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Sudah Dibayar (Rp)</label>
-                                <input type="number" name="dibayar" min="0" placeholder="0"
+                                <input type="number" name="dibayar" min="0" max="10000000000" step="1" placeholder="0"
                                     value="{{ old('dibayar', $editDebt?->dibayar ?? 0) }}"
                                     class="no-spinner {{ $inputClass }}">
                             </div>
 
                             <div>
                                 <label class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Tanggal Catat *</label>
-                                <input type="date" name="tanggal" required
-                                    value="{{ $editDebt ? $editDebt->tanggal->format('Y-m-d') : date('Y-m-d') }}"
+                                <input type="date" name="tanggal" required max="{{ date('Y-m-d') }}"
+                                    value="{{ old('tanggal', $editDebt ? $editDebt->tanggal->format('Y-m-d') : date('Y-m-d')) }}"
                                     class="{{ $inputClass }}">
                             </div>
                             <div>
                                 <label class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Jatuh Tempo</label>
                                 <input type="date" name="jatuh_tempo"
-                                    value="{{ $editDebt?->jatuh_tempo?->format('Y-m-d') ?? date('Y-m-d', strtotime('+14 days')) }}"
+                                    value="{{ old('jatuh_tempo', $editDebt ? $editDebt->jatuh_tempo?->format('Y-m-d') : date('Y-m-d', strtotime('+14 days'))) }}"
                                     class="{{ $inputClass }}">
                             </div>
 
@@ -408,7 +410,9 @@
                                                 <td class="text-center whitespace-nowrap">
                                                     <div class="flex items-center justify-center gap-3">
                                                         @if (! $d->isPaid())
-                                                            <form method="POST" action="/hutang-piutang" title="Tandai langsung Lunas">
+                                                            <form method="POST" action="/hutang-piutang" title="Tandai langsung Lunas"
+                                                                  data-nama="{{ $d->nama_pihak }}"
+                                                                  onsubmit="return confirm('Tandai catatan ' + this.dataset.nama + ' sebagai Lunas?')">
                                                                 @csrf
                                                                 <input type="hidden" name="action" value="lunasi">
                                                                 <input type="hidden" name="id" value="{{ $d->id }}">
@@ -418,7 +422,9 @@
                                                             </form>
                                                         @endif
                                                         <a href="/hutang-piutang?edit={{ $d->id }}#form-hutang" class="text-xs sm:text-sm text-[#C4FF0D] hover:underline font-semibold transition">Edit</a>
-                                                        <form method="POST" action="/hutang-piutang" onsubmit="return confirm('Hapus catatan ini?')">
+                                                        <form method="POST" action="/hutang-piutang"
+                                                              data-nama="{{ $d->nama_pihak }}"
+                                                              onsubmit="return confirm('Hapus catatan ' + this.dataset.nama + '? Data yang dihapus tidak dapat dikembalikan.')">
                                                             @csrf
                                                             <input type="hidden" name="action" value="hapus">
                                                             <input type="hidden" name="id" value="{{ $d->id }}">

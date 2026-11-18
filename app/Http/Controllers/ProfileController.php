@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -23,7 +25,7 @@ class ProfileController extends Controller
     }
 
     /**
-     * Handle profile save action.
+     * Handle profile actions: save, delete photo, delete account.
      */
     public function handle(Request $request): RedirectResponse
     {
@@ -33,7 +35,75 @@ class ProfileController extends Controller
             return $this->handleSave($request);
         }
 
+        if ($action === 'hapus_foto') {
+            return $this->handleDeletePhoto($request);
+        }
+
+        if ($action === 'hapus_akun') {
+            return $this->handleDeleteAccount($request);
+        }
+
         return redirect('/profil');
+    }
+
+    /**
+     * Hapus foto profil pengguna (file + kolom foto di database).
+     */
+    private function handleDeletePhoto(Request $request): RedirectResponse
+    {
+        /** @var User $user */
+        $user = $request->user();
+
+        if (empty($user->foto)) {
+            return redirect('/profil')->with('flash', [
+                'type' => 'error',
+                'message' => 'Anda belum memiliki foto profil untuk dihapus.',
+            ]);
+        }
+
+        $user->deletePhotoFile();
+        $user->update(['foto' => null]);
+
+        return redirect('/profil')->with('flash', [
+            'type' => 'success',
+            'message' => 'Foto profil berhasil dihapus.',
+        ]);
+    }
+
+    /**
+     * Hapus akun pengguna secara permanen setelah verifikasi kata sandi.
+     */
+    private function handleDeleteAccount(Request $request): RedirectResponse
+    {
+        /** @var User $user */
+        $user = $request->user();
+        $password = (string) $request->input('password_konfirmasi', '');
+
+        if ($password === '') {
+            return redirect('/profil')->with('flash', [
+                'type' => 'error',
+                'message' => 'Masukkan kata sandi Anda untuk mengonfirmasi penghapusan akun.',
+            ]);
+        }
+
+        if (! Hash::check($password, $user->password)) {
+            return redirect('/profil')->with('flash', [
+                'type' => 'error',
+                'message' => 'Kata sandi salah. Akun tidak dihapus.',
+            ]);
+        }
+
+        $user->deletePhotoFile();
+
+        Auth::logout();
+        $user->delete();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/login')
+            ->with('success', 'Akun Anda beserta seluruh datanya berhasil dihapus.')
+            ->with('tab', 'login');
     }
 
     /**
@@ -99,13 +169,7 @@ class ProfileController extends Controller
                 mkdir($uploadDir, 0777, true);
             }
 
-            if (
-                ! empty($user->foto) &&
-                str_starts_with($user->foto, 'uploads/') &&
-                file_exists(public_path($user->foto))
-            ) {
-                unlink(public_path($user->foto));
-            }
+            $user->deletePhotoFile();
 
             $file->move($uploadDir, $newFileName);
             $fotoPath = 'uploads/'.$newFileName;

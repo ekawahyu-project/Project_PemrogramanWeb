@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Debt;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,6 +22,7 @@ class DebtFactory extends Factory
         $dibayar = fake()->randomElement([0, (int) round($jumlah / 2), $jumlah]);
 
         return [
+            'user_id' => User::factory(),
             'nama_pihak' => fake()->name(),
             'no_hp' => '08123456789',
             'jenis' => fake()->randomElement(Debt::TYPES),

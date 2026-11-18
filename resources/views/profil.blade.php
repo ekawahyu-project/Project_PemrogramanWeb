@@ -103,7 +103,7 @@
                             </div>
                         </div>
 
-                        <div class="mt-6 pt-4 border-t border-white/[0.08]">
+                        <div class="mt-6 pt-4 border-t border-white/[0.08] flex flex-col gap-2.5">
                             <label
                                 for="foto_profil"
                                 class="cursor-pointer w-full btn-ghost-dark text-sm justify-center hover:border-[#C4FF0D]/50 hover:text-white"
@@ -115,6 +115,17 @@
                                 </svg>
                                 Ubah Foto Profil
                             </label>
+                            @if (! empty($fotoUrl))
+                                <form method="POST" action="/profil"
+                                      onsubmit="return confirm('Hapus foto profil Anda?')">
+                                    @csrf
+                                    <input type="hidden" name="action" value="hapus_foto">
+                                    <button type="submit"
+                                            class="w-full btn-ghost-dark text-sm justify-center text-rose-300 hover:border-rose-500/50 hover:text-rose-200">
+                                        Hapus Foto Profil
+                                    </button>
+                                </form>
+                            @endif
                         </div>
                     </section>
 
@@ -163,8 +174,9 @@
 
                 </div>
 
-                <!-- RIGHT COLUMN (xl:col-span-8): Bento Profile & Merchant Settings Form -->
-                <section class="bento-tile bento-tile-lg xl:col-span-8 justify-between">
+                <!-- RIGHT COLUMN (xl:col-span-8): Bento Profile & Merchant Settings Form + Zona Hapus Akun -->
+                <div class="xl:col-span-8 space-y-4">
+                <section class="bento-tile bento-tile-lg justify-between">
                     <form
                         method="POST"
                         action="/profil"
@@ -317,6 +329,34 @@
                         </div>
                     </form>
                 </section>
+
+                <!-- ZONA BERBAHAYA: Hapus Akun Permanen -->
+                <section class="bento-tile border-rose-500/30">
+                    <div class="flex flex-col lg:flex-row lg:items-end gap-5">
+                        <div class="flex-1">
+                            <h3 class="text-base font-bold text-rose-300">Hapus Akun</h3>
+                            <p class="text-xs sm:text-sm text-[#9AA68E] mt-1.5 leading-relaxed">
+                                Akun, foto profil, dan seluruh catatan hutang &amp; piutang milik Anda akan dihapus permanen
+                                dan tidak dapat dikembalikan. Masukkan kata sandi untuk konfirmasi.
+                            </p>
+                        </div>
+                        <form method="POST" action="/profil" data-spa-ignore="true"
+                              class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto"
+                              onsubmit="return confirm('Yakin ingin menghapus akun secara permanen? Tindakan ini tidak dapat dibatalkan.')">
+                            @csrf
+                            <input type="hidden" name="action" value="hapus_akun">
+                            <label for="password_konfirmasi" class="sr-only">Kata sandi</label>
+                            <input type="password" id="password_konfirmasi" name="password_konfirmasi" required
+                                   autocomplete="current-password" placeholder="Kata sandi Anda"
+                                   class="{{ $inputClass }} sm:w-56">
+                            <button type="submit"
+                                    class="shrink-0 px-5 py-2.5 rounded-xl text-sm font-semibold bg-rose-500/15 text-rose-300 border border-rose-500/40 hover:bg-rose-500 hover:text-white transition">
+                                Hapus Akun Permanen
+                            </button>
+                        </form>
+                    </div>
+                </section>
+                </div>
 
             </div>
         </div>

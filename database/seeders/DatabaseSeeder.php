@@ -165,7 +165,7 @@ class DatabaseSeeder extends Seeder
             ];
 
             foreach ($debts as $d) {
-                Debt::create($d);
+                $admin->debts()->create($d);
             }
         }
     }

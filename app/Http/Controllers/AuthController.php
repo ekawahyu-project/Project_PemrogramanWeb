@@ -53,6 +53,14 @@ class AuthController extends Controller
         $identifier = trim((string) $request->input('username', ''));
         $password = (string) $request->input('password', '');
 
+        if ($identifier === '' || $password === '') {
+            return redirect('/login')
+                ->withInput($request->only('username'))
+                ->with('error', 'Email / Username dan kata sandi wajib diisi.')
+                ->with('tab', 'login');
+        }
+
+        // Query memakai parameter binding Eloquent sehingga aman dari SQL injection.
         $user = User::where('username', $identifier)
             ->orWhereRaw('LOWER(email) = ?', [mb_strtolower($identifier)])
             ->first();
@@ -77,7 +85,7 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'nama' => ['required', 'string', 'max:100'],
-            'username' => ['required', 'string', 'max:50', 'unique:users,username'],
+            'username' => ['required', 'string', 'min:3', 'max:50', 'alpha_dash', 'unique:users,username'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:6'],
             'password2' => ['required', 'same:password'],
@@ -89,6 +97,10 @@ class AuthController extends Controller
             'nama.required' => 'Nama lengkap, username, email, dan kata sandi wajib diisi.',
             'username.required' => 'Nama lengkap, username, email, dan kata sandi wajib diisi.',
             'username.unique' => 'Username sudah terdaftar.',
+            'username.min' => 'Username minimal 3 karakter.',
+            'username.max' => 'Username maksimal 50 karakter.',
+            'username.alpha_dash' => 'Username hanya boleh berisi huruf, angka, tanda minus (-), dan garis bawah (_), tanpa spasi.',
+            'nama.max' => 'Nama lengkap maksimal 100 karakter.',
             'email.required' => 'Nama lengkap, username, email, dan kata sandi wajib diisi.',
             'email.email' => 'Format alamat email tidak valid.',
             'email.unique' => 'Email sudah terdaftar.',

@@ -31,6 +31,7 @@ class DebtControllerTest extends TestCase
         $storeResponse->assertRedirect('/hutang-piutang');
         $debt = Debt::where('nama_pihak', 'Warung Kopi Senja')->first();
         $this->assertNotNull($debt);
+        $this->assertSame($user->id, $debt->user_id);
         $this->assertSame(Debt::STATUS_PARTIAL, $debt->status);
         $this->assertSame(300000, $debt->remainingAmount());
 
@@ -79,5 +80,64 @@ class DebtControllerTest extends TestCase
 
         $deleteResponse->assertRedirect('/hutang-piutang');
         $this->assertModelMissing($debt);
+    }
+
+    public function test_debt_validation_rejects_invalid_and_unreasonable_inputs_with_clear_messages(): void
+    {
+        $user = User::factory()->create();
+
+        // Nilai tidak wajar: dibayar > jumlah
+        $overpaid = $this->actingAs($user)->post('/hutang-piutang', [
+            'action' => 'tambah',
+            'nama_pihak' => 'Toko Maju',
+            'no_hp' => '08123456789',
+            'jenis' => Debt::TYPE_RECEIVABLE,
+            'jumlah' => 100000,
+            'dibayar' => 250000,
+            'tanggal' => '2026-10-01',
+        ]);
+
+        $overpaid->assertSessionHas('flash.type', 'danger');
+        $overpaid->assertSessionHas('flash.msg', 'Nominal yang sudah dibayar tidak boleh melebihi total nominal.');
+        $this->assertDatabaseCount('debts', 0);
+
+        // Format nomor HP salah (berisi huruf)
+        $badPhone = $this->actingAs($user)->post('/hutang-piutang', [
+            'action' => 'tambah',
+            'nama_pihak' => 'Toko Maju',
+            'no_hp' => 'abc- salah',
+            'jenis' => Debt::TYPE_RECEIVABLE,
+            'jumlah' => 100000,
+            'dibayar' => 0,
+            'tanggal' => '2026-10-01',
+        ]);
+
+        $badPhone->assertSessionHas('flash.msg', 'Format nomor HP tidak valid. Gunakan angka saja, contoh: 081234567890.');
+        $this->assertDatabaseCount('debts', 0);
+    }
+
+    public function test_debt_security_prevents_unauthenticated_access_sql_injection_and_xss(): void
+    {
+        // Guest tidak bisa akses lewat URL langsung
+        $this->get('/hutang-piutang')->assertRedirect('/login');
+
+        $user = User::factory()->create();
+
+        // Input berisi XSS & SQL Injection disimpan aman via prepared statement dan ditampilkan ter-escape
+        $this->actingAs($user)->post('/hutang-piutang', [
+            'action' => 'tambah',
+            'nama_pihak' => "<script>alert('xss')</script>",
+            'no_hp' => '08123456789',
+            'jenis' => Debt::TYPE_PAYABLE,
+            'jumlah' => 150000,
+            'dibayar' => 0,
+            'tanggal' => '2026-10-01',
+            'keterangan' => "'; DROP TABLE debts; --",
+        ]);
+
+        $page = $this->actingAs($user)->get('/hutang-piutang');
+        $page->assertOk();
+        $page->assertSee('&lt;script&gt;alert(&#039;xss&#039;)&lt;/script&gt;', false);
+        $page->assertDontSee("<script>alert('xss')</script>", false);
     }
 }

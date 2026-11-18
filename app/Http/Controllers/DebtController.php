@@ -3,25 +3,36 @@
 namespace App\Http\Controllers;
 
 use App\Models\Debt;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator as ValidationValidator;
 use Illuminate\View\View;
 
 class DebtController extends Controller
 {
     /**
-     * Tampilkan halaman manajemen Hutang & Piutang (Kasbon).
+     * Batas nominal wajar untuk satu catatan (Rp 10 miliar).
+     */
+    public const MAX_AMOUNT = 10_000_000_000;
+
+    /**
+     * Tampilkan halaman manajemen Hutang & Piutang (Kasbon) milik pengguna yang login.
      */
     public function index(Request $request): View
     {
+        /** @var User $user */
+        $user = $request->user();
+
         $currentPage = 'hutang_piutang';
         $flash = session('flash');
         $editId = $request->query('edit');
-        $editDebt = $editId ? Debt::find($editId) : null;
+        $editDebt = $editId ? $user->debts()->find($editId) : null;
 
-        $debtList = Debt::orderByRaw("CASE WHEN status = 'Lunas' THEN 1 ELSE 0 END")
+        $debtList = $user->debts()
+            ->orderByRaw('CASE WHEN status = ? THEN 1 ELSE 0 END', [Debt::STATUS_PAID])
             ->orderBy('jatuh_tempo')
             ->orderByDesc('id')
             ->get();
@@ -93,36 +104,32 @@ class DebtController extends Controller
      */
     protected function store(Request $request): RedirectResponse
     {
-        $validator = Validator::make($request->all(), [
-            'nama_pihak' => ['required', 'string', 'max:100'],
-            'no_hp' => ['nullable', 'string', 'max:30'],
-            'jenis' => ['required', Rule::in(Debt::TYPES)],
-            'jumlah' => ['required', 'integer', 'min:1'],
-            'dibayar' => ['nullable', 'integer', 'min:0'],
-            'tanggal' => ['required', 'date'],
-            'jatuh_tempo' => ['nullable', 'date'],
-            'keterangan' => ['nullable', 'string', 'max:255'],
-        ]);
+        /** @var User $user */
+        $user = $request->user();
+
+        $validator = $this->makeValidator($request);
 
         if ($validator->fails()) {
-            return redirect('/hutang-piutang')->with('flash', [
-                'type' => 'danger',
-                'msg' => 'Mohon lengkapi nama pihak, jenis, tanggal, dan nominal dengan benar.',
-            ]);
+            return redirect('/hutang-piutang#form-hutang')
+                ->withInput()
+                ->with('flash', [
+                    'type' => 'danger',
+                    'msg' => $validator->errors()->first(),
+                ]);
         }
 
         $validated = $validator->validated();
         $jumlah = (int) $validated['jumlah'];
-        $dibayar = min($jumlah, (int) ($validated['dibayar'] ?? 0));
+        $dibayar = (int) ($validated['dibayar'] ?? 0);
 
-        Debt::create([
+        $user->debts()->create([
             'nama_pihak' => trim($validated['nama_pihak']),
             'no_hp' => trim((string) ($validated['no_hp'] ?? '')) ?: null,
             'jenis' => $validated['jenis'],
             'jumlah' => $jumlah,
             'dibayar' => $dibayar,
             'tanggal' => $validated['tanggal'],
-            'jatuh_tempo' => $validated['jatuh_tempo'] ?: null,
+            'jatuh_tempo' => ($validated['jatuh_tempo'] ?? null) ?: null,
             'status' => Debt::resolveStatus($jumlah, $dibayar),
             'keterangan' => trim((string) ($validated['keterangan'] ?? '')) ?: null,
         ]);
@@ -138,36 +145,26 @@ class DebtController extends Controller
      */
     protected function update(Request $request): RedirectResponse
     {
-        $debt = Debt::find($request->input('id'));
+        $debt = $this->findOwnedDebt($request);
 
         if (! $debt) {
-            return redirect('/hutang-piutang')->with('flash', [
-                'type' => 'danger',
-                'msg' => 'Data catatan tidak ditemukan.',
-            ]);
+            return $this->notFoundResponse();
         }
 
-        $validator = Validator::make($request->all(), [
-            'nama_pihak' => ['required', 'string', 'max:100'],
-            'no_hp' => ['nullable', 'string', 'max:30'],
-            'jenis' => ['required', Rule::in(Debt::TYPES)],
-            'jumlah' => ['required', 'integer', 'min:1'],
-            'dibayar' => ['nullable', 'integer', 'min:0'],
-            'tanggal' => ['required', 'date'],
-            'jatuh_tempo' => ['nullable', 'date'],
-            'keterangan' => ['nullable', 'string', 'max:255'],
-        ]);
+        $validator = $this->makeValidator($request);
 
         if ($validator->fails()) {
-            return redirect('/hutang-piutang?edit='.$debt->id)->with('flash', [
-                'type' => 'danger',
-                'msg' => 'Input tidak valid, periksa kembali formulir.',
-            ]);
+            return redirect('/hutang-piutang?edit='.$debt->id.'#form-hutang')
+                ->withInput()
+                ->with('flash', [
+                    'type' => 'danger',
+                    'msg' => $validator->errors()->first(),
+                ]);
         }
 
         $validated = $validator->validated();
         $jumlah = (int) $validated['jumlah'];
-        $dibayar = min($jumlah, (int) ($validated['dibayar'] ?? 0));
+        $dibayar = (int) ($validated['dibayar'] ?? 0);
 
         $debt->update([
             'nama_pihak' => trim($validated['nama_pihak']),
@@ -176,7 +173,7 @@ class DebtController extends Controller
             'jumlah' => $jumlah,
             'dibayar' => $dibayar,
             'tanggal' => $validated['tanggal'],
-            'jatuh_tempo' => $validated['jatuh_tempo'] ?: null,
+            'jatuh_tempo' => ($validated['jatuh_tempo'] ?? null) ?: null,
             'status' => Debt::resolveStatus($jumlah, $dibayar),
             'keterangan' => trim((string) ($validated['keterangan'] ?? '')) ?: null,
         ]);
@@ -192,18 +189,20 @@ class DebtController extends Controller
      */
     protected function markAsPaid(Request $request): RedirectResponse
     {
-        $debt = Debt::find($request->input('id'));
+        $debt = $this->findOwnedDebt($request);
 
-        if ($debt) {
-            $debt->update([
-                'dibayar' => $debt->jumlah,
-                'status' => Debt::STATUS_PAID,
-            ]);
+        if (! $debt) {
+            return $this->notFoundResponse();
         }
+
+        $debt->update([
+            'dibayar' => $debt->jumlah,
+            'status' => Debt::STATUS_PAID,
+        ]);
 
         return redirect('/hutang-piutang')->with('flash', [
             'type' => 'success',
-            'msg' => 'Catatan telah ditandai Lunas!',
+            'msg' => 'Catatan '.$debt->nama_pihak.' telah ditandai Lunas!',
         ]);
     }
 
@@ -212,11 +211,81 @@ class DebtController extends Controller
      */
     protected function destroy(Request $request): RedirectResponse
     {
-        Debt::find($request->input('id'))?->delete();
+        $debt = $this->findOwnedDebt($request);
+
+        if (! $debt) {
+            return $this->notFoundResponse();
+        }
+
+        $debt->delete();
 
         return redirect('/hutang-piutang')->with('flash', [
             'type' => 'success',
             'msg' => 'Catatan berhasil dihapus.',
+        ]);
+    }
+
+    /**
+     * Buat validator untuk form tambah / ubah catatan hutang piutang.
+     */
+    protected function makeValidator(Request $request): ValidationValidator
+    {
+        return Validator::make($request->all(), [
+            'nama_pihak' => ['required', 'string', 'min:2', 'max:100'],
+            'no_hp' => ['nullable', 'string', 'regex:/^(\+62|62|0)[0-9]{8,13}$/'],
+            'jenis' => ['required', Rule::in(Debt::TYPES)],
+            'jumlah' => ['required', 'integer', 'min:1', 'max:'.self::MAX_AMOUNT],
+            'dibayar' => ['nullable', 'integer', 'min:0', 'lte:jumlah'],
+            'tanggal' => ['required', 'date', 'before_or_equal:today'],
+            'jatuh_tempo' => ['nullable', 'date', 'after_or_equal:tanggal'],
+            'keterangan' => ['nullable', 'string', 'max:255'],
+        ], [
+            'nama_pihak.required' => 'Nama pelanggan / supplier wajib diisi.',
+            'nama_pihak.min' => 'Nama pelanggan / supplier minimal 2 karakter.',
+            'nama_pihak.max' => 'Nama pelanggan / supplier maksimal 100 karakter.',
+            'no_hp.regex' => 'Format nomor HP tidak valid. Gunakan angka saja, contoh: 081234567890.',
+            'jenis.required' => 'Jenis catatan wajib dipilih.',
+            'jenis.in' => 'Jenis catatan harus Piutang atau Hutang.',
+            'jumlah.required' => 'Total nominal wajib diisi.',
+            'jumlah.integer' => 'Total nominal harus berupa angka bulat tanpa titik/koma.',
+            'jumlah.min' => 'Total nominal harus lebih dari Rp 0.',
+            'jumlah.max' => 'Total nominal tidak wajar (maksimal Rp 10.000.000.000).',
+            'dibayar.integer' => 'Nominal yang sudah dibayar harus berupa angka bulat.',
+            'dibayar.min' => 'Nominal yang sudah dibayar tidak boleh negatif.',
+            'dibayar.lte' => 'Nominal yang sudah dibayar tidak boleh melebihi total nominal.',
+            'tanggal.required' => 'Tanggal catat wajib diisi.',
+            'tanggal.date' => 'Format tanggal catat tidak valid.',
+            'tanggal.before_or_equal' => 'Tanggal catat tidak boleh melebihi hari ini.',
+            'jatuh_tempo.date' => 'Format tanggal jatuh tempo tidak valid.',
+            'jatuh_tempo.after_or_equal' => 'Tanggal jatuh tempo tidak boleh sebelum tanggal catat.',
+            'keterangan.max' => 'Keterangan maksimal 255 karakter.',
+        ]);
+    }
+
+    /**
+     * Cari catatan berdasarkan ID, hanya milik pengguna yang sedang login.
+     */
+    protected function findOwnedDebt(Request $request): ?Debt
+    {
+        /** @var User $user */
+        $user = $request->user();
+        $id = $request->input('id');
+
+        if (! is_numeric($id)) {
+            return null;
+        }
+
+        return $user->debts()->find((int) $id);
+    }
+
+    /**
+     * Respons standar ketika catatan tidak ditemukan / bukan milik pengguna.
+     */
+    protected function notFoundResponse(): RedirectResponse
+    {
+        return redirect('/hutang-piutang')->with('flash', [
+            'type' => 'danger',
+            'msg' => 'Data catatan tidak ditemukan atau Anda tidak memiliki akses.',
         ]);
     }
 }

@@ -110,3 +110,12 @@
 <script src="{{ asset('assets/js/animations.js') }}"></script>
 <script src="{{ asset('assets/js/profil.js') }}"></script>
 <script src="{{ asset('assets/js/spa.js') }}"></script>
+<script>
+    // Jika halaman dipulihkan dari cache browser (tombol Back), muat ulang
+    // agar server mengecek sesi login kembali.
+    window.addEventListener('pageshow', function (event) {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    });
+</script>

@@ -76,12 +76,20 @@ class AuthTest extends TestCase
         $response->assertRedirect('/dashboard');
         $this->assertAuthenticatedAs($user);
 
+        // Protected page sends no-store cache headers to prevent Back button access after logout
+        $dashboardResponse = $this->actingAs($user)->get('/dashboard');
+        $dashboardResponse->assertOk();
+        $this->assertStringContainsString('no-store', (string) $dashboardResponse->headers->get('Cache-Control'));
+
         $logoutResponse = $this->post('/logout', [
             'action' => 'logout',
         ]);
 
         $logoutResponse->assertRedirect('/login');
         $this->assertGuest();
+
+        // After logout, accessing protected page redirects to /login
+        $this->get('/dashboard')->assertRedirect('/login');
     }
 
     public function test_user_can_login_with_email_case_insensitively_and_get_logout(): void
@@ -107,7 +115,7 @@ class AuthTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_login_fails_with_invalid_password(): void
+    public function test_login_fails_with_invalid_password_or_sql_injection_payload(): void
     {
         User::factory()->create([
             'username' => 'admin',
@@ -115,8 +123,8 @@ class AuthTest extends TestCase
         ]);
 
         $response = $this->post('/login', [
-            'username' => 'admin',
-            'password' => 'salah123',
+            'username' => "' OR '1'='1' --",
+            'password' => "' OR '1'='1",
             'action' => 'login',
         ]);
 

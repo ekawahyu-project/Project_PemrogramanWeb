@@ -55,7 +55,7 @@ class DashboardController extends Controller
         }
 
         // 3. Data unik untuk Solid Lime Tile: Ringkasan Hutang & Piutang (Kasbon)
-        $debts = Debt::all();
+        $debts = $request->user()?->debts()->get() ?? collect();
         $piutangTotal = (int) $debts->where('jenis', Debt::TYPE_RECEIVABLE)->sum('jumlah');
         $piutangCair = (int) $debts->where('jenis', Debt::TYPE_RECEIVABLE)->sum('dibayar');
         $sisaPiutang = max(0, $piutangTotal - $piutangCair);

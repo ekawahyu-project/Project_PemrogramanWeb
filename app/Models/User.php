@@ -63,6 +63,30 @@ class User extends Authenticatable
     }
 
     /**
+     * Relasi ke catatan hutang & piutang milik pengguna.
+     *
+     * @return HasMany<Debt, $this>
+     */
+    public function debts(): HasMany
+    {
+        return $this->hasMany(Debt::class);
+    }
+
+    /**
+     * Hapus file foto profil dari folder public/uploads jika ada.
+     */
+    public function deletePhotoFile(): void
+    {
+        if (
+            ! empty($this->foto) &&
+            str_starts_with($this->foto, 'uploads/') &&
+            file_exists(public_path($this->foto))
+        ) {
+            unlink(public_path($this->foto));
+        }
+    }
+
+    /**
      * Ambil URL publik foto profil jika tersedia.
      */
     public function photoUrl(): string
