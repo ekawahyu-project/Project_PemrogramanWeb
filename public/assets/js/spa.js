@@ -121,6 +121,14 @@
                 currentMain.style.transition = 'opacity 0.28s cubic-bezier(0.22, 1, 0.36, 1), transform 0.28s cubic-bezier(0.22, 1, 0.36, 1)';
                 currentMain.style.opacity = '1';
                 currentMain.style.transform = 'translateY(0)';
+                setTimeout(() => {
+                    currentMain.style.transform = '';
+                    currentMain.style.transition = '';
+                }, 300);
+
+                // Bersihkan modal portaled dari halaman sebelumnya jika ada
+                document.querySelectorAll('body > [data-bento-portal-modal]').forEach(el => el.remove());
+                document.body.classList.remove('overflow-hidden');
 
                 if (pushState) {
                     window.history.pushState({ url }, '', url);
@@ -203,6 +211,8 @@
 
             if (newMain && currentMain) {
                 if (doc.title) document.title = doc.title;
+                document.querySelectorAll('body > [data-bento-portal-modal]').forEach(el => el.remove());
+                document.body.classList.remove('overflow-hidden');
                 currentMain.innerHTML = newMain.innerHTML;
 
                 const finalUrl = res.url || targetUrl.href;

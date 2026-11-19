@@ -77,6 +77,13 @@
                 }
             });
 
+            // Sync if value is updated programmatically (e.g. opening Edit modal)
+            selectEl.addEventListener('bento:sync', function () {
+                const curOpt = selectEl.options[selectEl.selectedIndex];
+                labelSpan.textContent = curOpt ? curOpt.textContent : 'Pilih...';
+                buildOptions();
+            });
+
             // Sync if form is reset
             const parentForm = selectEl.closest('form');
             if (parentForm) {

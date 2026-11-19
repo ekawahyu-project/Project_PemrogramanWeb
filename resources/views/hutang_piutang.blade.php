@@ -229,37 +229,37 @@
             <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
 
                 <!-- 4. COMPOSER FORM TILE (4/12 on desktop, full width on mobile/tablet) -->
-                <section id="form-hutang" class="bento-tile xl:col-span-4 justify-between {{ $editDebt ? 'border-[#C4FF0D]/60 ring-1 ring-[#C4FF0D]/25' : '' }}">
+                @php
+                    $isCreateOld = old('action') !== 'update';
+                @endphp
+                <section id="form-hutang" class="bento-tile xl:col-span-4 justify-between">
                     <div>
                         <header class="mb-5 flex items-center justify-between gap-2">
                             <h3 class="text-base font-bold text-white flex items-center gap-2">
-                                {{ $editDebt ? 'Edit Catatan / Cicilan' : '+ Catat Kasbon / Hutang' }}
+                                + Catat Kasbon / Hutang
                             </h3>
                             <span class="text-xs font-semibold uppercase px-2.5 py-1 rounded-full bg-white/[0.06] text-[#9AA68E]">
-                                {{ $editDebt ? 'Update' : 'Baru' }}
+                                Baru
                             </span>
                         </header>
 
-                        <form method="POST" action="/hutang-piutang" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <form method="POST" action="/hutang-piutang" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 items-end">
                             @csrf
-                            <input type="hidden" name="action" value="{{ $editDebt ? 'update' : 'tambah' }}">
-                            @if ($editDebt)
-                                <input type="hidden" name="id" value="{{ $editDebt->id }}">
-                            @endif
+                            <input type="hidden" name="action" value="tambah">
 
                             <div class="sm:col-span-2">
                                 <label class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Jenis Catatan</label>
                                 <select name="jenis" class="{{ $inputClass }}">
-                                    <option value="Piutang" {{ old('jenis', $editDebt?->jenis ?? 'Piutang') === 'Piutang' ? 'selected' : '' }}>Piutang Pelanggan (Kasbon)</option>
-                                    <option value="Hutang"  {{ old('jenis', $editDebt?->jenis ?? '') === 'Hutang' ? 'selected' : '' }}>Hutang ke Supplier</option>
+                                    <option value="Piutang" {{ ($isCreateOld ? old('jenis', 'Piutang') : 'Piutang') === 'Piutang' ? 'selected' : '' }}>Piutang Pelanggan (Kasbon)</option>
+                                    <option value="Hutang"  {{ ($isCreateOld ? old('jenis', '') : '') === 'Hutang' ? 'selected' : '' }}>Hutang ke Supplier</option>
                                 </select>
                             </div>
 
                             <div>
-                                <label class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Nama Pelanggan / Supplier *</label>
+                                <label class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Nama Pihak *</label>
                                 <input type="text" name="nama_pihak" required minlength="2" maxlength="100"
                                     placeholder="Contoh: Warung Kopi Senja"
-                                    value="{{ old('nama_pihak', $editDebt?->nama_pihak ?? '') }}"
+                                    value="{{ $isCreateOld ? old('nama_pihak', '') : '' }}"
                                     class="{{ $inputClass }}">
                             </div>
 
@@ -269,33 +269,33 @@
                                     pattern="(\+62|62|0)[0-9]{8,13}"
                                     title="Nomor HP diawali 0, 62, atau +62 dan berisi 9–16 digit angka"
                                     placeholder="08123456789"
-                                    value="{{ old('no_hp', $editDebt?->no_hp ?? '') }}"
+                                    value="{{ $isCreateOld ? old('no_hp', '') : '' }}"
                                     class="{{ $inputClass }}">
                             </div>
 
                             <div>
                                 <label class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Total Nominal (Rp) *</label>
                                 <input type="number" name="jumlah" required min="1" max="10000000000" step="1" placeholder="0"
-                                    value="{{ old('jumlah', $editDebt?->jumlah ?? '') }}"
+                                    value="{{ $isCreateOld ? old('jumlah', '') : '' }}"
                                     class="no-spinner {{ $inputClass }}">
                             </div>
                             <div>
                                 <label class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Sudah Dibayar (Rp)</label>
                                 <input type="number" name="dibayar" min="0" max="10000000000" step="1" placeholder="0"
-                                    value="{{ old('dibayar', $editDebt?->dibayar ?? 0) }}"
+                                    value="{{ $isCreateOld ? old('dibayar', 0) : 0 }}"
                                     class="no-spinner {{ $inputClass }}">
                             </div>
 
                             <div>
                                 <label class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Tanggal Catat *</label>
                                 <input type="date" name="tanggal" required max="{{ date('Y-m-d') }}"
-                                    value="{{ old('tanggal', $editDebt ? $editDebt->tanggal->format('Y-m-d') : date('Y-m-d')) }}"
+                                    value="{{ $isCreateOld ? old('tanggal', date('Y-m-d')) : date('Y-m-d') }}"
                                     class="{{ $inputClass }}">
                             </div>
                             <div>
                                 <label class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Jatuh Tempo</label>
                                 <input type="date" name="jatuh_tempo"
-                                    value="{{ old('jatuh_tempo', $editDebt ? $editDebt->jatuh_tempo?->format('Y-m-d') : date('Y-m-d', strtotime('+14 days'))) }}"
+                                    value="{{ $isCreateOld ? old('jatuh_tempo', date('Y-m-d', strtotime('+14 days'))) : date('Y-m-d', strtotime('+14 days')) }}"
                                     class="{{ $inputClass }}">
                             </div>
 
@@ -303,17 +303,14 @@
                                 <label class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Keterangan Barang / Nota</label>
                                 <input type="text" name="keterangan" maxlength="255"
                                     placeholder="Contoh: Kasbon 10 pack Kopi Arabika"
-                                    value="{{ old('keterangan', $editDebt?->keterangan ?? '') }}"
+                                    value="{{ $isCreateOld ? old('keterangan', '') : '' }}"
                                     class="{{ $inputClass }}">
                             </div>
 
                             <div class="sm:col-span-2 pt-2 flex flex-col gap-2.5">
                                 <button type="submit" class="w-full btn-lime">
-                                    {{ $editDebt ? 'Simpan Perubahan' : '+ Simpan Catatan' }}
+                                    + Simpan Catatan
                                 </button>
-                                @if ($editDebt)
-                                    <a href="/hutang-piutang" class="w-full btn-ghost-dark">Batal Edit</a>
-                                @endif
                             </div>
                         </form>
                     </div>
@@ -325,7 +322,7 @@
                         <header class="p-5 sm:p-6 border-b border-white/[0.08] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             <div>
                                 <h3 class="text-base sm:text-lg font-bold text-white">Daftar Kasbon Pelanggan &amp; Hutang Supplier</h3>
-                                <p class="text-xs sm:text-sm text-[#9AA68E] mt-0.5">Pantau progres cicilan, jatuh tempo, atau klik Lunasi untuk pelunasan instan.</p>
+                                <p class="text-xs sm:text-sm text-[#9AA68E] mt-0.5">Pantau progres cicilan, jatuh tempo, atau klik Edit untuk mencatat pembayaran.</p>
                             </div>
                             <div class="flex flex-wrap items-center gap-3">
                                 <input type="text"
@@ -408,27 +405,35 @@
                                                     </span>
                                                 </td>
                                                 <td class="text-center whitespace-nowrap">
-                                                    <div class="flex items-center justify-center gap-3">
+                                                    <div class="inline-grid grid-cols-[56px_68px] items-center gap-2">
                                                         @if (! $d->isPaid())
-                                                            <form method="POST" action="/hutang-piutang" title="Tandai langsung Lunas"
-                                                                  data-nama="{{ $d->nama_pihak }}"
-                                                                  onsubmit="return confirm('Tandai catatan ' + this.dataset.nama + ' sebagai Lunas?')">
-                                                                @csrf
-                                                                <input type="hidden" name="action" value="lunasi">
-                                                                <input type="hidden" name="id" value="{{ $d->id }}">
-                                                                <button type="submit" class="px-2.5 py-1 rounded-lg bg-[#C4FF0D]/15 text-[#C4FF0D] hover:bg-[#C4FF0D] hover:text-[#152208] text-xs font-semibold transition">
-                                                                    ✓ Lunasi
-                                                                </button>
-                                                            </form>
+                                                            <button type="button"
+                                                                    onclick="openEditDebtModal(this)"
+                                                                    data-id="{{ $d->id }}"
+                                                                    data-jenis="{{ $d->jenis }}"
+                                                                    data-nama="{{ $d->nama_pihak }}"
+                                                                    data-hp="{{ $d->no_hp ?? '' }}"
+                                                                    data-jumlah="{{ $d->jumlah }}"
+                                                                    data-dibayar="{{ $d->dibayar }}"
+                                                                    data-tanggal="{{ $d->tanggal->format('Y-m-d') }}"
+                                                                    data-jatuh-tempo="{{ $d->jatuh_tempo?->format('Y-m-d') ?? '' }}"
+                                                                    data-keterangan="{{ $d->keterangan ?? '' }}"
+                                                                    class="w-full py-1.5 rounded-lg bg-[#C4FF0D]/12 text-[#C4FF0D] hover:bg-[#C4FF0D] hover:text-[#152208] border border-[#C4FF0D]/30 text-xs font-semibold transition cursor-pointer">
+                                                                Edit
+                                                            </button>
+                                                        @else
+                                                            <span aria-hidden="true"></span>
                                                         @endif
-                                                        <a href="/hutang-piutang?edit={{ $d->id }}#form-hutang" class="text-xs sm:text-sm text-[#C4FF0D] hover:underline font-semibold transition">Edit</a>
                                                         <form method="POST" action="/hutang-piutang"
                                                               data-nama="{{ $d->nama_pihak }}"
                                                               onsubmit="return confirm('Hapus catatan ' + this.dataset.nama + '? Data yang dihapus tidak dapat dikembalikan.')">
                                                             @csrf
                                                             <input type="hidden" name="action" value="hapus">
                                                             <input type="hidden" name="id" value="{{ $d->id }}">
-                                                            <button type="submit" class="text-xs sm:text-sm text-rose-400 hover:text-rose-300 font-semibold transition">Hapus</button>
+                                                            <button type="submit"
+                                                                    class="w-full py-1.5 rounded-lg bg-rose-500/12 text-rose-400 hover:bg-rose-500 hover:text-white border border-rose-500/30 text-xs font-semibold transition cursor-pointer">
+                                                                Hapus
+                                                            </button>
                                                         </form>
                                                     </div>
                                                 </td>
@@ -448,6 +453,287 @@
 
             </div>
         </div>
+
+        <!-- ══════════════════════════════════════════════════════════
+             WEB3BENTO EDIT MODAL OVERLAY (CRUD UPDATE TANPA RELOAD)
+             ══════════════════════════════════════════════════════════ -->
+        <div id="edit-debt-modal"
+             data-bento-portal-modal="true"
+             role="dialog"
+             aria-modal="true"
+             aria-labelledby="edit-debt-modal-title"
+             class="fixed inset-0 z-[9990] hidden items-center justify-center p-4 sm:p-6 bg-black/75 backdrop-blur-md">
+            <div id="edit-debt-modal-panel"
+                 class="relative w-full max-w-xl rounded-[26px] bg-[#12170D] border border-[#C4FF0D]/35 shadow-[0_28px_90px_rgba(0,0,0,0.85)] overflow-hidden max-h-[90vh] flex flex-col transform transition-all duration-200 scale-95 opacity-0">
+                <!-- Glow Bar Atas -->
+                <div class="h-1 w-full shrink-0 bg-gradient-to-r from-[#C4FF0D] via-[#8BC34A] to-[#C084FC]"></div>
+
+                <!-- Header Modal -->
+                <div class="px-5 py-4 border-b border-white/[0.08] flex items-start justify-between gap-4 shrink-0">
+                    <div class="min-w-0">
+                        <span class="inline-flex items-center gap-1.5 rounded-full bg-[#C4FF0D]/15 border border-[#C4FF0D]/30 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#C4FF0D]">
+                            Update Catatan
+                        </span>
+                        <h3 id="edit-debt-modal-title" class="text-base sm:text-lg font-bold text-white mt-1.5">
+                            Edit Kasbon &amp; Catat Cicilan
+                        </h3>
+                        <p id="edit-debt-subtitle" class="text-xs text-[#9AA68E] mt-0.5 truncate">
+                            Perbarui detail tagihan atau tambahkan nominal pembayaran cicilan.
+                        </p>
+                    </div>
+                    <button type="button"
+                            onclick="closeEditDebtModal()"
+                            aria-label="Tutup modal edit"
+                            class="size-8 rounded-full bg-[#181F11] border border-white/10 text-[#9AA68E] hover:text-white hover:border-[#C4FF0D]/50 flex items-center justify-center text-xl leading-none transition cursor-pointer shrink-0">
+                        &times;
+                    </button>
+                </div>
+
+                <!-- Body Form (Scrollable di layar kecil) -->
+                <div class="p-5 overflow-y-auto space-y-4">
+                    @if ($editDebt && $flash && ($flash['type'] ?? '') === 'danger')
+                        <div class="rounded-2xl bg-rose-500/10 border border-rose-500/35 px-4 py-3 text-xs sm:text-sm text-rose-300">
+                            {{ $flash['msg'] ?? '' }}
+                        </div>
+                    @endif
+
+                    <!-- Live Preview Progres Pelunasan -->
+                    <div class="rounded-2xl bg-[#181F11] border border-white/[0.08] px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                            <p class="text-[11px] uppercase tracking-wider text-[#9AA68E] font-medium">Estimasi Sisa Tagihan</p>
+                            <p id="edit-live-sisa" class="text-lg font-bold text-white mt-0.5 tabular-nums">Rp 0</p>
+                        </div>
+                        <div class="flex items-center gap-2.5">
+                            <span id="edit-live-status" class="px-3 py-1 rounded-full text-xs font-semibold bg-amber-400/15 text-amber-300 border border-amber-400/30">
+                                Dicicil
+                            </span>
+                            <button type="button"
+                                    onclick="fillEditDebtPaidFull()"
+                                    class="px-3 py-1.5 rounded-xl bg-[#C4FF0D]/15 hover:bg-[#C4FF0D] text-[#C4FF0D] hover:text-[#152208] border border-[#C4FF0D]/30 text-xs font-semibold transition cursor-pointer">
+                                Isi Lunas 100%
+                            </button>
+                        </div>
+                    </div>
+
+                    <form id="edit-debt-form" method="POST" action="/hutang-piutang" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 items-end">
+                        @csrf
+                        <input type="hidden" name="action" value="update">
+                        <input type="hidden" name="id" id="edit-debt-id" value="{{ $editDebt?->id ?? '' }}">
+
+                        <div class="sm:col-span-2">
+                            <label for="edit-debt-jenis" class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Jenis Catatan</label>
+                            <select id="edit-debt-jenis" name="jenis" class="{{ $inputClass }}">
+                                <option value="Piutang">Piutang Pelanggan (Kasbon)</option>
+                                <option value="Hutang">Hutang ke Supplier</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="edit-debt-nama" class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Nama Pihak *</label>
+                            <input type="text" id="edit-debt-nama" name="nama_pihak" required minlength="2" maxlength="100"
+                                   placeholder="Nama pelanggan / supplier" class="{{ $inputClass }}">
+                        </div>
+
+                        <div>
+                            <label for="edit-debt-hp" class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">No. WhatsApp / HP</label>
+                            <input type="tel" id="edit-debt-hp" name="no_hp" maxlength="16" inputmode="numeric"
+                                   pattern="(\+62|62|0)[0-9]{8,13}"
+                                   title="Nomor HP diawali 0, 62, atau +62 dan berisi 9–16 digit angka"
+                                   placeholder="08123456789" class="{{ $inputClass }}">
+                        </div>
+
+                        <div>
+                            <label for="edit-debt-jumlah" class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Total Nominal (Rp) *</label>
+                            <input type="number" id="edit-debt-jumlah" name="jumlah" required min="1" max="10000000000" step="1"
+                                   oninput="updateEditDebtPreview()" class="no-spinner {{ $inputClass }}">
+                        </div>
+
+                        <div>
+                            <label for="edit-debt-dibayar" class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Sudah Dibayar (Rp)</label>
+                            <input type="number" id="edit-debt-dibayar" name="dibayar" min="0" max="10000000000" step="1"
+                                   oninput="updateEditDebtPreview()" class="no-spinner {{ $inputClass }}">
+                        </div>
+
+                        <div>
+                            <label for="edit-debt-tanggal" class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Tanggal Catat *</label>
+                            <input type="date" id="edit-debt-tanggal" name="tanggal" required max="{{ date('Y-m-d') }}"
+                                   class="{{ $inputClass }}">
+                        </div>
+
+                        <div>
+                            <label for="edit-debt-jatuh-tempo" class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Jatuh Tempo</label>
+                            <input type="date" id="edit-debt-jatuh-tempo" name="jatuh_tempo"
+                                   class="{{ $inputClass }}">
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label for="edit-debt-keterangan" class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Keterangan Barang / Nota</label>
+                            <input type="text" id="edit-debt-keterangan" name="keterangan" maxlength="255"
+                                   placeholder="Contoh: Cicilan ke-2 sudah masuk" class="{{ $inputClass }}">
+                        </div>
+
+                        <div class="sm:col-span-2 pt-3 border-t border-white/[0.08] flex flex-col-reverse sm:flex-row items-center justify-end gap-3">
+                            <button type="button" onclick="closeEditDebtModal()" class="w-full sm:w-auto btn-ghost-dark px-6 cursor-pointer">
+                                Batal
+                            </button>
+                            <button type="submit" class="w-full sm:w-auto btn-lime px-7 cursor-pointer">
+                                Simpan Perubahan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        @if ($editDebt)
+            <div id="edit-debt-autoload" hidden
+                 data-id="{{ $editDebt->id }}"
+                 data-jenis="{{ old('action') === 'update' ? old('jenis', $editDebt->jenis) : $editDebt->jenis }}"
+                 data-nama="{{ old('action') === 'update' ? old('nama_pihak', $editDebt->nama_pihak) : $editDebt->nama_pihak }}"
+                 data-hp="{{ old('action') === 'update' ? old('no_hp', $editDebt->no_hp ?? '') : ($editDebt->no_hp ?? '') }}"
+                 data-jumlah="{{ old('action') === 'update' ? old('jumlah', $editDebt->jumlah) : $editDebt->jumlah }}"
+                 data-dibayar="{{ old('action') === 'update' ? old('dibayar', $editDebt->dibayar) : $editDebt->dibayar }}"
+                 data-tanggal="{{ old('action') === 'update' ? old('tanggal', $editDebt->tanggal->format('Y-m-d')) : $editDebt->tanggal->format('Y-m-d') }}"
+                 data-jatuh-tempo="{{ old('action') === 'update' ? old('jatuh_tempo', $editDebt->jatuh_tempo?->format('Y-m-d') ?? '') : ($editDebt->jatuh_tempo?->format('Y-m-d') ?? '') }}"
+                 data-keterangan="{{ old('action') === 'update' ? old('keterangan', $editDebt->keterangan ?? '') : ($editDebt->keterangan ?? '') }}"></div>
+        @endif
+
+        <script>
+            (function () {
+                function fmtRp(val) {
+                    return 'Rp ' + Math.max(0, Math.round(Number(val) || 0)).toLocaleString('id-ID');
+                }
+
+                window.updateEditDebtPreview = function () {
+                    const jumlahEl = document.getElementById('edit-debt-jumlah');
+                    const dibayarEl = document.getElementById('edit-debt-dibayar');
+                    const sisaEl = document.getElementById('edit-live-sisa');
+                    const statusEl = document.getElementById('edit-live-status');
+                    if (!jumlahEl || !dibayarEl || !sisaEl || !statusEl) return;
+
+                    const jumlah = Math.max(0, parseInt(jumlahEl.value || '0', 10));
+                    const dibayar = Math.max(0, parseInt(dibayarEl.value || '0', 10));
+                    const sisa = Math.max(0, jumlah - dibayar);
+
+                    sisaEl.textContent = fmtRp(sisa);
+
+                    if (jumlah > 0 && dibayar > jumlah) {
+                        statusEl.textContent = 'Melebihi Total!';
+                        statusEl.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/15 text-rose-300 border border-rose-500/35';
+                    } else if (jumlah > 0 && dibayar >= jumlah) {
+                        statusEl.textContent = 'Lunas (100%)';
+                        statusEl.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-[#C4FF0D]/15 text-[#C4FF0D] border border-[#C4FF0D]/35';
+                    } else if (dibayar > 0) {
+                        const pct = jumlah > 0 ? Math.round((dibayar / jumlah) * 100) : 0;
+                        statusEl.textContent = 'Dicicil (' + pct + '%)';
+                        statusEl.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-amber-400/15 text-amber-300 border border-amber-400/30';
+                    } else {
+                        statusEl.textContent = 'Belum Lunas';
+                        statusEl.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/15 text-rose-300 border border-rose-500/30';
+                    }
+                };
+
+                window.fillEditDebtPaidFull = function () {
+                    const jumlahEl = document.getElementById('edit-debt-jumlah');
+                    const dibayarEl = document.getElementById('edit-debt-dibayar');
+                    if (jumlahEl && dibayarEl && jumlahEl.value) {
+                        dibayarEl.value = jumlahEl.value;
+                        window.updateEditDebtPreview();
+                    }
+                };
+
+                window.openEditDebtModal = function (el) {
+                    const modal = document.getElementById('edit-debt-modal');
+                    const panel = document.getElementById('edit-debt-modal-panel');
+                    if (!modal || !panel || !el) return;
+
+                    const d = el.dataset;
+                    document.getElementById('edit-debt-id').value = d.id || '';
+                    document.getElementById('edit-debt-nama').value = d.nama || '';
+                    document.getElementById('edit-debt-hp').value = d.hp || '';
+                    document.getElementById('edit-debt-jumlah').value = d.jumlah || '';
+                    document.getElementById('edit-debt-dibayar').value = d.dibayar || '0';
+                    document.getElementById('edit-debt-tanggal').value = d.tanggal || '';
+                    document.getElementById('edit-debt-jatuh-tempo').value = d.jatuhTempo || '';
+                    document.getElementById('edit-debt-keterangan').value = d.keterangan || '';
+
+                    const jenisEl = document.getElementById('edit-debt-jenis');
+                    if (jenisEl) {
+                        jenisEl.value = d.jenis || 'Piutang';
+                        jenisEl.dispatchEvent(new Event('bento:sync'));
+                    }
+
+                    const sub = document.getElementById('edit-debt-subtitle');
+                    if (sub) {
+                        sub.textContent = 'Mengubah catatan: ' + (d.nama || '-') + ' (' + (d.jenis || 'Piutang') + ')';
+                    }
+
+                    window.updateEditDebtPreview();
+
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                    document.body.classList.add('overflow-hidden');
+
+                    requestAnimationFrame(function () {
+                        panel.classList.remove('scale-95', 'opacity-0');
+                        panel.classList.add('scale-100', 'opacity-100');
+                    });
+                };
+
+                window.closeEditDebtModal = function () {
+                    const modal = document.getElementById('edit-debt-modal');
+                    const panel = document.getElementById('edit-debt-modal-panel');
+                    if (!modal || !panel) return;
+
+                    panel.classList.remove('scale-100', 'opacity-100');
+                    panel.classList.add('scale-95', 'opacity-0');
+                    document.body.classList.remove('overflow-hidden');
+
+                    setTimeout(function () {
+                        modal.classList.remove('flex');
+                        modal.classList.add('hidden');
+                    }, 180);
+                };
+
+                // Pindahkan modal langsung ke <body> agar position:fixed selalu 100% di tengah viewport
+                const modalEl = document.getElementById('edit-debt-modal');
+                if (modalEl) {
+                    document.querySelectorAll('body > #edit-debt-modal').forEach(function (oldEl) {
+                        if (oldEl !== modalEl) oldEl.remove();
+                    });
+                    if (modalEl.parentElement !== document.body) {
+                        document.body.appendChild(modalEl);
+                    }
+                    if (!modalEl.dataset.bound) {
+                        modalEl.dataset.bound = 'true';
+                        modalEl.addEventListener('click', function (e) {
+                            if (e.target === modalEl) {
+                                window.closeEditDebtModal();
+                            }
+                        });
+                    }
+                }
+
+                if (!window._editDebtEscBound) {
+                    window._editDebtEscBound = true;
+                    document.addEventListener('keydown', function (e) {
+                        if (e.key === 'Escape') {
+                            const m = document.getElementById('edit-debt-modal');
+                            if (m && !m.classList.contains('hidden')) {
+                                window.closeEditDebtModal();
+                            }
+                        }
+                    });
+                }
+
+                const autoload = document.getElementById('edit-debt-autoload');
+                if (autoload) {
+                    setTimeout(function () {
+                        window.openEditDebtModal(autoload);
+                    }, 80);
+                }
+            })();
+        </script>
     </main>
 </body>
 </html>

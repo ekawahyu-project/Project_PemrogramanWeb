@@ -30,6 +30,9 @@ class DebtController extends Controller
         $flash = session('flash');
         $editId = $request->query('edit');
         $editDebt = $editId ? $user->debts()->find($editId) : null;
+        if ($editDebt && $editDebt->isPaid()) {
+            $editDebt = null;
+        }
 
         $debtList = $user->debts()
             ->orderByRaw('CASE WHEN status = ? THEN 1 ELSE 0 END', [Debt::STATUS_PAID])
@@ -86,10 +89,6 @@ class DebtController extends Controller
 
         if ($action === 'update') {
             return $this->update($request);
-        }
-
-        if ($action === 'lunasi') {
-            return $this->markAsPaid($request);
         }
 
         if ($action === 'hapus') {
@@ -151,10 +150,17 @@ class DebtController extends Controller
             return $this->notFoundResponse();
         }
 
+        if ($debt->isPaid()) {
+            return redirect('/hutang-piutang')->with('flash', [
+                'type' => 'danger',
+                'msg' => 'Catatan yang sudah Lunas tidak dapat diubah lagi.',
+            ]);
+        }
+
         $validator = $this->makeValidator($request);
 
         if ($validator->fails()) {
-            return redirect('/hutang-piutang?edit='.$debt->id.'#form-hutang')
+            return redirect('/hutang-piutang?edit='.$debt->id)
                 ->withInput()
                 ->with('flash', [
                     'type' => 'danger',
@@ -181,28 +187,6 @@ class DebtController extends Controller
         return redirect('/hutang-piutang')->with('flash', [
             'type' => 'success',
             'msg' => 'Data catatan berhasil diperbarui.',
-        ]);
-    }
-
-    /**
-     * Tandai catatan hutang / piutang langsung lunas 100%.
-     */
-    protected function markAsPaid(Request $request): RedirectResponse
-    {
-        $debt = $this->findOwnedDebt($request);
-
-        if (! $debt) {
-            return $this->notFoundResponse();
-        }
-
-        $debt->update([
-            'dibayar' => $debt->jumlah,
-            'status' => Debt::STATUS_PAID,
-        ]);
-
-        return redirect('/hutang-piutang')->with('flash', [
-            'type' => 'success',
-            'msg' => 'Catatan '.$debt->nama_pihak.' telah ditandai Lunas!',
         ]);
     }
 

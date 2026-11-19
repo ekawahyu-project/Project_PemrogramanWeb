@@ -72,9 +72,6 @@
                     {!! $sidebarIcons[$item['page']] !!}
                     <span>{{ $item['label'] }}</span>
                 </span>
-                @if ($isActive)
-                <span class="w-1.5 h-1.5 rounded-full bg-[#152208]"></span>
-                @endif
             </a>
             @endforeach
         </nav>
@@ -96,7 +93,7 @@
                     class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium
                            text-[#9AA68E] hover:bg-rose-500/15 hover:text-rose-300 border border-transparent hover:border-rose-500/25 transition">
                     {!! $sidebarIcons['logout'] !!}
-                    <span>Keluar Sesi</span>
+                    <span>Keluar</span>
                 </button>
             </form>
         </div>

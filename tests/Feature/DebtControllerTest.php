@@ -61,10 +61,18 @@ class DebtControllerTest extends TestCase
         $this->assertSame(350000, $debt->dibayar);
         $this->assertSame(Debt::STATUS_PARTIAL, $debt->status);
 
-        // 4. LUNASI (Tandai Lunas 1 Klik)
+        // 4. UPDATE MENJADI LUNAS (Pelunasan via Edit Overlay)
         $payResponse = $this->actingAs($user)->post('/hutang-piutang', [
-            'action' => 'lunasi',
+            'action' => 'update',
             'id' => $debt->id,
+            'nama_pihak' => 'Warung Kopi Senja Updated',
+            'no_hp' => '08123456789',
+            'jenis' => Debt::TYPE_RECEIVABLE,
+            'jumlah' => 500000,
+            'dibayar' => 500000,
+            'tanggal' => '2026-10-01',
+            'jatuh_tempo' => '2026-10-20',
+            'keterangan' => 'Pelunasan penuh',
         ]);
 
         $payResponse->assertRedirect('/hutang-piutang');
@@ -72,7 +80,21 @@ class DebtControllerTest extends TestCase
         $this->assertSame(500000, $debt->dibayar);
         $this->assertSame(Debt::STATUS_PAID, $debt->status);
 
-        // 5. DELETE (Hapus catatan)
+        // Catatan yang sudah Lunas tidak bisa di-edit lagi
+        $blockedEdit = $this->actingAs($user)->post('/hutang-piutang', [
+            'action' => 'update',
+            'id' => $debt->id,
+            'nama_pihak' => 'Coba Ubah Lunas',
+            'jenis' => Debt::TYPE_RECEIVABLE,
+            'jumlah' => 500000,
+            'dibayar' => 100000,
+            'tanggal' => '2026-10-01',
+        ]);
+        $blockedEdit->assertSessionHas('flash.type', 'danger');
+        $debt->refresh();
+        $this->assertSame('Warung Kopi Senja Updated', $debt->nama_pihak);
+
+        // 5. DELETE (Catatan yang sudah Lunas tetap bisa dihapus)
         $deleteResponse = $this->actingAs($user)->post('/hutang-piutang', [
             'action' => 'hapus',
             'id' => $debt->id,
