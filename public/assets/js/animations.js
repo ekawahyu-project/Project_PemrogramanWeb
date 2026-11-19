@@ -7,7 +7,7 @@
 
     // 1. Custom Bento Dropdown Enhancer (Replaces ugly OS native select popup)
     function initCustomSelects() {
-        document.querySelectorAll('select:not([data-bento-select-ready])').forEach(selectEl => {
+        document.querySelectorAll('select:not([data-bento-select-ready]):not(.swal2-select)').forEach(selectEl => {
             selectEl.setAttribute('data-bento-select-ready', 'true');
 
             const wrapper = document.createElement('div');

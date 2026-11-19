@@ -43,6 +43,24 @@
     @endphp
 
     <main class="w-full min-h-screen lg:pl-64 flex flex-col transition-all duration-300">
+        <!-- Gaya toast notifikasi (di dalam main agar ikut termuat oleh spa.js) -->
+        <style>
+            .swal-toast-bento {
+                border: 1px solid rgba(196, 255, 13, 0.35) !important;
+                border-radius: 16px !important;
+                box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5) !important;
+            }
+            .swal2-timer-progress-bar {
+                background: #C4FF0D !important;
+            }
+            .swal2-icon.swal2-success [class^='swal2-success-line'] {
+                background-color: #C4FF0D !important;
+            }
+            .swal2-icon.swal2-success .swal2-success-ring {
+                border-color: rgba(196, 255, 13, 0.3) !important;
+            }
+        </style>
+
         <div class="p-4 sm:p-6 lg:p-8 flex-1 max-w-[1380px] w-full mx-auto space-y-5">
 
             <!-- Web3Bento Top Status Bar -->
@@ -445,12 +463,14 @@
                             toast: true,
                             position: 'top-end',
                             icon: 'success',
+                            iconColor: '#C4FF0D',
                             title: notif.text || notif.title,
                             background: '#12170D',
                             color: '#F4F7F0',
                             showConfirmButton: false,
                             timer: 3000,
                             timerProgressBar: true,
+                            customClass: { popup: 'swal-toast-bento' },
                             didOpen: function (toast) {
                                 toast.addEventListener('mouseenter', Swal.stopTimer);
                                 toast.addEventListener('mouseleave', Swal.resumeTimer);
