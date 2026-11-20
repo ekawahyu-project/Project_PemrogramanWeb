@@ -84,6 +84,56 @@
         }
     }
 
+    let currentPageKey = window.location.pathname + window.location.search;
+
+    function getHashTarget(hash) {
+        if (!hash || hash === '#') return null;
+
+        let id;
+        try {
+            id = decodeURIComponent(hash.slice(1));
+        } catch (_) {
+            id = hash.slice(1);
+        }
+
+        return id ? document.getElementById(id) : null;
+    }
+
+    function scrollToHash(hash, shouldFocus = false) {
+        const targetEl = getHashTarget(hash);
+        if (!targetEl) return false;
+
+        const mobileHeader = document.querySelector('body > header.sticky');
+        const offset = (mobileHeader && mobileHeader.offsetHeight > 0 ? mobileHeader.offsetHeight : 0) + 20;
+        const targetTop = Math.max(0, targetEl.getBoundingClientRect().top + window.scrollY - offset);
+
+        window.scrollTo({ top: targetTop, behavior: 'smooth' });
+
+        targetEl.classList.remove('bento-target-flash');
+        void targetEl.offsetWidth;
+        targetEl.classList.add('bento-target-flash');
+        targetEl.addEventListener('animationend', () => {
+            targetEl.classList.remove('bento-target-flash');
+        }, { once: true });
+
+        if (shouldFocus) {
+            const focusable = targetEl.querySelector(
+                'input:not([type="hidden"]):not([disabled]):not([readonly]), textarea:not([disabled]):not([readonly]), button.bento-select-trigger:not([disabled])'
+            );
+            if (focusable) {
+                setTimeout(() => {
+                    try {
+                        focusable.focus({ preventScroll: true });
+                    } catch (_) {
+                        // Abaikan jika elemen tidak dapat difokuskan
+                    }
+                }, 320);
+            }
+        }
+
+        return true;
+    }
+
     async function loadPage(url, pushState = true) {
         startProgress();
         closeSidebar();
@@ -130,18 +180,29 @@
                 document.querySelectorAll('body > [data-bento-portal-modal]').forEach(el => el.remove());
                 document.body.classList.remove('overflow-hidden');
 
+                const requestedUrlObj = new URL(url, window.location.href);
+                const resolvedUrlObj = res.redirected ? new URL(res.url, window.location.origin) : requestedUrlObj;
+                const finalUrl = res.redirected ? resolvedUrlObj.href : requestedUrlObj.href;
+                const targetHash = res.redirected ? resolvedUrlObj.hash : requestedUrlObj.hash;
+
+                currentPageKey = resolvedUrlObj.pathname + resolvedUrlObj.search;
+
                 if (pushState) {
-                    window.history.pushState({ url }, '', url);
+                    window.history.pushState({ url: finalUrl }, '', finalUrl);
                 }
 
-                updateSidebarActive(url);
+                updateSidebarActive(finalUrl);
                 executeScripts(currentMain);
 
                 if (typeof window.reinitPageAnimations === 'function') {
                     window.reinitPageAnimations();
                 }
 
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                if (targetHash && getHashTarget(targetHash)) {
+                    setTimeout(() => scrollToHash(targetHash, true), 80);
+                } else {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
             } else {
                 window.location.href = url;
             }
@@ -154,16 +215,40 @@
     }
 
     document.addEventListener('click', function (e) {
+        if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+
         const link = e.target.closest('a');
         if (!link) return;
 
         const href = link.getAttribute('href');
-        if (!href || href.startsWith('#') || href.startsWith('javascript:') || link.target === '_blank') return;
+        if (!href || href.startsWith('javascript:') || link.target === '_blank' || link.hasAttribute('download')) return;
+
+        if (href.startsWith('#')) {
+            if (href === '#') return;
+            if (getHashTarget(href)) {
+                e.preventDefault();
+                if (window.location.hash !== href) {
+                    window.history.replaceState(window.history.state, '', href);
+                }
+                scrollToHash(href, true);
+            }
+            return;
+        }
 
         const targetUrl = new URL(href, window.location.href);
         if (targetUrl.origin !== window.location.origin) return;
 
         if (href.includes('login') || href.includes('logout')) return;
+
+        const targetPageKey = targetUrl.pathname + targetUrl.search;
+        if (targetPageKey === currentPageKey && targetUrl.hash && getHashTarget(targetUrl.hash)) {
+            e.preventDefault();
+            if (window.location.hash !== targetUrl.hash) {
+                window.history.replaceState(window.history.state, '', targetUrl.hash);
+            }
+            scrollToHash(targetUrl.hash, true);
+            return;
+        }
 
         e.preventDefault();
         loadPage(targetUrl.href, true);
@@ -216,6 +301,8 @@
                 currentMain.innerHTML = newMain.innerHTML;
 
                 const finalUrl = res.url || targetUrl.href;
+                const finalUrlObj = new URL(finalUrl, window.location.origin);
+                currentPageKey = finalUrlObj.pathname + finalUrlObj.search;
                 window.history.pushState({ url: finalUrl }, '', finalUrl);
                 updateSidebarActive(finalUrl);
                 executeScripts(currentMain);
@@ -235,6 +322,14 @@
     });
 
     window.addEventListener('popstate', function () {
+        const nextPageKey = window.location.pathname + window.location.search;
+        if (nextPageKey === currentPageKey) {
+            if (window.location.hash) {
+                scrollToHash(window.location.hash, false);
+            }
+            return;
+        }
+
         loadPage(window.location.href, false);
     });
 })();

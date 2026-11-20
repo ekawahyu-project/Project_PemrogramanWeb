@@ -33,6 +33,27 @@
     @endphp
 
     <main class="w-full min-h-screen lg:pl-64 flex flex-col transition-all duration-300">
+        <!-- Gaya toast notifikasi (di dalam main agar ikut termuat oleh spa.js) -->
+        <style>
+            .swal2-container {
+                z-index: 10050 !important;
+            }
+            .swal-toast-bento {
+                border: 1px solid rgba(196, 255, 13, 0.35) !important;
+                border-radius: 16px !important;
+                box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5) !important;
+            }
+            .swal2-timer-progress-bar {
+                background: #C4FF0D !important;
+            }
+            .swal2-icon.swal2-success [class^='swal2-success-line'] {
+                background-color: #C4FF0D !important;
+            }
+            .swal2-icon.swal2-success .swal2-success-ring {
+                border-color: rgba(196, 255, 13, 0.3) !important;
+            }
+        </style>
+
         <div class="p-4 sm:p-6 lg:p-8 flex-1 max-w-[1380px] w-full mx-auto space-y-5">
 
             <!-- Web3Bento Top Status Bar -->
@@ -43,24 +64,15 @@
                 </div>
             </nav>
 
-            <!-- Flash Message -->
-            @if ($flash)
-            <div id="flash"
-                 role="status"
-                 class="flex items-start justify-between gap-3 rounded-[22px] border px-5 py-4 text-sm transition-opacity duration-300
-                        {{ ($flash['type'] ?? '') === 'success'
-                            ? 'bg-[#C4FF0D]/10 border-[#C4FF0D]/35 text-[#C4FF0D]'
-                            : 'bg-rose-500/10 border-rose-500/35 text-rose-300' }}">
-                <span>{{ $flash['msg'] ?? '' }}</span>
-                <button type="button" onclick="document.getElementById('flash').remove()"
-                        class="font-semibold leading-none text-lg" aria-label="Tutup">&times;</button>
+            @if (! empty($errorsList) && ! $editDebt)
+            <div class="rounded-[22px] bg-rose-500/10 border border-rose-500/30 text-rose-300 text-sm p-4">
+                <p class="font-semibold mb-1 text-rose-200">Periksa kembali formulir:</p>
+                <ul class="list-disc list-inside space-y-0.5">
+                    @foreach ($errorsList as $e)
+                        <li>{{ $e }}</li>
+                    @endforeach
+                </ul>
             </div>
-            <script>
-                setTimeout(() => {
-                    const el = document.getElementById('flash');
-                    if (el) { el.classList.add('opacity-0'); setTimeout(() => el.remove(), 300); }
-                }, 4000);
-            </script>
             @endif
 
             <!-- ══════════════════════════════════════════════════════════
@@ -424,13 +436,13 @@
                                                         @else
                                                             <span aria-hidden="true"></span>
                                                         @endif
-                                                        <form method="POST" action="/hutang-piutang"
-                                                              data-nama="{{ $d->nama_pihak }}"
-                                                              onsubmit="return confirm('Hapus catatan ' + this.dataset.nama + '? Data yang dihapus tidak dapat dikembalikan.')">
+                                                        <form method="POST" action="/hutang-piutang">
                                                             @csrf
                                                             <input type="hidden" name="action" value="hapus">
                                                             <input type="hidden" name="id" value="{{ $d->id }}">
-                                                            <button type="submit"
+                                                            <button type="button"
+                                                                    data-nama="{{ $d->nama_pihak }}"
+                                                                    onclick="konfirmasiHapusDebt(this)"
                                                                     class="w-full py-1.5 rounded-lg bg-rose-500/12 text-rose-400 hover:bg-rose-500 hover:text-white border border-rose-500/30 text-xs font-semibold transition cursor-pointer">
                                                                 Hapus
                                                             </button>
@@ -491,9 +503,17 @@
 
                 <!-- Body Form (Scrollable di layar kecil) -->
                 <div class="p-5 overflow-y-auto space-y-4">
-                    @if ($editDebt && $flash && ($flash['type'] ?? '') === 'danger')
+                    @if ($editDebt && (! empty($errorsList) || ($flash && ($flash['type'] ?? '') === 'danger')))
                         <div class="rounded-2xl bg-rose-500/10 border border-rose-500/35 px-4 py-3 text-xs sm:text-sm text-rose-300">
-                            {{ $flash['msg'] ?? '' }}
+                            @if (! empty($errorsList))
+                                <ul class="list-disc list-inside space-y-0.5">
+                                    @foreach ($errorsList as $e)
+                                        <li>{{ $e }}</li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                {{ $flash['msg'] ?? '' }}
+                            @endif
                         </div>
                     @endif
 
@@ -718,6 +738,7 @@
                     window._editDebtEscBound = true;
                     document.addEventListener('keydown', function (e) {
                         if (e.key === 'Escape') {
+                            if (typeof Swal !== 'undefined' && Swal.isVisible()) return;
                             const m = document.getElementById('edit-debt-modal');
                             if (m && !m.classList.contains('hidden')) {
                                 window.closeEditDebtModal();
@@ -734,6 +755,84 @@
                 }
             })();
         </script>
+
+        <!-- Konfirmasi hapus (SweetAlert) -->
+        <script>
+            window.konfirmasiHapusDebt = function (btn) {
+                const form = btn.closest('form');
+                if (!form) return;
+
+                const nama = btn.dataset.nama || '';
+                const submitForm = function () {
+                    if (typeof form.requestSubmit === 'function') {
+                        form.requestSubmit();
+                    } else {
+                        form.submit();
+                    }
+                };
+
+                if (typeof Swal === 'undefined') {
+                    if (confirm('Hapus catatan ' + nama + '? Data yang dihapus tidak dapat dikembalikan.')) {
+                        submitForm();
+                    }
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Hapus Catatan?',
+                    text: 'Hapus catatan ' + nama + '? Data yang dihapus tidak dapat dikembalikan.',
+                    icon: 'warning',
+                    background: '#12170D',
+                    color: '#F4F7F0',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, hapus',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#252f1b',
+                    reverseButtons: true
+                }).then(function (result) {
+                    if (result.isConfirmed) submitForm();
+                });
+            };
+        </script>
+
+        <!-- Notifikasi: sukses = toast 3 detik, selain itu = dialog -->
+        @if ($notif)
+            <div id="notif-data" data-notif="{{ json_encode($notif) }}" hidden></div>
+            <script>
+                (function () {
+                    const notifEl = document.getElementById('notif-data');
+                    if (!notifEl || typeof Swal === 'undefined') return;
+
+                    const notif = Object.assign(
+                        { background: '#12170D', color: '#F4F7F0', confirmButtonColor: '#252f1b' },
+                        JSON.parse(notifEl.dataset.notif)
+                    );
+
+                    if (notif.icon === 'success') {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            iconColor: '#C4FF0D',
+                            title: notif.text || notif.title,
+                            background: '#12170D',
+                            color: '#F4F7F0',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                            customClass: { popup: 'swal-toast-bento' },
+                            didOpen: function (toast) {
+                                toast.addEventListener('mouseenter', Swal.stopTimer);
+                                toast.addEventListener('mouseleave', Swal.resumeTimer);
+                            }
+                        });
+                    } else {
+                        Swal.fire(notif);
+                    }
+                })();
+            </script>
+        @endif
     </main>
 </body>
 </html>

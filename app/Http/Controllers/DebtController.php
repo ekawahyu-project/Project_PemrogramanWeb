@@ -28,6 +28,8 @@ class DebtController extends Controller
 
         $currentPage = 'hutang_piutang';
         $flash = session('flash');
+        $errorsList = session('errors_list', []);
+        $notif = $this->buildNotification($flash, $errorsList);
         $editId = $request->query('edit');
         $editDebt = $editId ? $user->debts()->find($editId) : null;
         if ($editDebt && $editDebt->isPaid()) {
@@ -62,6 +64,8 @@ class DebtController extends Controller
         return view('hutang_piutang', compact(
             'currentPage',
             'flash',
+            'errorsList',
+            'notif',
             'editId',
             'editDebt',
             'debtList',
@@ -111,6 +115,7 @@ class DebtController extends Controller
         if ($validator->fails()) {
             return redirect('/hutang-piutang#form-hutang')
                 ->withInput()
+                ->with('errors_list', $validator->errors()->all())
                 ->with('flash', [
                     'type' => 'danger',
                     'msg' => $validator->errors()->first(),
@@ -162,6 +167,7 @@ class DebtController extends Controller
         if ($validator->fails()) {
             return redirect('/hutang-piutang?edit='.$debt->id)
                 ->withInput()
+                ->with('errors_list', $validator->errors()->all())
                 ->with('flash', [
                     'type' => 'danger',
                     'msg' => $validator->errors()->first(),
@@ -260,6 +266,42 @@ class DebtController extends Controller
         }
 
         return $user->debts()->find((int) $id);
+    }
+
+    /**
+     * Susun payload notifikasi SweetAlert dari error validasi atau flash session.
+     *
+     * @param  array<int, string>  $errorsList
+     * @return array<string, string>|null
+     */
+    protected function buildNotification(mixed $flash, array $errorsList): ?array
+    {
+        if (! empty($errorsList)) {
+            $daftar = implode('', array_map(
+                fn (string $e): string => '<li style="margin-bottom:4px">• '.e($e).'</li>',
+                $errorsList
+            ));
+
+            return [
+                'icon' => 'error',
+                'title' => 'Gagal!',
+                'html' => '<ul style="text-align:left;list-style:none;padding:0;font-size:14px">'.$daftar.'</ul>',
+                'confirmButtonText' => 'Coba lagi',
+            ];
+        }
+
+        if (is_array($flash) && ! empty($flash['msg'])) {
+            $isSuccess = ($flash['type'] ?? '') === 'success';
+
+            return [
+                'icon' => $isSuccess ? 'success' : 'error',
+                'title' => $isSuccess ? 'Sukses!' : 'Gagal!',
+                'text' => (string) $flash['msg'],
+                'confirmButtonText' => $isSuccess ? 'OK' : 'Coba lagi',
+            ];
+        }
+
+        return null;
     }
 
     /**

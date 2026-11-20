@@ -101,12 +101,12 @@
 </aside>
 
 <!-- Global Assets -->
-<link rel="stylesheet" href="{{ asset('assets/css/animations.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/css/animations.css') }}?v={{ filemtime(public_path('assets/css/animations.css')) }}">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 <script src="{{ asset('assets/js/animations.js') }}"></script>
 <script src="{{ asset('assets/js/profil.js') }}"></script>
-<script src="{{ asset('assets/js/spa.js') }}"></script>
+<script src="{{ asset('assets/js/spa.js') }}?v={{ filemtime(public_path('assets/js/spa.js')) }}"></script>
 <script>
     // Jika halaman dipulihkan dari cache browser (tombol Back), muat ulang
     // agar server mengecek sesi login kembali.
