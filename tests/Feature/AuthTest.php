@@ -92,7 +92,7 @@ class AuthTest extends TestCase
         $this->get('/dashboard')->assertRedirect('/login');
     }
 
-    public function test_user_can_login_with_email_case_insensitively_and_get_logout(): void
+    public function test_user_can_login_with_email_case_insensitively_and_get_logout_is_blocked(): void
     {
         $user = User::factory()->create([
             'username' => 'alpet',
@@ -109,10 +109,9 @@ class AuthTest extends TestCase
         $response->assertRedirect('/dashboard');
         $this->assertAuthenticatedAs($user);
 
-        $getLogout = $this->get('/logout');
-
-        $getLogout->assertRedirect('/login');
-        $this->assertGuest();
+        // GET /logout harus ditolak (405) untuk mencegah serangan Logout CSRF
+        $this->get('/logout')->assertMethodNotAllowed();
+        $this->assertAuthenticatedAs($user);
     }
 
     public function test_login_fails_with_invalid_password_or_sql_injection_payload(): void

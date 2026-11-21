@@ -15,7 +15,7 @@ class StockControllerTest extends TestCase
     public function test_stock_movement_updates_product_stock_and_reverses_on_update_and_delete(): void
     {
         $user = User::factory()->create();
-        $product = Product::factory()->create(['stok' => 10]);
+        $product = Product::factory()->for($user)->create(['stok' => 10]);
 
         $storeResponse = $this->actingAs($user)->post('/stok', [
             'action' => 'catat',
@@ -61,7 +61,7 @@ class StockControllerTest extends TestCase
     public function test_stock_outgoing_rejects_insufficient_stock(): void
     {
         $user = User::factory()->create();
-        $product = Product::factory()->create(['nama' => 'Gula Pasir', 'stok' => 3]);
+        $product = Product::factory()->for($user)->create(['nama' => 'Gula Pasir', 'stok' => 3]);
 
         $response = $this->actingAs($user)->post('/stok', [
             'action' => 'catat',

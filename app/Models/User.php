@@ -53,6 +53,46 @@ class User extends Authenticatable
     }
 
     /**
+     * Relasi ke katalog produk milik pengguna.
+     *
+     * @return HasMany<Product, $this>
+     */
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
+    }
+
+    /**
+     * Relasi ke transaksi pemasukan & pengeluaran milik pengguna.
+     *
+     * @return HasMany<Transaction, $this>
+     */
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    /**
+     * Relasi ke riwayat mutasi stok milik pengguna.
+     *
+     * @return HasMany<StockLog, $this>
+     */
+    public function stockLogs(): HasMany
+    {
+        return $this->hasMany(StockLog::class);
+    }
+
+    /**
+     * Relasi ke catatan rekomendasi bisnis milik pengguna.
+     *
+     * @return HasMany<Recommendation, $this>
+     */
+    public function recommendations(): HasMany
+    {
+        return $this->hasMany(Recommendation::class);
+    }
+
+    /**
      * Relasi ke laporan yang dibuat oleh pengguna.
      *
      * @return HasMany<Report, $this>
@@ -70,6 +110,16 @@ class User extends Authenticatable
     public function debts(): HasMany
     {
         return $this->hasMany(Debt::class);
+    }
+
+    /**
+     * Relasi ke riwayat konsultasi bisnis AI milik pengguna.
+     *
+     * @return HasMany<AiConsultation, $this>
+     */
+    public function aiConsultations(): HasMany
+    {
+        return $this->hasMany(AiConsultation::class);
     }
 
     /**
@@ -91,7 +141,19 @@ class User extends Authenticatable
      */
     public function photoUrl(): string
     {
-        if (! empty($this->foto) && file_exists(public_path($this->foto))) {
+        if (empty($this->foto)) {
+            return '';
+        }
+
+        if (
+            str_starts_with($this->foto, 'data:image/') ||
+            str_starts_with($this->foto, 'http://') ||
+            str_starts_with($this->foto, 'https://')
+        ) {
+            return $this->foto;
+        }
+
+        if (file_exists(public_path($this->foto))) {
             return asset($this->foto).'?v='.filemtime(public_path($this->foto));
         }
 

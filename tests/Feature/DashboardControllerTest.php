@@ -15,13 +15,13 @@ class DashboardControllerTest extends TestCase
     public function test_dashboard_displays_database_aggregates_and_recent_transactions(): void
     {
         $user = User::factory()->create(['nama' => 'Alpet Alousius']);
-        Product::factory()->lowStock()->create(['nama' => 'Teh Hijau']);
-        Transaction::factory()->income()->create([
+        Product::factory()->for($user)->lowStock()->create(['nama' => 'Teh Hijau']);
+        Transaction::factory()->for($user)->income()->create([
             'keterangan' => 'Penjualan Kopi',
             'jumlah' => 250000,
             'tanggal' => '2026-10-10',
         ]);
-        Transaction::factory()->expense()->create([
+        Transaction::factory()->for($user)->expense()->create([
             'keterangan' => 'Beli Kemasan',
             'jumlah' => 100000,
             'tanggal' => '2026-10-11',

@@ -160,19 +160,28 @@ class ProfileController extends Controller
 
         if ($request->hasFile('foto_profil') && $request->file('foto_profil')->isValid()) {
             $file = $request->file('foto_profil');
-            $ext = strtolower($file->getClientOriginalExtension());
-            $safeUsername = preg_replace('/[^a-zA-Z0-9_-]/', '', $user->username);
-            $newFileName = 'profile_'.$safeUsername.'_'.bin2hex(random_bytes(8)).'.'.$ext;
-            $uploadDir = public_path('uploads');
-
-            if (! is_dir($uploadDir)) {
-                mkdir($uploadDir, 0777, true);
-            }
-
             $user->deletePhotoFile();
 
-            $file->move($uploadDir, $newFileName);
-            $fotoPath = 'uploads/'.$newFileName;
+            if ($this->shouldStorePhotoAsDataUri()) {
+                $mime = $file->getMimeType() ?: 'image/jpeg';
+                $contents = file_get_contents($file->getRealPath());
+
+                if ($contents !== false) {
+                    $fotoPath = 'data:'.$mime.';base64,'.base64_encode($contents);
+                }
+            } else {
+                $ext = strtolower($file->getClientOriginalExtension());
+                $safeUsername = preg_replace('/[^a-zA-Z0-9_-]/', '', $user->username);
+                $newFileName = 'profile_'.$safeUsername.'_'.bin2hex(random_bytes(8)).'.'.$ext;
+                $uploadDir = public_path('uploads');
+
+                if (! is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
+                }
+
+                $file->move($uploadDir, $newFileName);
+                $fotoPath = 'uploads/'.$newFileName;
+            }
         }
 
         $user->update([
@@ -189,6 +198,16 @@ class ProfileController extends Controller
             'type' => 'success',
             'message' => 'Profil dan informasi usaha berhasil diperbarui!',
         ]);
+    }
+
+    /**
+     * Tentukan apakah foto profil disimpan sebagai Data URI (untuk lingkungan serverless read-only seperti Vercel).
+     */
+    private function shouldStorePhotoAsDataUri(): bool
+    {
+        return isset($_ENV['VERCEL'])
+            || isset($_SERVER['VERCEL'])
+            || ! is_writable(public_path());
     }
 
     /**

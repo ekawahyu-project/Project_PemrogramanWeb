@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AlpetBizz | Masuk & Daftar</title>
+    <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}?v={{ filemtime(public_path('img/logo.png')) }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -36,10 +37,10 @@
     <nav class="relative z-40 px-5 sm:px-8 py-5 sm:py-6" aria-label="Navigasi Utama">
         <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
             <!-- Logo -->
-            <a href="/login" class="flex items-center gap-2.5 text-white no-underline group">
-                <span class="w-9 h-9 rounded-xl bg-[#C4FF0D] text-[#0b0e08] font-extrabold text-base flex items-center justify-center shadow-[0_0_24px_rgba(196,255,13,0.35)] transition-transform group-hover:scale-105">
-                    A
-                </span>
+            <a href="/login" class="flex items-center gap-3 text-white no-underline group">
+                <img src="{{ asset('img/logo.png') }}?v={{ filemtime(public_path('img/logo.png')) }}"
+                     alt="Logo AlpetBizz"
+                     class="w-10 h-10 rounded-full object-contain shrink-0 drop-shadow-[0_0_16px_rgba(196,255,13,0.5)] transition-transform duration-200 group-hover:scale-105">
                 <span class="text-xl sm:text-2xl font-bold tracking-tight text-white">AlpetBizz</span>
             </a>
 
@@ -135,7 +136,9 @@
                 <div class="vault-wallet-card" onclick="openLogin('login')" style="cursor: pointer;" title="Klik untuk masuk ke Dashboard">
                     <div class="flex items-center justify-between mb-5">
                         <div class="flex items-center gap-2.5">
-                            <span class="w-8 h-8 rounded-xl bg-[#C4FF0D]/20 border border-[#C4FF0D]/40 text-[#C4FF0D] font-mono text-xs font-bold flex items-center justify-center">Rp</span>
+                            <img src="{{ asset('img/logo.png') }}?v={{ filemtime(public_path('img/logo.png')) }}"
+                                 alt="Logo AlpetBizz"
+                                 class="w-9 h-9 rounded-full object-contain shrink-0 drop-shadow-[0_0_12px_rgba(196,255,13,0.45)]">
                             <div>
                                 <p class="text-xs font-semibold text-white">AlpetBizz Vault</p>
                                 <p class="font-mono text-[10px] text-white/50">Kas &amp; Inventaris Aktif</p>
@@ -324,8 +327,8 @@
                     <div>
                         <label class="field-label" for="r-pw">Kata Sandi *</label>
                         <div class="field-wrap">
-                            <input id="r-pw" class="field-input has-icon" type="password" name="password" required
-                                placeholder="Min. 6 karakter">
+                            <input id="r-pw" class="field-input has-icon" type="password" name="password" required minlength="8"
+                                placeholder="Min. 8 karakter (huruf & angka)">
                             <button type="button" class="pw-toggle" onclick="togglePw('r-pw', this)" aria-label="Lihat sandi">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -13,17 +14,20 @@ use Illuminate\View\View;
 class ProductController extends Controller
 {
     /**
-     * Tampilkan halaman data produk.
+     * Tampilkan halaman data produk milik pengguna yang sedang login.
      */
     public function index(Request $request): View
     {
+        /** @var User $user */
+        $user = $request->user();
+
         $currentPage = 'produk';
         $kategoriOpt = Product::CATEGORIES;
         $satuanOpt = Product::UNITS;
-        $produkList = Product::orderBy('id')->get();
+        $produkList = $user->products()->orderBy('id')->get();
 
         $editId = $request->query('edit');
-        $editPrd = $editId ? Product::find($editId) : null;
+        $editPrd = is_numeric($editId) ? $user->products()->find((int) $editId) : null;
 
         $errorsList = session('errors_list', []);
         $notif = session('flash');
@@ -73,14 +77,17 @@ class ProductController extends Controller
     }
 
     /**
-     * Tambah atau perbarui data produk.
+     * Tambah atau perbarui data produk milik pengguna aktif.
      */
     protected function storeOrUpdate(Request $request): RedirectResponse
     {
+        /** @var User $user */
+        $user = $request->user();
+
         $action = (string) $request->input('action');
         $isUpdate = $action === 'update';
         $id = $isUpdate ? $request->input('id') : null;
-        $product = $isUpdate ? Product::find($id) : null;
+        $product = $isUpdate && is_numeric($id) ? $user->products()->find((int) $id) : null;
         $maxAngka = 1000000000;
 
         $nama = trim((string) $request->input('nama', ''));
@@ -98,7 +105,9 @@ class ProductController extends Controller
                 'required',
                 'string',
                 'max:100',
-                Rule::unique('products', 'nama')->ignore($product?->id),
+                Rule::unique('products', 'nama')
+                    ->where('user_id', $user->id)
+                    ->ignore($product?->id),
             ],
             'kategori' => ['required', Rule::in(Product::CATEGORIES)],
             'satuan' => ['required', Rule::in(Product::UNITS)],
@@ -166,7 +175,7 @@ class ProductController extends Controller
             $product->update($data);
             $pesan = 'Produk berhasil diperbarui.';
         } else {
-            Product::create($data);
+            $user->products()->create($data);
             $pesan = 'Produk berhasil ditambahkan.';
         }
 
@@ -179,12 +188,25 @@ class ProductController extends Controller
     }
 
     /**
-     * Hapus produk.
+     * Hapus produk milik pengguna aktif.
      */
     protected function destroy(Request $request): RedirectResponse
     {
-        $product = Product::find($request->input('id'));
-        $product?->delete();
+        /** @var User $user */
+        $user = $request->user();
+        $id = $request->input('id');
+        $product = is_numeric($id) ? $user->products()->find((int) $id) : null;
+
+        if (! $product) {
+            return redirect('/produk')->with('flash', [
+                'icon' => 'error',
+                'title' => 'Gagal!',
+                'text' => 'Produk tidak ditemukan atau Anda tidak memiliki akses.',
+                'confirmButtonText' => 'OK',
+            ]);
+        }
+
+        $product->delete();
 
         return redirect('/produk')->with('flash', [
             'icon' => 'success',

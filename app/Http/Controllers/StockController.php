@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\StockLog;
+use App\Models\User;
 use App\Services\StockMovementService;
 use DomainException;
 use Illuminate\Http\RedirectResponse;
@@ -17,23 +18,30 @@ class StockController extends Controller
     public function __construct(private StockMovementService $stockService) {}
 
     /**
-     * Tampilkan halaman mutasi stok.
+     * Tampilkan halaman mutasi stok milik pengguna aktif.
      */
     public function index(Request $request): View
     {
+        /** @var User $user */
+        $user = $request->user();
+
         $currentPage = 'stok';
         $error = session('error', '');
         $flash = session('flash');
 
-        $produkList = Product::orderBy('id')->get();
-        $lowStock = Product::lowStock()->orderBy('id')->get();
-        $stokLogList = StockLog::with('product')
+        $produkList = $user->products()->orderBy('id')->get();
+        $productsById = $produkList->keyBy('id');
+        $lowStock = $produkList->filter(fn (Product $p): bool => $p->isLowStock())->values();
+        $stokLogList = $user->stockLogs()
             ->orderByDesc('tanggal')
             ->orderByDesc('id')
-            ->get();
+            ->get()
+            ->each(function (StockLog $log) use ($productsById): void {
+                $log->setRelation('product', $productsById->get($log->product_id));
+            });
 
         $editId = $request->query('edit');
-        $editLog = $editId ? StockLog::find($editId) : null;
+        $editLog = is_numeric($editId) ? $user->stockLogs()->find((int) $editId) : null;
 
         return view('stok', compact(
             'currentPage',
@@ -74,10 +82,13 @@ class StockController extends Controller
      */
     protected function store(Request $request): RedirectResponse
     {
+        /** @var User $user */
+        $user = $request->user();
+
         $validator = Validator::make($request->all(), [
-            'produk_id' => ['required', 'integer', 'exists:products,id'],
+            'produk_id' => ['required', 'integer', Rule::exists('products', 'id')->where('user_id', $user->id)],
             'jenis' => ['required', Rule::in(StockLog::TYPES)],
-            'jumlah' => ['required', 'integer', 'min:1'],
+            'jumlah' => ['required', 'integer', 'min:1', 'max:1000000000'],
             'tanggal' => ['required', 'date'],
             'keterangan' => ['nullable', 'string', 'max:255'],
         ]);
@@ -90,6 +101,7 @@ class StockController extends Controller
 
         try {
             $this->stockService->record(
+                $user,
                 (int) $validated['produk_id'],
                 $validated['jenis'],
                 (int) $validated['jumlah'],
@@ -112,13 +124,16 @@ class StockController extends Controller
      */
     protected function update(Request $request): RedirectResponse
     {
-        $id = (string) $request->input('id', '');
-        $stockLog = StockLog::find($id);
+        /** @var User $user */
+        $user = $request->user();
+
+        $id = $request->input('id');
+        $stockLog = is_numeric($id) ? $user->stockLogs()->find((int) $id) : null;
 
         $validator = Validator::make($request->all(), [
-            'produk_id' => ['required', 'integer', 'exists:products,id'],
+            'produk_id' => ['required', 'integer', Rule::exists('products', 'id')->where('user_id', $user->id)],
             'jenis' => ['required', Rule::in(StockLog::TYPES)],
-            'jumlah' => ['required', 'integer', 'min:1'],
+            'jumlah' => ['required', 'integer', 'min:1', 'max:1000000000'],
             'tanggal' => ['required', 'date'],
             'keterangan' => ['nullable', 'string', 'max:255'],
         ]);
@@ -131,6 +146,7 @@ class StockController extends Controller
 
         try {
             $this->stockService->update(
+                $user,
                 $stockLog,
                 (int) $validated['produk_id'],
                 $validated['jenis'],
@@ -139,7 +155,7 @@ class StockController extends Controller
                 trim((string) ($validated['keterangan'] ?? ''))
             );
         } catch (DomainException $e) {
-            return redirect('/stok?edit='.$id)->with('error', $e->getMessage());
+            return redirect('/stok?edit='.$stockLog->id)->with('error', $e->getMessage());
         }
 
         return redirect('/stok')->with('flash', [
@@ -154,11 +170,17 @@ class StockController extends Controller
      */
     protected function destroy(Request $request): RedirectResponse
     {
-        $stockLog = StockLog::find($request->input('id'));
+        /** @var User $user */
+        $user = $request->user();
 
-        if ($stockLog) {
-            $this->stockService->reverseAndDelete($stockLog);
+        $id = $request->input('id');
+        $stockLog = is_numeric($id) ? $user->stockLogs()->find((int) $id) : null;
+
+        if (! $stockLog) {
+            return redirect('/stok')->with('error', 'Data mutasi tidak ditemukan atau Anda tidak memiliki akses.');
         }
+
+        $this->stockService->reverseAndDelete($user, $stockLog);
 
         return redirect('/stok')->with('flash', [
             'icon' => 'success',

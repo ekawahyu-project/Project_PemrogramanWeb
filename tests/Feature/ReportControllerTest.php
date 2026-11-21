@@ -15,8 +15,8 @@ class ReportControllerTest extends TestCase
     public function test_report_page_and_crud_work_with_eloquent(): void
     {
         $user = User::factory()->create(['nama' => 'Alpet']);
-        Transaction::factory()->income()->create(['tanggal' => '2026-08-01', 'jumlah' => 300000]);
-        Transaction::factory()->expense()->create(['tanggal' => '2026-08-05', 'jumlah' => 100000]);
+        Transaction::factory()->for($user)->income()->create(['tanggal' => '2026-08-01', 'jumlah' => 300000]);
+        Transaction::factory()->for($user)->expense()->create(['tanggal' => '2026-08-05', 'jumlah' => 100000]);
 
         $indexResponse = $this->actingAs($user)->get('/laporan');
         $indexResponse->assertOk();

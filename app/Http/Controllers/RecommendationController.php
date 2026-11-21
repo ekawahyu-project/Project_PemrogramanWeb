@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Recommendation;
-use App\Models\Transaction;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -14,17 +14,22 @@ use Illuminate\View\View;
 class RecommendationController extends Controller
 {
     /**
-     * Tampilkan halaman rekomendasi dan catatan tindak lanjut.
+     * Tampilkan halaman rekomendasi dan catatan tindak lanjut milik pengguna aktif.
      */
     public function index(Request $request): View
     {
+        /** @var User $user */
+        $user = $request->user();
         $currentPage = 'rekomendasi';
         $prioritasOpt = Recommendation::PRIORITIES;
 
-        $incomeTransactions = Transaction::income()
+        $incomeTransactions = $user->transactions()
+            ->income()
             ->whereNotNull('product_id')
-            ->with('product')
             ->get();
+
+        $products = $user->products()->orderBy('id')->get();
+        $productsById = $products->keyBy('id');
 
         $produkStats = [];
         foreach ($incomeTransactions as $trx) {
@@ -33,7 +38,7 @@ class RecommendationController extends Controller
                 $produkStats[$pid] = [
                     'count' => 0,
                     'revenue' => 0,
-                    'nama' => $trx->product?->nama ?? 'Dihapus',
+                    'nama' => $productsById->get($pid)?->nama ?? 'Dihapus',
                 ];
             }
 
@@ -43,14 +48,15 @@ class RecommendationController extends Controller
 
         uasort($produkStats, fn (array $a, array $b): int => $b['count'] <=> $a['count']);
 
-        $lowStock = Product::lowStock()->orderBy('id')->get();
-        $unsoldProd = Product::whereDoesntHave('transactions', fn ($query) => $query->income())
-            ->orderBy('id')
-            ->get();
+        $lowStock = $products->filter(fn (Product $p): bool => $p->isLowStock())->values();
+        $soldProductIds = $incomeTransactions->pluck('product_id')->filter()->unique()->all();
+        $unsoldProd = $products
+            ->filter(fn (Product $p): bool => ! in_array($p->id, $soldProductIds, true))
+            ->values();
 
-        $catatanList = Recommendation::orderByDesc('id')->get();
+        $catatanList = $user->recommendations()->orderByDesc('id')->get();
         $editId = $request->query('edit');
-        $editCat = $editId ? Recommendation::find($editId) : null;
+        $editCat = is_numeric($editId) ? $user->recommendations()->find((int) $editId) : null;
 
         return view('rekomendasi', compact(
             'currentPage',
@@ -87,13 +93,16 @@ class RecommendationController extends Controller
     }
 
     /**
-     * Tambah catatan rekomendasi.
+     * Tambah catatan rekomendasi milik pengguna aktif.
      */
     protected function store(Request $request): RedirectResponse
     {
+        /** @var User $user */
+        $user = $request->user();
+
         $validator = Validator::make($request->all(), [
             'judul' => ['required', 'string', 'max:255'],
-            'isi' => ['required', 'string'],
+            'isi' => ['required', 'string', 'max:2000'],
             'prioritas' => ['required', Rule::in(Recommendation::PRIORITIES)],
         ]);
 
@@ -103,7 +112,7 @@ class RecommendationController extends Controller
 
         $validated = $validator->validated();
 
-        Recommendation::create([
+        $user->recommendations()->create([
             'judul' => trim($validated['judul']),
             'isi' => trim($validated['isi']),
             'prioritas' => $validated['prioritas'],
@@ -114,11 +123,15 @@ class RecommendationController extends Controller
     }
 
     /**
-     * Update catatan rekomendasi.
+     * Update catatan rekomendasi milik pengguna aktif.
      */
     protected function update(Request $request): RedirectResponse
     {
-        $recommendation = Recommendation::find($request->input('id'));
+        /** @var User $user */
+        $user = $request->user();
+
+        $id = $request->input('id');
+        $recommendation = is_numeric($id) ? $user->recommendations()->find((int) $id) : null;
 
         if (! $recommendation) {
             return redirect('/rekomendasi');
@@ -126,7 +139,7 @@ class RecommendationController extends Controller
 
         $validator = Validator::make($request->all(), [
             'judul' => ['required', 'string', 'max:255'],
-            'isi' => ['required', 'string'],
+            'isi' => ['required', 'string', 'max:2000'],
             'prioritas' => ['required', Rule::in(Recommendation::PRIORITIES)],
         ]);
 
@@ -146,11 +159,17 @@ class RecommendationController extends Controller
     }
 
     /**
-     * Hapus catatan rekomendasi.
+     * Hapus catatan rekomendasi milik pengguna aktif.
      */
     protected function destroy(Request $request): RedirectResponse
     {
-        Recommendation::find($request->input('id'))?->delete();
+        /** @var User $user */
+        $user = $request->user();
+
+        $id = $request->input('id');
+        if (is_numeric($id)) {
+            $user->recommendations()->find((int) $id)?->delete();
+        }
 
         return redirect('/rekomendasi');
     }

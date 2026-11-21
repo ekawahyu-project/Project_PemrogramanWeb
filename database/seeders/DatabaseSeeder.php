@@ -4,8 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Debt;
 use App\Models\Product;
-use App\Models\Recommendation;
-use App\Models\Report;
 use App\Models\StockLog;
 use App\Models\Transaction;
 use App\Models\User;
@@ -37,10 +35,13 @@ class DatabaseSeeder extends Seeder
 
         $products = [];
         foreach ($productsData as $key => $item) {
-            $products[$key] = Product::firstOrCreate(['nama' => $item['nama']], $item);
+            $products[$key] = Product::firstOrCreate(
+                ['user_id' => $admin->id, 'nama' => $item['nama']],
+                array_merge($item, ['user_id' => $admin->id])
+            );
         }
 
-        if (Transaction::count() === 0) {
+        if ($admin->transactions()->count() === 0) {
             $transactions = [
                 ['tanggal' => '2026-07-15', 'keterangan' => 'Penjualan Kopi Arabika', 'jenis' => Transaction::TYPE_INCOME, 'jumlah' => 385000, 'product_id' => $products['p1']->id],
                 ['tanggal' => '2026-07-20', 'keterangan' => 'Biaya Sewa Tempat', 'jenis' => Transaction::TYPE_EXPENSE, 'jumlah' => 500000, 'product_id' => null],
@@ -58,11 +59,11 @@ class DatabaseSeeder extends Seeder
             ];
 
             foreach ($transactions as $trx) {
-                Transaction::create($trx);
+                $admin->transactions()->create($trx);
             }
         }
 
-        if (StockLog::count() === 0) {
+        if ($admin->stockLogs()->count() === 0) {
             $stockLogs = [
                 ['tanggal' => '2026-09-20', 'product_id' => $products['p1']->id, 'jenis' => StockLog::TYPE_IN, 'jumlah' => 30, 'keterangan' => 'Restock dari supplier'],
                 ['tanggal' => '2026-09-22', 'product_id' => $products['p2']->id, 'jenis' => StockLog::TYPE_IN, 'jumlah' => 20, 'keterangan' => 'Pembelian batch baru'],
@@ -72,13 +73,12 @@ class DatabaseSeeder extends Seeder
             ];
 
             foreach ($stockLogs as $log) {
-                StockLog::create($log);
+                $admin->stockLogs()->create($log);
             }
         }
 
-        if (Report::count() === 0) {
-            Report::create([
-                'user_id' => $admin->id,
+        if ($admin->reports()->count() === 0) {
+            $admin->reports()->create([
                 'judul' => 'Evaluasi Bisnis Juli 2026',
                 'kategori' => 'Evaluasi Bulanan',
                 'tanggal_dari' => '2026-07-01',
@@ -88,8 +88,7 @@ class DatabaseSeeder extends Seeder
                 'pembuat' => $admin->nama,
             ]);
 
-            Report::create([
-                'user_id' => $admin->id,
+            $admin->reports()->create([
                 'judul' => 'Performa Penjualan Agustus',
                 'kategori' => 'Penjualan & Produk',
                 'tanggal_dari' => '2026-08-01',
@@ -100,15 +99,15 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        if (Recommendation::count() === 0) {
-            Recommendation::create([
+        if ($admin->recommendations()->count() === 0) {
+            $admin->recommendations()->create([
                 'judul' => 'Tingkatkan stok Kopi Arabika',
                 'isi' => 'Produk terlaris. Tambah minimal 50 pack/bulan untuk hindari kehabisan.',
                 'prioritas' => 'Tinggi',
                 'dibuat' => '2026-09-28',
             ]);
 
-            Recommendation::create([
+            $admin->recommendations()->create([
                 'judul' => 'Promosi Teh Hijau',
                 'isi' => 'Stok menipis, jarang terjual. Pertimbangkan diskon atau bundle promo.',
                 'prioritas' => 'Sedang',
@@ -116,7 +115,7 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        if (Debt::count() === 0) {
+        if ($admin->debts()->count() === 0) {
             $debts = [
                 [
                     'nama_pihak' => 'Warung Kopi Senja',

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AiConsultationController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DebtController;
@@ -16,8 +17,8 @@ Route::get('/', fn () => redirect('/login'));
 
 // Auth routes (tanpa auth middleware)
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'handle'])->name('login.handle');
-Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('logout');
+Route::post('/login', [AuthController::class, 'handle'])->middleware('throttle:auth')->name('login.handle');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Register (redirect ke /login?tab=register)
 Route::get('/register', fn () => redirect('/login?tab=register'))->name('register');
@@ -44,6 +45,12 @@ Route::middleware('auth.custom')->group(function () {
 
     Route::get('/rekomendasi', [RecommendationController::class, 'index'])->name('rekomendasi');
     Route::post('/rekomendasi', [RecommendationController::class, 'handle'])->name('rekomendasi.handle');
+
+    Route::get('/konsultasi-ai', [AiConsultationController::class, 'index'])->name('konsultasi-ai');
+    Route::post('/konsultasi-ai/kirim', [AiConsultationController::class, 'send'])
+        ->middleware('throttle:ai-consultation')
+        ->name('konsultasi-ai.send');
+    Route::post('/konsultasi-ai/reset', [AiConsultationController::class, 'reset'])->name('konsultasi-ai.reset');
 
     Route::get('/profil', [ProfileController::class, 'index'])->name('profil');
     Route::post('/profil', [ProfileController::class, 'handle'])->name('profil.handle');

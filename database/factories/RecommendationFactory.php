@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Recommendation;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,6 +19,7 @@ class RecommendationFactory extends Factory
     public function definition(): array
     {
         return [
+            'user_id' => User::factory(),
             'judul' => fake()->sentence(3),
             'isi' => fake()->paragraph(),
             'prioritas' => fake()->randomElement(Recommendation::PRIORITIES),

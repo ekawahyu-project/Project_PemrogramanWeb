@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Product;
 use App\Models\StockLog;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -19,6 +20,7 @@ class StockLogFactory extends Factory
     public function definition(): array
     {
         return [
+            'user_id' => User::factory(),
             'product_id' => Product::factory(),
             'tanggal' => fake()->date(),
             'jenis' => fake()->randomElement(StockLog::TYPES),

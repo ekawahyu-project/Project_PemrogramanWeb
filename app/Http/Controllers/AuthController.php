@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
 class AuthController extends Controller
@@ -87,12 +88,12 @@ class AuthController extends Controller
             'nama' => ['required', 'string', 'max:100'],
             'username' => ['required', 'string', 'min:3', 'max:50', 'alpha_dash', 'unique:users,username'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:6'],
+            'password' => ['required', 'string', Password::min(8)->letters()->numbers()],
             'password2' => ['required', 'same:password'],
             'no_hp' => ['nullable', 'string', 'max:20'],
             'nama_usaha' => ['nullable', 'string', 'max:100'],
             'kategori' => ['nullable', 'string', 'max:50'],
-            'alamat' => ['nullable', 'string'],
+            'alamat' => ['nullable', 'string', 'max:500'],
         ], [
             'nama.required' => 'Nama lengkap, username, email, dan kata sandi wajib diisi.',
             'username.required' => 'Nama lengkap, username, email, dan kata sandi wajib diisi.',
@@ -105,7 +106,9 @@ class AuthController extends Controller
             'email.email' => 'Format alamat email tidak valid.',
             'email.unique' => 'Email sudah terdaftar.',
             'password.required' => 'Nama lengkap, username, email, dan kata sandi wajib diisi.',
-            'password.min' => 'Kata sandi minimal 6 karakter.',
+            'password.min' => 'Kata sandi minimal 8 karakter.',
+            'password.letters' => 'Kata sandi harus mengandung kombinasi huruf dan angka.',
+            'password.numbers' => 'Kata sandi harus mengandung kombinasi huruf dan angka.',
             'password2.required' => 'Konfirmasi kata sandi tidak cocok.',
             'password2.same' => 'Konfirmasi kata sandi tidak cocok.',
         ]);

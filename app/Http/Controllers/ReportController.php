@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Report;
-use App\Models\Transaction;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -31,13 +31,15 @@ class ReportController extends Controller
     ];
 
     /**
-     * Tampilkan halaman laporan analitik dan laporan tersimpan.
+     * Tampilkan halaman laporan analitik dan laporan tersimpan milik pengguna aktif.
      */
     public function index(Request $request): View
     {
+        /** @var User $user */
+        $user = $request->user();
         $currentPage = 'laporan';
 
-        $transaksiList = Transaction::orderBy('tanggal')->get();
+        $transaksiList = $user->transactions()->orderBy('tanggal')->get();
 
         $bulanData = [];
         $totalMasuk = 0;
@@ -74,9 +76,9 @@ class ReportController extends Controller
         $pengeluaranData = array_column(array_values($bulanData), 'pengeluaran');
         $totalLaba = $totalMasuk - $totalKeluar;
 
-        $laporanTersimpan = Report::orderByDesc('id')->get();
+        $laporanTersimpan = $user->reports()->orderByDesc('id')->get();
         $editId = $request->query('edit');
-        $editLap = $editId ? Report::find($editId) : null;
+        $editLap = is_numeric($editId) ? $user->reports()->find((int) $editId) : null;
 
         $kategoriOptions = Report::CATEGORIES;
         $statusOptions = Report::STATUSES;
@@ -122,17 +124,20 @@ class ReportController extends Controller
     }
 
     /**
-     * Simpan laporan baru.
+     * Simpan laporan baru milik pengguna aktif.
      */
     protected function store(Request $request): RedirectResponse
     {
+        /** @var User $user */
+        $user = $request->user();
+
         $validator = Validator::make($request->all(), [
             'judul' => ['required', 'string', 'max:255'],
             'kategori' => ['required', Rule::in(Report::CATEGORIES)],
             'tanggal_dari' => ['required', 'date'],
             'tanggal_sampai' => ['required', 'date', 'after_or_equal:tanggal_dari'],
             'status' => ['required', Rule::in(Report::STATUSES)],
-            'catatan' => ['nullable', 'string'],
+            'catatan' => ['nullable', 'string', 'max:2000'],
         ]);
 
         if ($validator->fails()) {
@@ -141,26 +146,29 @@ class ReportController extends Controller
 
         $validated = $validator->validated();
 
-        Report::create([
-            'user_id' => $request->user()?->id,
+        $user->reports()->create([
             'judul' => trim($validated['judul']),
             'kategori' => $validated['kategori'],
             'tanggal_dari' => $validated['tanggal_dari'],
             'tanggal_sampai' => $validated['tanggal_sampai'],
             'status' => $validated['status'],
             'catatan' => trim((string) ($validated['catatan'] ?? '')) ?: null,
-            'pembuat' => $request->user()?->nama ?? 'Admin',
+            'pembuat' => $user->nama ?: 'Admin',
         ]);
 
         return redirect('/laporan');
     }
 
     /**
-     * Update laporan tersimpan.
+     * Update laporan tersimpan milik pengguna aktif.
      */
     protected function update(Request $request): RedirectResponse
     {
-        $report = Report::find($request->input('id'));
+        /** @var User $user */
+        $user = $request->user();
+
+        $id = $request->input('id');
+        $report = is_numeric($id) ? $user->reports()->find((int) $id) : null;
 
         if (! $report) {
             return redirect('/laporan');
@@ -172,7 +180,7 @@ class ReportController extends Controller
             'tanggal_dari' => ['required', 'date'],
             'tanggal_sampai' => ['required', 'date', 'after_or_equal:tanggal_dari'],
             'status' => ['required', Rule::in(Report::STATUSES)],
-            'catatan' => ['nullable', 'string'],
+            'catatan' => ['nullable', 'string', 'max:2000'],
         ]);
 
         if ($validator->fails()) {
@@ -194,11 +202,17 @@ class ReportController extends Controller
     }
 
     /**
-     * Hapus laporan tersimpan.
+     * Hapus laporan tersimpan milik pengguna aktif.
      */
     protected function destroy(Request $request): RedirectResponse
     {
-        Report::find($request->input('id'))?->delete();
+        /** @var User $user */
+        $user = $request->user();
+
+        $id = $request->input('id');
+        if (is_numeric($id)) {
+            $user->reports()->find((int) $id)?->delete();
+        }
 
         return redirect('/laporan');
     }

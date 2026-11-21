@@ -16,9 +16,9 @@ class RecommendationControllerTest extends TestCase
     public function test_recommendation_displays_analytics_and_supports_crud(): void
     {
         $user = User::factory()->create();
-        $bestSeller = Product::factory()->create(['nama' => 'Kopi Arabika']);
-        $unsoldLow = Product::factory()->lowStock()->create(['nama' => 'Teh Hijau']);
-        Transaction::factory()->income($bestSeller)->create(['jumlah' => 110000]);
+        $bestSeller = Product::factory()->for($user)->create(['nama' => 'Kopi Arabika']);
+        $unsoldLow = Product::factory()->for($user)->lowStock()->create(['nama' => 'Teh Hijau']);
+        Transaction::factory()->for($user)->income($bestSeller)->create(['jumlah' => 110000]);
 
         $indexResponse = $this->actingAs($user)->get('/rekomendasi');
         $indexResponse->assertOk();

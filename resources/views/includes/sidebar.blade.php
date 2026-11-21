@@ -12,8 +12,10 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
             </svg>
         </button>
-        <div class="flex items-center gap-2">
-            <span class="w-6 h-6 rounded-lg bg-[#C4FF0D] text-[#152208] font-extrabold text-xs grid place-items-center">A</span>
+        <div class="flex items-center gap-2.5">
+            <img src="{{ asset('img/logo.png') }}?v={{ filemtime(public_path('img/logo.png')) }}"
+                 alt="Logo AlpetBizz"
+                 class="w-7 h-7 rounded-full object-contain shrink-0 drop-shadow-[0_0_10px_rgba(196,255,13,0.45)]">
             <span class="font-bold text-white text-base tracking-tight">AlpetBizz</span>
         </div>
     </div>
@@ -41,10 +43,9 @@
         <!-- Brand / Logo -->
         <div class="relative px-5 py-5 border-b border-white/[0.08] flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-[#C4FF0D] flex items-center justify-center
-                            text-[#152208] font-extrabold text-base shadow-[0_0_24px_rgba(196,255,13,0.3)]">
-                    A
-                </div>
+                <img src="{{ asset('img/logo.png') }}?v={{ filemtime(public_path('img/logo.png')) }}"
+                     alt="Logo AlpetBizz"
+                     class="w-10 h-10 rounded-full object-contain shrink-0 drop-shadow-[0_0_14px_rgba(196,255,13,0.45)]">
                 <div>
                     <h1 class="font-bold text-white text-base tracking-[-0.02em] leading-tight">AlpetBizz</h1>
                 </div>
@@ -89,8 +90,9 @@
             <form method="POST" action="/logout" data-spa-ignore="true">
                 @csrf
                 <input type="hidden" name="action" value="logout">
-                <button type="submit"
-                    class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium
+                <button type="button"
+                    onclick="konfirmasiLogout(this)"
+                    class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium cursor-pointer
                            text-[#9AA68E] hover:bg-rose-500/15 hover:text-rose-300 border border-transparent hover:border-rose-500/25 transition">
                     {!! $sidebarIcons['logout'] !!}
                     <span>Keluar</span>
@@ -104,10 +106,40 @@
 <link rel="stylesheet" href="{{ asset('assets/css/animations.css') }}?v={{ filemtime(public_path('assets/css/animations.css')) }}">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
-<script src="{{ asset('assets/js/animations.js') }}"></script>
+<script src="{{ asset('assets/js/animations.js') }}?v={{ filemtime(public_path('assets/js/animations.js')) }}"></script>
 <script src="{{ asset('assets/js/profil.js') }}"></script>
 <script src="{{ asset('assets/js/spa.js') }}?v={{ filemtime(public_path('assets/js/spa.js')) }}"></script>
 <script>
+    window.konfirmasiLogout = function (btn) {
+        const form = btn.closest('form');
+        if (!form) return;
+
+        if (typeof Swal === 'undefined') {
+            if (confirm('Yakin ingin keluar dari akun AlpetBizz?')) {
+                form.submit();
+            }
+            return;
+        }
+
+        Swal.fire({
+            title: 'Keluar dari Akun?',
+            text: 'Sesi Anda saat ini akan diakhiri dan Anda akan kembali ke halaman login.',
+            icon: 'warning',
+            background: '#12170D',
+            color: '#F4F7F0',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, keluar',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#252f1b',
+            reverseButtons: true
+        }).then(function (result) {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    };
+
     // Jika halaman dipulihkan dari cache browser (tombol Back), muat ulang
     // agar server mengecek sesi login kembali.
     window.addEventListener('pageshow', function (event) {

@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,6 +21,7 @@ class ProductFactory extends Factory
         $hargaBeli = fake()->numberBetween(5000, 50000);
 
         return [
+            'user_id' => User::factory(),
             'nama' => fake()->unique()->words(3, true),
             'kategori' => fake()->randomElement(Product::CATEGORIES),
             'harga_beli' => $hargaBeli,

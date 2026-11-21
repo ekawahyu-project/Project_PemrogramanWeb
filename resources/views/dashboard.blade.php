@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | AlpetBizz</title>
+    <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}?v={{ filemtime(public_path('img/logo.png')) }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -495,7 +496,7 @@
                 <section class="bento-tile md:col-span-2 xl:col-span-2 xl:col-start-1 xl:row-start-4 justify-between">
                     <header class="mb-3.5 flex items-center justify-between gap-3">
                         <h3 class="text-sm font-semibold text-[#9AA68E]">Akses Cepat Modul</h3>
-                        <span class="text-xs font-semibold text-[#C4FF0D]">6 modul aktif</span>
+                        <span class="text-xs font-semibold text-[#C4FF0D]">{{ count($shortcuts) }} modul aktif</span>
                     </header>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">

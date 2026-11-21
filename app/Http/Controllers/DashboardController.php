@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Debt;
 use App\Models\Product;
 use App\Models\Transaction;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -12,21 +13,36 @@ class DashboardController extends Controller
 {
     /**
      * Tampilkan halaman dashboard utama bergaya Web3Bento tanpa duplikasi metrik.
+     * Hanya mengeksekusi 3 query utama (transactions, products, debts) milik pengguna aktif.
      */
     public function index(Request $request): View
     {
+        /** @var User $authUser */
+        $authUser = $request->user();
+
         $currentPage = 'dashboard';
-        $user = $request->user()?->nama ?? 'Administrator';
+        $user = $authUser->nama ?: 'Administrator';
 
-        $pemasukan = (int) Transaction::income()->sum('jumlah');
-        $pengeluaran = (int) Transaction::expense()->sum('jumlah');
-        $transaksiPemasukanCount = Transaction::income()->count();
-        $transaksiPengeluaranCount = Transaction::expense()->count();
+        // 3 query terisolasi per akun (menggantikan ~10 query terpisah sebelumnya)
+        $transactions = $authUser->transactions()
+            ->orderByDesc('tanggal')
+            ->orderByDesc('id')
+            ->get();
+        $products = $authUser->products()->get();
+        $productsById = $products->keyBy('id');
+        $debts = $authUser->debts()->get();
 
-        $products = Product::all();
+        $incomeTransactions = $transactions->where('jenis', Transaction::TYPE_INCOME);
+        $expenseTransactions = $transactions->where('jenis', Transaction::TYPE_EXPENSE);
+
+        $pemasukan = (int) $incomeTransactions->sum('jumlah');
+        $pengeluaran = (int) $expenseTransactions->sum('jumlah');
+        $transaksiPemasukanCount = $incomeTransactions->count();
+        $transaksiPengeluaranCount = $expenseTransactions->count();
+
         $jmlStok = $products->count();
         $totalUnitStok = (int) $products->sum('stok');
-        $lowStock = Product::lowStock()->count();
+        $lowStock = $products->filter(fn (Product $p): bool => $p->isLowStock())->count();
         $laba = $pemasukan - $pengeluaran;
         $marginPct = $pemasukan > 0 ? round(($laba / $pemasukan) * 100, 1) : 0.0;
         $stockHealthScore = $jmlStok > 0
@@ -39,10 +55,13 @@ class DashboardController extends Controller
         $potensiLabaStok = max(0, $nilaiJualStok - $modalStok);
 
         // 2. Data unik untuk AllocationTile: Kontribusi Omzet per Kategori Produk
-        $incomeWithProduct = Transaction::income()->with('product')->whereNotNull('product_id')->get();
         $categoryRevenue = [];
-        foreach ($incomeWithProduct as $trx) {
-            $cat = $trx->product?->kategori ?? 'Lainnya';
+        foreach ($incomeTransactions as $trx) {
+            if ($trx->product_id === null) {
+                continue;
+            }
+
+            $cat = $productsById->get($trx->product_id)?->kategori ?? 'Lainnya';
             $categoryRevenue[$cat] = ($categoryRevenue[$cat] ?? 0) + $trx->jumlah;
         }
         arsort($categoryRevenue);
@@ -55,7 +74,6 @@ class DashboardController extends Controller
         }
 
         // 3. Data unik untuk Solid Lime Tile: Ringkasan Hutang & Piutang (Kasbon)
-        $debts = $request->user()?->debts()->get() ?? collect();
         $piutangTotal = (int) $debts->where('jenis', Debt::TYPE_RECEIVABLE)->sum('jumlah');
         $piutangCair = (int) $debts->where('jenis', Debt::TYPE_RECEIVABLE)->sum('dibayar');
         $sisaPiutang = max(0, $piutangTotal - $piutangCair);
@@ -99,13 +117,11 @@ class DashboardController extends Controller
             ['href' => '/stok', 'label' => 'Stok', 'desc' => 'Pantau & catat pergerakan barang'],
             ['href' => '/hutang-piutang', 'label' => 'Hutang & Piutang', 'desc' => 'Kelola kasbon pelanggan & supplier'],
             ['href' => '/laporan', 'label' => 'Laporan', 'desc' => 'Grafik analitik & laporan bulanan'],
+            ['href' => '/konsultasi-ai', 'label' => 'Konsultasi AI', 'desc' => 'Tanya strategi bisnis ke Gemini AI'],
             ['href' => '/profil', 'label' => 'Profil', 'desc' => 'Informasi akun & profil usaha'],
         ];
 
-        $transaksiTerbaru = Transaction::orderByDesc('tanggal')
-            ->orderByDesc('id')
-            ->limit(5)
-            ->get();
+        $transaksiTerbaru = $transactions->take(5)->values();
 
         return view('dashboard', compact(
             'currentPage',

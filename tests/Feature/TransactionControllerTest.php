@@ -15,7 +15,7 @@ class TransactionControllerTest extends TestCase
     public function test_authenticated_user_can_manage_transactions(): void
     {
         $user = User::factory()->create();
-        $product = Product::factory()->create(['nama' => 'Sabun Herbal']);
+        $product = Product::factory()->for($user)->create(['nama' => 'Sabun Herbal']);
 
         $storeResponse = $this->actingAs($user)->post('/transaksi', [
             'action' => 'tambah',

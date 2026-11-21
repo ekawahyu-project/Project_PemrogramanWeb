@@ -158,10 +158,10 @@
             if (newMain && currentMain) {
                 if (doc.title) document.title = doc.title;
 
-                currentMain.style.transition = 'opacity 0.12s ease, transform 0.12s ease';
+                currentMain.style.transition = 'opacity 0.05s ease, transform 0.05s ease';
                 currentMain.style.opacity = '0';
-                currentMain.style.transform = 'translateY(-6px)';
-                await new Promise(r => setTimeout(r, 120));
+                currentMain.style.transform = 'translateY(-4px)';
+                await new Promise(r => setTimeout(r, 45));
 
                 currentMain.innerHTML = newMain.innerHTML;
 

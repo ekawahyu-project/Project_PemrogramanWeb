@@ -3,6 +3,7 @@
 .env
 .env.backup
 .env.production
+.env.local
 .phpactor.json
 .phpunit.result.cache
 /.codex
@@ -10,6 +11,7 @@
 /.idea
 /.nova
 /.phpunit.cache
+/.vercel
 /.vscode
 /.zed
 /auth.json

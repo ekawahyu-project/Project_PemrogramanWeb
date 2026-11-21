@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Product;
 use App\Models\StockLog;
+use App\Models\User;
 use DomainException;
 use Illuminate\Support\Facades\DB;
 
@@ -14,10 +15,13 @@ class StockMovementService
      *
      * @throws DomainException
      */
-    public function record(int $productId, string $jenis, int $jumlah, string $tanggal, string $keterangan): StockLog
+    public function record(User $user, int $productId, string $jenis, int $jumlah, string $tanggal, string $keterangan): StockLog
     {
-        return DB::transaction(function () use ($productId, $jenis, $jumlah, $tanggal, $keterangan): StockLog {
-            $product = Product::where('id', $productId)->lockForUpdate()->first();
+        return DB::transaction(function () use ($user, $productId, $jenis, $jumlah, $tanggal, $keterangan): StockLog {
+            $product = Product::where('id', $productId)
+                ->where('user_id', $user->id)
+                ->lockForUpdate()
+                ->first();
 
             if (! $product) {
                 throw new DomainException('Produk tidak ditemukan.');
@@ -33,6 +37,7 @@ class StockMovementService
             $product->save();
 
             return StockLog::create([
+                'user_id' => $user->id,
                 'product_id' => $product->id,
                 'tanggal' => $tanggal,
                 'jenis' => $jenis,
@@ -47,10 +52,17 @@ class StockMovementService
      *
      * @throws DomainException
      */
-    public function update(StockLog $stockLog, int $productId, string $jenis, int $jumlah, string $tanggal, string $keterangan): StockLog
+    public function update(User $user, StockLog $stockLog, int $productId, string $jenis, int $jumlah, string $tanggal, string $keterangan): StockLog
     {
-        return DB::transaction(function () use ($stockLog, $productId, $jenis, $jumlah, $tanggal, $keterangan): StockLog {
-            $oldProduct = Product::where('id', $stockLog->product_id)->lockForUpdate()->first();
+        return DB::transaction(function () use ($user, $stockLog, $productId, $jenis, $jumlah, $tanggal, $keterangan): StockLog {
+            if ((int) $stockLog->user_id !== (int) $user->id) {
+                throw new DomainException('Data mutasi tidak ditemukan.');
+            }
+
+            $oldProduct = Product::where('id', $stockLog->product_id)
+                ->where('user_id', $user->id)
+                ->lockForUpdate()
+                ->first();
 
             if ($oldProduct) {
                 $oldProduct->stok = $stockLog->isIncoming()
@@ -61,7 +73,10 @@ class StockMovementService
 
             $targetProduct = $productId === $stockLog->product_id && $oldProduct
                 ? $oldProduct
-                : Product::where('id', $productId)->lockForUpdate()->first();
+                : Product::where('id', $productId)
+                    ->where('user_id', $user->id)
+                    ->lockForUpdate()
+                    ->first();
 
             if (! $targetProduct) {
                 throw new DomainException('Produk tidak ditemukan.');
@@ -91,10 +106,17 @@ class StockMovementService
     /**
      * Hapus log mutasi stok dan kembalikan perubahan stok produk.
      */
-    public function reverseAndDelete(StockLog $stockLog): void
+    public function reverseAndDelete(User $user, StockLog $stockLog): void
     {
-        DB::transaction(function () use ($stockLog): void {
-            $product = Product::where('id', $stockLog->product_id)->lockForUpdate()->first();
+        if ((int) $stockLog->user_id !== (int) $user->id) {
+            return;
+        }
+
+        DB::transaction(function () use ($user, $stockLog): void {
+            $product = Product::where('id', $stockLog->product_id)
+                ->where('user_id', $user->id)
+                ->lockForUpdate()
+                ->first();
 
             if ($product) {
                 $product->stok = $stockLog->isIncoming()

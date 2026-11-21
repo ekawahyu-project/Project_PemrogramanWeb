@@ -376,6 +376,6 @@
     }
 
     window.reinitPageAnimations = function () {
-        setTimeout(bootAll, 40);
+        requestAnimationFrame(bootAll);
     };
 })();
