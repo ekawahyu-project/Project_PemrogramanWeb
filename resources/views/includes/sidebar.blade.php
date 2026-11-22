@@ -84,7 +84,6 @@
                     <p class="text-sm font-semibold text-white truncate">{{ auth()->user()?->nama ?? 'Administrator' }}</p>
                     <p class="font-mono text-xs text-[#9AA68E] truncate">{{ '@' . (auth()->user()?->username ?? 'admin') }}</p>
                 </div>
-                <span class="shrink-0 rounded-full bg-[#C4FF0D]/15 px-2.5 py-0.5 font-mono text-xs font-semibold text-[#C4FF0D]">PRO</span>
             </div>
 
             <form method="POST" action="/logout" data-spa-ignore="true">
