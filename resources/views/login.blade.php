@@ -69,27 +69,23 @@
         <div class="hero-watermark" data-parallax="0.16" data-parallax-axis="x" aria-hidden="true">ALPETBIZZ</div>
 
         <div class="relative z-10 flex-1 flex items-center px-5 sm:px-8 py-6 sm:py-8">
-            <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+            <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 xl:gap-10 items-center">
 
                 <!-- Left: Balanced 3-Line Editorial Typography & Instant Entry -->
-                <div class="lg:col-span-6 space-y-5">
-                    <p class="anim-hero-1 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.22em] text-[#9AA68E]">
-                        00 &mdash; Operasional &amp; Finansial UMKM
-                    </p>
-
-                    <h1 class="anim-hero-2 font-extrabold tracking-[-0.035em] leading-[1.08] text-white"
-                        style="font-size: clamp(2.15rem, 3.75vw, 3.65rem);">
-                        Kendalikan Kas,<br>
-                        Stok, dan <span class="text-[#C4FF0D]">Laba</span><br>
-                        Tanpa Ribet.
+                <div class="lg:col-span-7 space-y-6">
+                    <h1 class="anim-hero-1 font-extrabold tracking-[-0.035em] leading-[1.06] text-white"
+                        style="font-size: clamp(2.25rem, 4.5vw, 4.35rem);">
+                        <span class="block sm:whitespace-nowrap">Kendalikan Kas,</span>
+                        <span class="block sm:whitespace-nowrap">Stok, dan <span class="text-[#C4FF0D]">Laba</span></span>
+                        <span class="block sm:whitespace-nowrap">Tanpa Ribet.</span>
                     </h1>
 
-                    <p class="anim-hero-3 text-sm sm:text-[15px] max-w-[490px] leading-[1.7] text-[#9AA68E]">
+                    <p class="anim-hero-2 text-sm sm:text-base max-w-[520px] leading-[1.72] text-[#9AA68E]">
                         Ruang kerja privat untuk toko kelontong dan UMKM: pencatatan transaksi harian, mutasi stok atomik, buku kasbon, hingga konsultan bisnis berbasis data nyata.
                     </p>
 
                     <!-- Direct Login / Quick Start Input -->
-                    <div class="anim-hero-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 max-w-[460px] pt-1">
+                    <div class="anim-hero-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 max-w-[490px] pt-1">
                         <input
                             id="hero-quick-email"
                             type="text"
@@ -117,8 +113,8 @@
                 </div>
 
                 <!-- Right: Custom 3D Dark Matte & Acid-Lime Editorial Sculpture (Parallax + 3D Mouse Tilt) -->
-                <div class="lg:col-span-6 hero-stage flex items-center justify-center">
-                    <div class="hero-3d-wrap relative w-full max-w-[460px] lg:max-w-[520px] mx-auto" data-parallax="-0.1">
+                <div class="lg:col-span-5 hero-stage flex items-center justify-center">
+                    <div class="hero-3d-wrap relative w-full max-w-[400px] sm:max-w-[440px] lg:max-w-[490px] mx-auto" data-parallax="-0.1">
                         <div class="hero-3d-aura" aria-hidden="true"></div>
                         <div class="hero-3d-float">
                             <div id="hero-3d-figure" class="hero-3d-figure">
@@ -140,7 +136,7 @@
         <!-- Bottom Minimal Scroll Hint -->
         <div class="relative z-10 px-5 sm:px-8 pb-7 max-w-7xl w-full mx-auto flex items-center justify-between text-[11px] uppercase tracking-[0.18em] text-white/40">
             <span>Scroll untuk jelajahi</span>
-            <a href="#produk" class="text-white/55 hover:text-[#C4FF0D] transition no-underline">01 / Produk &darr;</a>
+            <a href="#produk" class="text-white/55 hover:text-[#C4FF0D] transition no-underline">Produk &darr;</a>
         </div>
     </section>
 </div>
@@ -181,8 +177,7 @@
             <!-- Editorial Intro Header -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-end mb-14 sm:mb-16" data-reveal="up">
                 <div class="lg:col-span-7">
-                    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-[#C4FF0D]">01 &mdash; Empat Pilar Operasional</p>
-                    <h2 class="mt-3 text-3xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] leading-[1.08] text-white">
+                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] leading-[1.08] text-white">
                         Dirancang untuk ritme nyata<br class="hidden sm:inline"> toko harian Anda.
                     </h2>
                 </div>
@@ -198,7 +193,6 @@
                 <article class="overlap-slab overlap-slab-dark p-6 sm:p-10 lg:p-12" style="--stack-idx: 0;">
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
                         <div class="lg:col-span-5 space-y-5">
-                            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-[#C4FF0D]">01 / Arus Kas &amp; Laba</p>
                             <h3 class="text-2xl sm:text-3xl lg:text-[34px] font-bold tracking-[-0.03em] leading-[1.12] text-white">
                                 Setiap rupiah masuk dan keluar langsung terukur labanya.
                             </h3>
@@ -255,7 +249,6 @@
                 <article class="overlap-slab overlap-slab-deep p-6 sm:p-10 lg:p-12" style="--stack-idx: 1;">
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
                         <div class="lg:col-span-5 space-y-5">
-                            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-[#C4FF0D]">02 / Inventaris &amp; Mutasi Stok</p>
                             <h3 class="text-2xl sm:text-3xl lg:text-[34px] font-bold tracking-[-0.03em] leading-[1.12] text-white">
                                 Stok gudang dikunci atomik. Anti minus, anti selisih.
                             </h3>
@@ -303,7 +296,6 @@
                 <article class="overlap-slab overlap-slab-lime p-6 sm:p-10 lg:p-12" style="--stack-idx: 2;">
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
                         <div class="lg:col-span-5 space-y-5">
-                            <p class="text-xs font-bold uppercase tracking-[0.22em] opacity-70">03 / Buku Kasbon &amp; Hutang</p>
                             <h3 class="text-2xl sm:text-3xl lg:text-[34px] font-extrabold tracking-[-0.03em] leading-[1.1] text-[#0E1605]">
                                 Catat kasbon pelanggan tanpa lagi lupa jatuh tempo.
                             </h3>
@@ -351,7 +343,6 @@
                 <article id="alpetbizz-ai" class="overlap-slab overlap-slab-ai p-6 sm:p-10 lg:p-12" style="--stack-idx: 3;">
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
                         <div class="lg:col-span-5 space-y-5">
-                            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-[#C4FF0D]">04 / AlpetBizz Gemini AI</p>
                             <h3 class="text-2xl sm:text-3xl lg:text-[34px] font-bold tracking-[-0.03em] leading-[1.12] text-white">
                                 Konsultan bisnis AI yang membaca data tokomu langsung.
                             </h3>
@@ -362,19 +353,19 @@
                             <div class="space-y-2.5 pt-1">
                                 <button type="button" data-ai-demo="laba" aria-pressed="true" class="ai-switch-btn active">
                                     <div class="flex items-center justify-between gap-2 text-xs sm:text-sm font-semibold text-white">
-                                        <span>01. Evaluasi Laba &amp; Margin</span>
+                                        <span>Evaluasi Laba &amp; Margin</span>
                                         <span class="text-[#C4FF0D]">&rarr;</span>
                                     </div>
                                 </button>
                                 <button type="button" data-ai-demo="restock" aria-pressed="false" class="ai-switch-btn">
                                     <div class="flex items-center justify-between gap-2 text-xs sm:text-sm font-semibold text-white">
-                                        <span>02. Prioritas Restock Gudang</span>
+                                        <span>Prioritas Restock Gudang</span>
                                         <span class="text-[#C4FF0D]">&rarr;</span>
                                     </div>
                                 </button>
                                 <button type="button" data-ai-demo="kasbon" aria-pressed="false" class="ai-switch-btn">
                                     <div class="flex items-center justify-between gap-2 text-xs sm:text-sm font-semibold text-white">
-                                        <span>03. Strategi Penagihan Kasbon</span>
+                                        <span>Strategi Penagihan Kasbon</span>
                                         <span class="text-[#C4FF0D]">&rarr;</span>
                                     </div>
                                 </button>
@@ -432,7 +423,6 @@
         <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
 
             <div class="lg:col-span-5 lg:sticky lg:top-28 space-y-4" data-reveal="left">
-                <p class="text-xs font-semibold uppercase tracking-[0.22em] text-[#C4FF0D]">02 &mdash; Standar Rekayasa &amp; Keamanan</p>
                 <h2 class="text-3xl sm:text-4xl font-bold tracking-[-0.03em] leading-[1.1] text-white">
                     Cepat di jaringan lokal, ketat di lapisan data.
                 </h2>
@@ -445,25 +435,21 @@
                 @php
                     $specs = [
                         [
-                            'no' => '01',
                             'metric' => '100% Privat',
                             'title' => 'Isolasi Multi-Tenant Anti-IDOR',
                             'desc' => 'Seluruh tabel produk, mutasi stok, transaksi, kasbon, laporan, dan percakapan AI terikat pada user_id pemilik. Akun lain tidak dapat membaca atau memodifikasi data tokomu.',
                         ],
                         [
-                            'no' => '02',
                             'metric' => '< 300ms',
                             'title' => 'Server Region Singapura (sin1) & Query Terkonsolidasi',
                             'desc' => 'Serverless PHP dan database Neon PostgreSQL berada di satu region Singapura dengan indeks komposit dan konsolidasi query (Dashboard hanya 3 query).',
                         ],
                         [
-                            'no' => '03',
                             'metric' => '0 CVE',
                             'title' => 'Proteksi Produksi Berlapis',
                             'desc' => 'Dilengkapi rate limiting login & kuota AI, logout khusus POST ber-CSRF, hashing Bcrypt, HSTS, X-Frame-Options DENY, serta audit dependensi bersih tanpa celah.',
                         ],
                         [
-                            'no' => '04',
                             'metric' => '36 Tests',
                             'title' => 'Navigasi SPA Halus & Teruji Otomatis',
                             'desc' => 'Pindah antar halaman berlangsung instan tanpa reload penuh, dilengkapi konfirmasi SweetAlert2 dan 36 automated feature tests PHPUnit.',
@@ -473,8 +459,7 @@
 
                 @foreach ($specs as $sp)
                 <div class="spec-row grid grid-cols-1 sm:grid-cols-12 gap-3 sm:gap-6 items-start" data-velocity-skew>
-                    <div class="sm:col-span-3 flex sm:flex-col justify-between gap-1">
-                        <span class="text-xs font-mono text-[#8E9882]">{{ $sp['no'] }}</span>
+                    <div class="sm:col-span-3 pt-0.5">
                         <span class="text-lg sm:text-xl font-extrabold text-[#C4FF0D] tabular-nums">{{ $sp['metric'] }}</span>
                     </div>
                     <div class="sm:col-span-9">
@@ -494,8 +479,7 @@
     <section id="faq" class="px-5 sm:px-8 py-20 sm:py-24 border-t border-white/[0.08]">
         <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
             <div class="lg:col-span-4" data-reveal="up">
-                <p class="text-xs font-semibold uppercase tracking-[0.22em] text-[#C4FF0D]">03 &mdash; Tanya Jawab</p>
-                <h2 class="mt-3 text-3xl font-bold tracking-[-0.03em] text-white">Hal yang sering ditanyakan.</h2>
+                <h2 class="text-3xl font-bold tracking-[-0.03em] text-white">Hal yang sering ditanyakan.</h2>
             </div>
 
             <div class="lg:col-span-8" data-reveal="up" data-reveal-delay="80">
@@ -545,8 +529,7 @@
     <section class="px-5 sm:px-8 py-20 sm:py-24 border-t border-white/[0.08] bg-gradient-to-b from-[#0c1108] to-[#070a05]">
         <div class="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-end justify-between gap-8" data-reveal="up">
             <div class="max-w-2xl">
-                <p class="text-xs font-semibold uppercase tracking-[0.22em] text-[#C4FF0D]">Mulai Hari Ini</p>
-                <h2 class="mt-3 font-extrabold tracking-[-0.04em] leading-[1.02] text-white"
+                <h2 class="font-extrabold tracking-[-0.04em] leading-[1.02] text-white"
                     style="font-size: clamp(2.1rem, 4.8vw, 3.9rem);">
                     Rapikan kas &amp; stok tokomu dalam satu menit.
                 </h2>
