@@ -58,7 +58,7 @@
                 <div class="xl:col-span-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 gap-4">
 
                     <!-- 1. DIGITAL MERCHANT PASS TILE -->
-                    <section class="bento-tile justify-between relative overflow-hidden">
+                    <section class="bento-tile justify-between relative !overflow-hidden">
                         <div class="pointer-events-none absolute -top-12 -right-12 w-36 h-36 rounded-full bg-[#C4FF0D]/15 blur-2xl"></div>
 
                         <div>
@@ -349,7 +349,7 @@
                             <label for="password_konfirmasi" class="sr-only">Kata sandi</label>
                             <input type="password" id="password_konfirmasi" name="password_konfirmasi" required
                                    autocomplete="current-password" placeholder="Kata sandi Anda"
-                                   class="{{ $inputClass }} sm:w-56">
+                                   class="{{ $inputClass }} w-full sm:w-56">
                             <button type="submit"
                                     class="shrink-0 px-5 py-2.5 rounded-xl text-sm font-semibold bg-rose-500/15 text-rose-300 border border-rose-500/40 hover:bg-rose-500 hover:text-white transition">
                                 Hapus Akun Permanen

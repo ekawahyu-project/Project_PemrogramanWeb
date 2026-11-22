@@ -245,7 +245,7 @@
                 @php
                     $isCreateOld = old('action') !== 'update';
                 @endphp
-                <section id="form-hutang" class="bento-tile xl:col-span-4 justify-between">
+                <section id="form-hutang" class="bento-tile xl:col-span-4 xl:sticky xl:top-6 justify-between">
                     <div>
                         <header class="mb-5 flex items-center justify-between gap-2">
                             <h3 class="text-base font-bold text-white flex items-center gap-2">
@@ -256,11 +256,11 @@
                             </span>
                         </header>
 
-                        <form method="POST" action="/hutang-piutang" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 items-end">
+                        <form method="POST" action="/hutang-piutang" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2 gap-3.5 items-end">
                             @csrf
                             <input type="hidden" name="action" value="tambah">
 
-                            <div class="sm:col-span-2">
+                            <div class="sm:col-span-2 xl:col-span-1 2xl:col-span-2">
                                 <label class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Jenis Catatan</label>
                                 <select name="jenis" class="{{ $inputClass }}">
                                     <option value="Piutang" {{ ($isCreateOld ? old('jenis', 'Piutang') : 'Piutang') === 'Piutang' ? 'selected' : '' }}>Piutang Pelanggan (Kasbon)</option>
@@ -312,7 +312,7 @@
                                     class="{{ $inputClass }}">
                             </div>
 
-                            <div class="sm:col-span-2">
+                            <div class="sm:col-span-2 xl:col-span-1 2xl:col-span-2">
                                 <label class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Keterangan Barang / Nota</label>
                                 <input type="text" name="keterangan" maxlength="255"
                                     placeholder="Contoh: Kasbon 10 pack Kopi Arabika"
@@ -320,7 +320,7 @@
                                     class="{{ $inputClass }}">
                             </div>
 
-                            <div class="sm:col-span-2 pt-2 flex flex-col gap-2.5">
+                            <div class="sm:col-span-2 xl:col-span-1 2xl:col-span-2 pt-2 flex flex-col gap-2.5">
                                 <button type="submit" class="w-full btn-lime">
                                     + Simpan Catatan
                                 </button>
@@ -330,19 +330,19 @@
                 </section>
 
                 <!-- 5. INTERACTIVE LEDGER TABLE TILE (8/12 on desktop) -->
-                <section class="bento-tile xl:col-span-8 !p-0 overflow-hidden justify-between">
+                <section class="bento-tile xl:col-span-8 !p-0 !overflow-hidden justify-between">
                     <div>
-                        <header class="p-5 sm:p-6 border-b border-white/[0.08] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div>
+                        <header class="p-5 sm:p-6 border-b border-white/[0.08] flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                            <div class="min-w-0">
                                 <h3 class="text-base sm:text-lg font-bold text-white">Daftar Kasbon Pelanggan &amp; Hutang Supplier</h3>
                                 <p class="text-xs sm:text-sm text-[#9AA68E] mt-0.5">Pantau progres cicilan, jatuh tempo, atau klik Edit untuk mencatat pembayaran.</p>
                             </div>
-                            <div class="flex flex-wrap items-center gap-3">
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2.5 w-full lg:w-auto">
                                 <input type="text"
                                        data-bento-search="debt-table-body"
                                        placeholder="Cari nama / keterangan..."
-                                       class="px-4 py-2 rounded-full bg-[#181F11] border border-white/12 text-xs sm:text-sm text-white placeholder:text-[#9AA68E]/60 outline-none w-full sm:w-56">
-                                <div class="bento-pills" data-bento-filter-group="debt-table-body" role="radiogroup" aria-label="Filter Jenis">
+                                       class="px-4 py-2 rounded-full bg-[#181F11] border border-white/12 text-xs sm:text-sm text-white placeholder:text-[#9AA68E]/60 outline-none w-full sm:flex-1 lg:w-52">
+                                <div class="bento-pills self-start sm:self-auto" data-bento-filter-group="debt-table-body" role="radiogroup" aria-label="Filter Jenis">
                                     <button type="button" data-filter-val="all" class="bento-pill active">Semua</button>
                                     <button type="button" data-filter-val="Piutang" class="bento-pill">Piutang</button>
                                     <button type="button" data-filter-val="Hutang" class="bento-pill">Hutang</button>
@@ -458,7 +458,7 @@
                         @endif
                     </div>
 
-                    <div class="px-6 py-4 border-t border-white/[0.06] bg-[#151B0F] flex items-center justify-between text-xs text-[#9AA68E]">
+                    <div class="px-5 sm:px-6 py-4 border-t border-white/[0.06] bg-[#151B0F] flex flex-wrap items-center justify-between gap-2 text-xs text-[#9AA68E]">
                         <span>Total {{ $debtList->count() }} catatan kasbon &amp; hutang</span>
                         <span class="text-[#C4FF0D] font-medium">Receivable &amp; Payable Ledger</span>
                     </div>

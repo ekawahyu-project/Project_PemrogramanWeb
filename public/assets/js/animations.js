@@ -1,11 +1,17 @@
 /**
- * animations.js — Web3Bento Interactive Widgets, Custom Dropdowns & Micro-Interactions
+ * animations.js — Web3Bento Interactive Widgets, Scroll Reveals, Spotlight Sheen & Micro-Interactions
  */
 
 (function () {
     'use strict';
 
-    // 1. Custom Bento Dropdown Enhancer (Replaces ugly OS native select popup)
+    const prefersReducedMotion = () =>
+        window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let activeTileObserver = null;
+    let activeRowObserver = null;
+
+    // 1. Custom Bento Dropdown Enhancer (Replaces OS native select popup)
     function initCustomSelects() {
         document.querySelectorAll('select:not([data-bento-select-ready]):not(.swal2-select)').forEach(selectEl => {
             selectEl.setAttribute('data-bento-select-ready', 'true');
@@ -77,14 +83,12 @@
                 }
             });
 
-            // Sync if value is updated programmatically (e.g. opening Edit modal)
             selectEl.addEventListener('bento:sync', function () {
                 const curOpt = selectEl.options[selectEl.selectedIndex];
                 labelSpan.textContent = curOpt ? curOpt.textContent : 'Pilih...';
                 buildOptions();
             });
 
-            // Sync if form is reset
             const parentForm = selectEl.closest('form');
             if (parentForm) {
                 parentForm.addEventListener('reset', function () {
@@ -170,7 +174,7 @@
         renderStack();
     }
 
-    // 3. Web3Bento Semicircle Gauge
+    // 3. Web3Bento Semicircle Gauge (Animated Entry Sweep)
     function initBentoGauge() {
         const gaugeRoot = document.getElementById('bento-gauge-tile');
         if (!gaugeRoot) return;
@@ -182,9 +186,9 @@
         const pillBtns = gaugeRoot.querySelectorAll('[data-gauge-tier]');
         const len = Math.PI * 62;
 
-        function updateGauge(mult) {
-            const val = Math.max(5, Math.min(100, baseScore * mult));
-            const t = val / 100;
+        function setGaugeVisual(val) {
+            const clamped = Math.max(0, Math.min(100, val));
+            const t = clamped / 100;
             const angle = -90 + t * 180;
             if (arcEl) {
                 arcEl.style.strokeDasharray = String(len);
@@ -194,8 +198,13 @@
                 needleEl.style.transform = `rotate(${angle.toFixed(1)}deg)`;
             }
             if (valueEl) {
-                valueEl.textContent = val.toFixed(1);
+                valueEl.textContent = clamped.toFixed(1);
             }
+        }
+
+        function updateGauge(mult) {
+            const val = Math.max(5, Math.min(100, baseScore * mult));
+            setGaugeVisual(val);
         }
 
         pillBtns.forEach(btn => {
@@ -208,10 +217,17 @@
             });
         });
 
-        updateGauge(1);
+        if (prefersReducedMotion()) {
+            updateGauge(1);
+        } else {
+            setGaugeVisual(0);
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => updateGauge(1));
+            });
+        }
     }
 
-    // 4. Web3Bento PnL Bar Strip Hover Readout
+    // 4. Web3Bento PnL Bar Strip Hover Readout + Wave Rise
     function initPnLStrip() {
         const strip = document.getElementById('bento-pnl-strip');
         const readout = document.getElementById('bento-pnl-readout');
@@ -220,7 +236,11 @@
         const defaultLabel = readout.dataset.default || 'Arus Kas Harian';
         const bars = strip.querySelectorAll('[data-pnl-label]');
 
-        bars.forEach(bar => {
+        bars.forEach((bar, idx) => {
+            if (!prefersReducedMotion()) {
+                bar.style.setProperty('--bar-delay', `${idx * 18}ms`);
+                bar.classList.add('pnl-bar-rise');
+            }
             bar.addEventListener('pointerenter', function () {
                 readout.textContent = this.dataset.pnlLabel || defaultLabel;
                 bars.forEach(b => { b.style.opacity = b === this ? '1' : '0.25'; });
@@ -359,6 +379,255 @@
         });
     }
 
+    // 8. Staggered Scroll-Reveal for Bento Tiles (Clears transform post-reveal to preserve stacking contexts)
+    function initScrollReveal() {
+        if (activeTileObserver) {
+            activeTileObserver.disconnect();
+            activeTileObserver = null;
+        }
+        if (prefersReducedMotion() || !('IntersectionObserver' in window)) return;
+
+        const main = document.querySelector('main');
+        if (!main) return;
+
+        const tiles = Array.from(main.querySelectorAll('.bento-tile, .bento-tile-accent')).filter(el => {
+            // Skip tiles inside fixed/modal overlays or explicitly marked data-no-reveal (e.g. sticky AI chat workspace)
+            return !el.hasAttribute('data-no-reveal') && !el.closest('[data-bento-portal-modal]') && !el.closest('.fixed');
+        });
+
+        if (!tiles.length) return;
+
+        function cleanupTile(el) {
+            el.classList.remove('bento-reveal', 'bento-revealed');
+            el.style.removeProperty('--stagger-delay');
+        }
+
+        function revealTile(el, delayMs) {
+            el.style.setProperty('--stagger-delay', `${delayMs}ms`);
+            requestAnimationFrame(() => {
+                el.classList.add('bento-revealed');
+            });
+            setTimeout(() => cleanupTile(el), delayMs + 650);
+        }
+
+        let initialIdx = 0;
+        const viewH = window.innerHeight || 900;
+
+        activeTileObserver = new IntersectionObserver((entries) => {
+            let batchIdx = 0;
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                const el = entry.target;
+                activeTileObserver.unobserve(el);
+                revealTile(el, Math.min(batchIdx * 65, 320));
+                batchIdx++;
+            });
+        }, { threshold: 0.01, rootMargin: '0px 0px -12px 0px' });
+
+        tiles.forEach(tile => {
+            const rect = tile.getBoundingClientRect();
+            tile.classList.add('bento-reveal');
+
+            if (rect.top < viewH * 0.96) {
+                revealTile(tile, Math.min(initialIdx * 55, 360));
+                initialIdx++;
+            } else {
+                activeTileObserver.observe(tile);
+            }
+        });
+    }
+
+    // 9. Staggered Table Row Cascade
+    function initTableRowReveal() {
+        if (activeRowObserver) {
+            activeRowObserver.disconnect();
+            activeRowObserver = null;
+        }
+        if (prefersReducedMotion() || !('IntersectionObserver' in window)) return;
+
+        const main = document.querySelector('main');
+        if (!main) return;
+
+        const tables = Array.from(main.querySelectorAll('.bento-table'));
+        if (!tables.length) return;
+
+        activeRowObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                const table = entry.target;
+                activeRowObserver.unobserve(table);
+
+                const rows = Array.from(table.querySelectorAll('tbody tr')).slice(0, 14);
+                rows.forEach((row, idx) => {
+                    row.style.setProperty('--row-delay', `${idx * 30}ms`);
+                    row.classList.add('bento-row-reveal');
+                    requestAnimationFrame(() => {
+                        row.classList.add('bento-row-shown');
+                    });
+                    setTimeout(() => {
+                        row.classList.remove('bento-row-reveal', 'bento-row-shown');
+                        row.style.removeProperty('--row-delay');
+                    }, idx * 30 + 420);
+                });
+            });
+        }, { threshold: 0.05 });
+
+        tables.forEach(t => activeRowObserver.observe(t));
+    }
+
+    // 10. Smooth KPI Currency & Metric Count-Up
+    function initKpiCountUp() {
+        if (prefersReducedMotion()) return;
+
+        const main = document.querySelector('main');
+        if (!main) return;
+
+        const candidates = Array.from(main.querySelectorAll('.bento-tile .tabular-nums, .bento-tile-accent .tabular-nums'));
+
+        candidates.forEach(el => {
+            if (el.children.length > 0 || el.dataset.kpiAnimated === 'true') return;
+            if (el.closest('table') || el.closest('form') || el.id === 'bento-gauge-value') return;
+
+            const raw = el.textContent.trim();
+            // Match Rp formatted numbers like "Rp 1.995.000", "+Rp 765.000", "-Rp 50.000"
+            const rpMatch = raw.match(/^([+\-−]?)\s*Rp\s+([\d.]+)$/);
+            if (!rpMatch) return;
+
+            const sign = rpMatch[1] || '';
+            const target = parseInt(rpMatch[2].replace(/\./g, ''), 10);
+            if (!Number.isFinite(target) || target <= 0) return;
+
+            el.dataset.kpiAnimated = 'true';
+            const duration = 640;
+            const start = performance.now();
+
+            function tick(now) {
+                const progress = Math.min(1, (now - start) / duration);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const val = Math.round(target * eased);
+                el.textContent = `${sign}Rp ${val.toLocaleString('id-ID')}`;
+                if (progress < 1) {
+                    requestAnimationFrame(tick);
+                } else {
+                    el.textContent = raw;
+                }
+            }
+
+            requestAnimationFrame(tick);
+        });
+    }
+
+    // 11. Cursor-Tracking Spotlight Sheen (Single lightweight delegated listener)
+    let spotlightBound = false;
+    function initBentoSpotlight() {
+        if (spotlightBound || prefersReducedMotion()) return;
+        spotlightBound = true;
+
+        let rafId = null;
+        let lastEvent = null;
+
+        document.addEventListener('pointermove', function (e) {
+            lastEvent = e;
+            if (rafId) return;
+            rafId = requestAnimationFrame(() => {
+                rafId = null;
+                if (!lastEvent) return;
+                const tile = lastEvent.target && lastEvent.target.closest ? lastEvent.target.closest('.bento-tile') : null;
+                if (!tile) return;
+                const r = tile.getBoundingClientRect();
+                tile.style.setProperty('--spot-x', `${(lastEvent.clientX - r.left).toFixed(0)}px`);
+                tile.style.setProperty('--spot-y', `${(lastEvent.clientY - r.top).toFixed(0)}px`);
+            });
+        }, { passive: true });
+    }
+
+    // 12. Global Scroll Helpers: App Scroll Progress Bar, Velocity Scroll Inertia & Floating Scroll-to-Top
+    let scrollHelpersBound = false;
+    function initScrollHelpers() {
+        if (scrollHelpersBound) return;
+        scrollHelpersBound = true;
+
+        const bar = document.createElement('div');
+        bar.id = 'app-scroll-progress';
+        bar.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(bar);
+
+        const topBtn = document.createElement('button');
+        topBtn.id = 'bento-scroll-top';
+        topBtn.type = 'button';
+        topBtn.setAttribute('aria-label', 'Kembali ke atas');
+        topBtn.title = 'Kembali ke atas';
+        topBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M5 15l7-7 7 7"/></svg>';
+        topBtn.addEventListener('click', function () {
+            window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+        });
+        document.body.appendChild(topBtn);
+
+        let lastY = window.scrollY || 0;
+        let smoothVel = 0;
+        let rafActive = false;
+
+        function velocityLoop() {
+            const scrollY = window.scrollY || window.pageYOffset || 0;
+            const maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 0);
+
+            if (maxScroll > 120 && scrollY > 24) {
+                bar.style.opacity = '1';
+                bar.style.width = `${Math.min(100, (scrollY / maxScroll) * 100).toFixed(2)}%`;
+            } else {
+                bar.style.opacity = '0';
+                bar.style.width = '0%';
+            }
+
+            topBtn.classList.toggle('visible', scrollY > 360);
+
+            // Subtle scroll-velocity physics on workspace header & non-sticky, non-form tiles
+            if (!prefersReducedMotion()) {
+                const rawVel = scrollY - lastY;
+                lastY = scrollY;
+                smoothVel += (rawVel - smoothVel) * 0.18;
+
+                const headerNav = document.querySelector('main nav[aria-label]');
+                if (headerNav) {
+                    const hdrShift = Math.min(18, scrollY * 0.08);
+                    headerNav.style.transform = hdrShift > 0.2 ? `translate3d(0, ${hdrShift.toFixed(1)}px, 0)` : '';
+                }
+
+                const skew = Math.max(-1.1, Math.min(1.1, smoothVel * 0.032));
+                const main = document.querySelector('main');
+                if (main) {
+                    const tiles = main.querySelectorAll('.bento-tile:not([data-no-reveal]):not(.bento-reveal), .bento-tile-accent:not(.bento-reveal)');
+                    tiles.forEach(t => {
+                        if (t.classList.contains('xl:sticky') || t.querySelector('form')) return;
+                        if (Math.abs(skew) < 0.04) {
+                            if (t.style.transform && t.style.transform.includes('skewY')) {
+                                t.style.transform = '';
+                            }
+                        } else {
+                            t.style.transform = `skewY(${skew.toFixed(2)}deg)`;
+                        }
+                    });
+                }
+
+                if (Math.abs(smoothVel) > 0.06 || Math.abs(rawVel) > 0.06) {
+                    requestAnimationFrame(velocityLoop);
+                    return;
+                }
+            }
+
+            rafActive = false;
+        }
+
+        window.addEventListener('scroll', function () {
+            if (!rafActive) {
+                rafActive = true;
+                requestAnimationFrame(velocityLoop);
+            }
+        }, { passive: true });
+
+        velocityLoop();
+    }
+
     function bootAll() {
         initCustomSelects();
         initBentoCardStack();
@@ -367,6 +636,11 @@
         initAllocationHover();
         initBentoChart();
         initBentoFilters();
+        initScrollReveal();
+        initTableRowReveal();
+        initKpiCountUp();
+        initBentoSpotlight();
+        initScrollHelpers();
     }
 
     if (document.readyState === 'loading') {

@@ -240,8 +240,8 @@
                  ══════════════════════════════════════════════════════════ -->
             <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
 
-                <!-- 4. PRODUCT COMPOSER TILE (4/12 on desktop, full width on mobile/tablet) -->
-                <section id="form-produk" class="bento-tile xl:col-span-4 justify-between {{ $editPrd ? 'border-[#C4FF0D]/60 ring-1 ring-[#C4FF0D]/25' : '' }}">
+                <!-- 4. PRODUCT COMPOSER TILE (4/12 sticky on desktop, full width on mobile/tablet) -->
+                <section id="form-produk" class="bento-tile xl:col-span-4 xl:sticky xl:top-6 justify-between {{ $editPrd ? 'border-[#C4FF0D]/60 ring-1 ring-[#C4FF0D]/25' : '' }}">
                     <div>
                         <header class="mb-5 flex items-center justify-between gap-2">
                             <h3 class="text-base font-bold text-white flex items-center gap-2">
@@ -265,7 +265,7 @@
                                     value="{{ old('nama', $editPrd?->nama ?? '') }}" class="{{ $inputClass }}">
                             </div>
 
-                            <div>
+                            <div class="sm:col-span-2 xl:col-span-2 2xl:col-span-1">
                                 <label class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Kategori</label>
                                 <select name="kategori" class="{{ $inputClass }}">
                                     @foreach ($kategoriOpt as $k)
@@ -273,7 +273,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div>
+                            <div class="sm:col-span-2 xl:col-span-2 2xl:col-span-1">
                                 <label class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Satuan</label>
                                 <select name="satuan" class="{{ $inputClass }}">
                                     @foreach ($satuanOpt as $s)
@@ -317,19 +317,19 @@
                 </section>
 
                 <!-- 5. INTERACTIVE CATALOG TABLE TILE (8/12 on desktop) -->
-                <section class="bento-tile xl:col-span-8 !p-0 overflow-hidden justify-between">
+                <section class="bento-tile xl:col-span-8 !p-0 !overflow-hidden justify-between">
                     <div>
-                        <header class="p-5 sm:p-6 border-b border-white/[0.08] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div>
+                        <header class="p-5 sm:p-6 border-b border-white/[0.08] flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                            <div class="min-w-0">
                                 <h3 class="text-base sm:text-lg font-bold text-white">Daftar Katalog Produk ({{ $produkList->count() }})</h3>
                                 <p class="text-xs sm:text-sm text-[#9AA68E] mt-0.5">Filter produk berdasarkan status ketersediaan atau cari nama produk.</p>
                             </div>
-                            <div class="flex flex-wrap items-center gap-3">
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2.5 w-full lg:w-auto">
                                 <input type="text"
                                        data-bento-search="produk-table-body"
                                        placeholder="Cari produk / kategori..."
-                                       class="px-4 py-2 rounded-full bg-[#181F11] border border-white/12 text-xs sm:text-sm text-white placeholder:text-[#9AA68E]/60 outline-none w-full sm:w-56">
-                                <div class="bento-pills" data-bento-filter-group="produk-table-body" role="radiogroup" aria-label="Filter Status Produk">
+                                       class="px-4 py-2 rounded-full bg-[#181F11] border border-white/12 text-xs sm:text-sm text-white placeholder:text-[#9AA68E]/60 outline-none w-full sm:flex-1 lg:w-52">
+                                <div class="bento-pills self-start sm:self-auto" data-bento-filter-group="produk-table-body" role="radiogroup" aria-label="Filter Status Produk">
                                     <button type="button" data-filter-val="all" class="bento-pill active">Semua</button>
                                     <button type="button" data-filter-val="Normal" class="bento-pill">Normal</button>
                                     <button type="button" data-filter-val="Menipis" class="bento-pill">Menipis</button>
@@ -418,7 +418,7 @@
                         @endif
                     </div>
 
-                    <div class="px-6 py-4 border-t border-white/[0.06] bg-[#151B0F] flex items-center justify-between text-xs text-[#9AA68E]">
+                    <div class="px-5 sm:px-6 py-4 border-t border-white/[0.06] bg-[#151B0F] flex flex-wrap items-center justify-between gap-2 text-xs text-[#9AA68E]">
                         <span>Total {{ $totalSku }} produk dalam database</span>
                         <span class="text-[#C4FF0D] font-medium">Inventory Live</span>
                     </div>

@@ -128,7 +128,7 @@
                 </section>
 
                 <!-- 2. VAULT CARDS TILE: Valuasi Aset Gudang -->
-                <section class="bento-tile overflow-hidden xl:col-start-3 xl:row-start-1" data-card-glare-zone>
+                <section class="bento-tile !overflow-hidden xl:col-start-3 xl:row-start-1" data-card-glare-zone>
                     <header class="mb-3 flex items-center justify-between gap-3">
                         <h3 class="text-sm font-semibold text-[#9AA68E]">
                             Aset Gudang <sup class="text-xs text-[#C4FF0D]">3</sup>
@@ -214,14 +214,14 @@
                         <div class="relative z-10 flex shrink-0 items-end justify-between gap-3 px-5 pb-4 pt-3"
                              style="height: 90px; background: rgba(18, 23, 13, 0.82); backdrop-filter: blur(16px); border-top: 1px solid rgba(255,255,255,0.08);">
                             <div class="min-w-0">
-                                <p id="bento-card-front-last4" class="truncate text-sm font-semibold tabular-nums tracking-[0.04em] text-white">
+                                <p id="bento-card-front-last4" class="truncate text-xs font-semibold tabular-nums tracking-[0.03em] text-white">
                                     •••• •••• •••• 6902
                                 </p>
-                                <p id="bento-card-front-holder" class="mt-1 truncate text-xs text-[#9AA68E]">
+                                <p id="bento-card-front-holder" class="mt-1 truncate text-[11px] text-[#9AA68E]">
                                     Nilai Jual Inventaris · {{ $totalUnitStok ?? 0 }} unit
                                 </p>
                             </div>
-                            <p id="bento-card-front-balance" class="shrink-0 text-base font-bold tabular-nums text-[#C4FF0D]">
+                            <p id="bento-card-front-balance" class="shrink-0 text-sm sm:text-base font-bold tabular-nums text-[#C4FF0D]">
                                 {{ $fmtNilaiJual }}
                             </p>
                         </div>
@@ -314,7 +314,7 @@
                                 {{ $outFormatted }}
                             </p>
                         </div>
-                        <span class="ml-auto rounded-full bg-[#C4FF0D]/15 px-3 py-1 text-xs font-semibold tabular-nums text-[#C4FF0D]">
+                        <span class="hidden sm:inline-flex ml-auto rounded-full bg-[#C4FF0D]/15 px-3 py-1 text-xs font-semibold tabular-nums text-[#C4FF0D]">
                             Hover titik kurva
                         </span>
                     </div>
@@ -501,11 +501,12 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         @foreach ($shortcuts as $s)
+                        @php $isFeaturedShortcut = $s['href'] === '/konsultasi-ai'; @endphp
                         <a href="{{ $s['href'] }}"
-                           class="group rounded-2xl bg-[#181F11] border border-white/[0.07] hover:border-[#C4FF0D]/45 p-4 transition flex flex-col justify-between">
+                           class="group rounded-2xl border p-4 transition flex flex-col justify-between {{ $isFeaturedShortcut ? 'sm:col-span-2 lg:col-span-3 bg-[#C4FF0D]/[0.08] border-[#C4FF0D]/30 hover:border-[#C4FF0D]/60' : 'bg-[#181F11] border-white/[0.07] hover:border-[#C4FF0D]/45' }}">
                             <div class="flex items-center justify-between gap-2">
-                                <span class="font-semibold text-sm text-white group-hover:text-[#C4FF0D] transition">{{ $s['label'] }}</span>
-                                <span class="text-sm text-[#9AA68E] group-hover:text-[#C4FF0D] group-hover:translate-x-0.5 transition-transform">→</span>
+                                <span class="font-semibold text-sm {{ $isFeaturedShortcut ? 'text-[#C4FF0D]' : 'text-white group-hover:text-[#C4FF0D]' }} transition">{{ $s['label'] }}</span>
+                                <span class="text-sm {{ $isFeaturedShortcut ? 'text-[#C4FF0D]' : 'text-[#9AA68E] group-hover:text-[#C4FF0D]' }} group-hover:translate-x-0.5 transition-transform">→</span>
                             </div>
                             <p class="text-xs text-[#9AA68E] mt-1.5 leading-relaxed">{{ $s['desc'] }}</p>
                         </a>
@@ -539,12 +540,12 @@
                                         {{ $t->tanggal->format('d M Y') }} · {{ $t->jenis }}
                                     </p>
                                 </div>
-                                <div class="text-right">
-                                    <p class="text-sm font-bold tabular-nums {{ $t->isIncome() ? 'text-[#C4FF0D]' : 'text-[#C084FC]' }}">
+                                <div class="text-right shrink-0">
+                                    <p class="text-xs sm:text-sm font-bold tabular-nums whitespace-nowrap {{ $t->isIncome() ? 'text-[#C4FF0D]' : 'text-[#C084FC]' }}">
                                         {{ ($t->isIncome() ? '+' : '-') . 'Rp ' . number_format($t->jumlah, 0, ',', '.') }}
                                     </p>
-                                    <p class="mt-0.5 text-xs font-medium text-[#9AA68E]">
-                                        confirmed
+                                    <p class="mt-0.5 text-[11px] font-medium text-[#9AA68E]">
+                                        tercatat
                                     </p>
                                 </div>
                             </li>

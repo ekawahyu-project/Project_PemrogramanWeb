@@ -117,8 +117,8 @@ class DashboardController extends Controller
             ['href' => '/stok', 'label' => 'Stok', 'desc' => 'Pantau & catat pergerakan barang'],
             ['href' => '/hutang-piutang', 'label' => 'Hutang & Piutang', 'desc' => 'Kelola kasbon pelanggan & supplier'],
             ['href' => '/laporan', 'label' => 'Laporan', 'desc' => 'Grafik analitik & laporan bulanan'],
-            ['href' => '/konsultasi-ai', 'label' => 'Konsultasi AI', 'desc' => 'Tanya strategi bisnis ke Gemini AI'],
             ['href' => '/profil', 'label' => 'Profil', 'desc' => 'Informasi akun & profil usaha'],
+            ['href' => '/konsultasi-ai', 'label' => 'Konsultasi AI Bisnis', 'desc' => 'Tanya strategi bisnis, stok, dan arus kas langsung ke Gemini AI berbasis data toko Anda'],
         ];
 
         $transaksiTerbaru = $transactions->take(5)->values();

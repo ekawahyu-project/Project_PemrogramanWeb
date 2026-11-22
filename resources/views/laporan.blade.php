@@ -64,30 +64,30 @@
 
                     <!-- 3 KPI Summary Sub-Cards -->
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-                        <div class="rounded-2xl bg-[#181F11] border border-white/[0.07] p-4">
+                        <div class="rounded-2xl bg-[#181F11] border border-white/[0.07] p-4 min-w-0">
                             <p class="text-xs font-medium text-[#9AA68E] flex items-center gap-2">
-                                <span class="size-2.5 rounded-full bg-[#C4FF0D]"></span>
+                                <span class="size-2.5 rounded-full bg-[#C4FF0D] shrink-0"></span>
                                 Total Pemasukan
                             </p>
-                            <p class="text-xl sm:text-2xl font-bold text-[#C4FF0D] mt-1.5">Rp {{ number_format($totalMasuk, 0, ',', '.') }}</p>
+                            <p class="text-lg sm:text-xl xl:text-2xl font-bold tabular-nums text-[#C4FF0D] mt-1.5 truncate">Rp {{ number_format($totalMasuk, 0, ',', '.') }}</p>
                             <p class="text-xs text-[#9AA68E]/85 mt-1">{{ $pemasukanCount }} transaksi tercatat</p>
                         </div>
 
-                        <div class="rounded-2xl bg-[#181F11] border border-white/[0.07] p-4">
+                        <div class="rounded-2xl bg-[#181F11] border border-white/[0.07] p-4 min-w-0">
                             <p class="text-xs font-medium text-[#9AA68E] flex items-center gap-2">
-                                <span class="size-2.5 rounded-full bg-[#C084FC]"></span>
+                                <span class="size-2.5 rounded-full bg-[#C084FC] shrink-0"></span>
                                 Total Pengeluaran
                             </p>
-                            <p class="text-xl sm:text-2xl font-bold text-[#C084FC] mt-1.5">Rp {{ number_format($totalKeluar, 0, ',', '.') }}</p>
+                            <p class="text-lg sm:text-xl xl:text-2xl font-bold tabular-nums text-[#C084FC] mt-1.5 truncate">Rp {{ number_format($totalKeluar, 0, ',', '.') }}</p>
                             <p class="text-xs text-[#9AA68E]/85 mt-1">{{ $pengeluaranCount }} transaksi tercatat</p>
                         </div>
 
-                        <div class="rounded-2xl bg-[#181F11] border border-white/[0.07] p-4">
+                        <div class="rounded-2xl bg-[#181F11] border border-white/[0.07] p-4 min-w-0">
                             <p class="text-xs font-medium text-[#9AA68E] flex items-center gap-2">
-                                <span class="size-2.5 rounded-full bg-sky-400"></span>
+                                <span class="size-2.5 rounded-full bg-sky-400 shrink-0"></span>
                                 Laba Bersih
                             </p>
-                            <p class="text-xl sm:text-2xl font-bold text-white mt-1.5">Rp {{ number_format(abs($totalLaba), 0, ',', '.') }}</p>
+                            <p class="text-lg sm:text-xl xl:text-2xl font-bold tabular-nums text-white mt-1.5 truncate">Rp {{ number_format(abs($totalLaba), 0, ',', '.') }}</p>
                             <p class="text-xs text-[#C4FF0D] mt-1">{{ $totalLaba >= 0 ? 'Status: Surplus (Untung)' : 'Status: Defisit (Rugi)' }}</p>
                         </div>
                     </div>
@@ -156,8 +156,8 @@
                  ══════════════════════════════════════════════════════════ -->
             <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
 
-                <!-- 3. REPORT COMPOSER TILE (4/12 on desktop, full width on mobile/tablet) -->
-                <section id="form-laporan" class="bento-tile xl:col-span-4 justify-between {{ $editLap ? 'border-[#C4FF0D]/60 ring-1 ring-[#C4FF0D]/25' : '' }}">
+                <!-- 3. REPORT COMPOSER TILE (4/12 sticky on desktop, full width on mobile/tablet) -->
+                <section id="form-laporan" class="bento-tile xl:col-span-4 xl:sticky xl:top-6 justify-between {{ $editLap ? 'border-[#C4FF0D]/60 ring-1 ring-[#C4FF0D]/25' : '' }}">
                     <div>
                         <header class="mb-5 flex items-center justify-between gap-2">
                             <h3 class="text-base font-bold text-white flex items-center gap-2">
@@ -168,21 +168,21 @@
                             </span>
                         </header>
 
-                        <form method="POST" action="/laporan" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <form method="POST" action="/laporan" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2 gap-3.5">
                             @csrf
                             <input type="hidden" name="action" value="{{ $editLap ? 'update' : 'simpan' }}">
                             @if ($editLap)
                             <input type="hidden" name="id" value="{{ $editLap->id }}">
                             @endif
 
-                            <div class="sm:col-span-2">
+                            <div class="sm:col-span-2 xl:col-span-1 2xl:col-span-2">
                                 <label class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Judul Laporan</label>
                                 <input type="text" name="judul" required placeholder="Contoh: Laporan Q3 2026"
                                     value="{{ $editLap?->judul ?? '' }}"
                                     class="{{ $inputClass }}">
                             </div>
 
-                            <div class="sm:col-span-2">
+                            <div class="sm:col-span-2 xl:col-span-1 2xl:col-span-2">
                                 <label class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Kategori Laporan</label>
                                 <select name="kategori" class="{{ $inputClass }}">
                                     @foreach ($kategoriOptions as $kat)
@@ -204,7 +204,7 @@
                                     class="{{ $inputClass }}">
                             </div>
 
-                            <div class="sm:col-span-2">
+                            <div class="sm:col-span-2 xl:col-span-1 2xl:col-span-2">
                                 <label class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Status Laporan</label>
                                 <select name="status" class="{{ $inputClass }}">
                                     @foreach ($statusOptions as $stOpt)
@@ -213,14 +213,14 @@
                                 </select>
                             </div>
 
-                            <div class="sm:col-span-2">
+                            <div class="sm:col-span-2 xl:col-span-1 2xl:col-span-2">
                                 <label class="block text-xs sm:text-sm font-medium text-[#9AA68E] mb-1.5">Catatan Evaluasi</label>
                                 <input type="text" name="catatan" placeholder="Catatan singkat evaluasi"
                                     value="{{ $editLap?->catatan ?? '' }}"
                                     class="{{ $inputClass }}">
                             </div>
 
-                            <div class="sm:col-span-2 pt-2 flex flex-col gap-2.5">
+                            <div class="sm:col-span-2 xl:col-span-1 2xl:col-span-2 pt-2 flex flex-col gap-2.5">
                                 <button type="submit" class="w-full btn-lime">
                                     {{ $editLap ? 'Simpan Perubahan' : 'Simpan Laporan Ini' }}
                                 </button>
@@ -233,19 +233,19 @@
                 </section>
 
                 <!-- 4. SAVED REPORTS ARCHIVE TABLE TILE (8/12 on desktop) -->
-                <section class="bento-tile xl:col-span-8 !p-0 overflow-hidden justify-between">
+                <section class="bento-tile xl:col-span-8 !p-0 !overflow-hidden justify-between">
                     <div>
-                        <header class="p-5 sm:p-6 border-b border-white/[0.08] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div>
+                        <header class="p-5 sm:p-6 border-b border-white/[0.08] flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                            <div class="min-w-0">
                                 <h3 class="text-base sm:text-lg font-bold text-white">Daftar Laporan Tersimpan</h3>
                                 <p class="text-xs sm:text-sm text-[#9AA68E] mt-0.5">Arsip evaluasi periode beserta status peninjauan.</p>
                             </div>
-                            <div class="flex flex-wrap items-center gap-3">
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2.5 w-full lg:w-auto">
                                 <input type="text"
                                        data-bento-search="laporan-table-body"
                                        placeholder="Cari judul / catatan..."
-                                       class="px-4 py-2 rounded-full bg-[#181F11] border border-white/12 text-xs sm:text-sm text-white placeholder:text-[#9AA68E]/60 outline-none w-full sm:w-56">
-                                <div class="bento-pills" data-bento-filter-group="laporan-table-body" role="radiogroup" aria-label="Filter Status Laporan">
+                                       class="px-4 py-2 rounded-full bg-[#181F11] border border-white/12 text-xs sm:text-sm text-white placeholder:text-[#9AA68E]/60 outline-none w-full sm:flex-1 lg:w-48">
+                                <div class="bento-pills self-start sm:self-auto" data-bento-filter-group="laporan-table-body" role="radiogroup" aria-label="Filter Status Laporan">
                                     <button type="button" data-filter-val="all" class="bento-pill active">Semua</button>
                                     <button type="button" data-filter-val="Selesai" class="bento-pill">Selesai</button>
                                     <button type="button" data-filter-val="Dalam Tinjauan" class="bento-pill">Tinjauan</button>
@@ -321,7 +321,7 @@
                         @endif
                     </div>
 
-                    <div class="px-6 py-4 border-t border-white/[0.06] bg-[#151B0F] flex items-center justify-between text-xs text-[#9AA68E]">
+                    <div class="px-5 sm:px-6 py-4 border-t border-white/[0.06] bg-[#151B0F] flex flex-wrap items-center justify-between gap-2 text-xs text-[#9AA68E]">
                         <span>Total {{ $laporanTersimpan->count() }} arsip laporan periode</span>
                         <span class="text-[#C4FF0D] font-medium">Audit Ready</span>
                     </div>

@@ -1,5 +1,5 @@
 /**
- * animations.css — Vaultory × Web3Bento Design System for AlpetBizz Laravel
+ * animations.css — Vaultory × Web3Bento Design System & Motion Language for AlpetBizz
  */
 
 :root {
@@ -8,7 +8,7 @@
     --bg-elevated: #181f11;
     --bg-muted: #1e2615;
     --border-subtle: rgba(255, 255, 255, 0.09);
-    --border-hover: rgba(196, 255, 13, 0.32);
+    --border-hover: rgba(196, 255, 13, 0.34);
     --accent: #c4ff0d;
     --accent-ink: #152208;
     --accent-2: #c084fc;
@@ -18,6 +18,10 @@
     color-scheme: dark;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 html, body {
     background-color: var(--bg-canvas);
     color: var(--text-main);
@@ -25,6 +29,7 @@ html, body {
     font-size: 16px;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
 }
 
 .font-sans, .font-mono {
@@ -41,12 +46,80 @@ html, body {
 body.bento-body {
     background-color: var(--bg-canvas);
     background-image:
-        radial-gradient(circle at 18% 12%, rgba(196, 255, 13, 0.06) 0%, transparent 45%),
-        radial-gradient(circle at 85% 80%, rgba(192, 132, 252, 0.04) 0%, transparent 45%);
+        radial-gradient(circle at 18% 12%, rgba(196, 255, 13, 0.065) 0%, transparent 45%),
+        radial-gradient(circle at 85% 80%, rgba(192, 132, 252, 0.045) 0%, transparent 45%);
     background-attachment: fixed;
 }
 
-/* Web3Bento Tile Shell */
+/* ── App Scroll Reading Bar & Floating Scroll-to-Top ─ */
+#app-scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    width: 0%;
+    z-index: 9990;
+    background: linear-gradient(90deg, rgba(139, 195, 74, 0.8), #C4FF0D);
+    box-shadow: 0 0 10px rgba(196, 255, 13, 0.55);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s ease, width 0.08s linear;
+}
+
+#bento-scroll-top {
+    position: fixed;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    z-index: 70;
+    width: 42px;
+    height: 42px;
+    border-radius: 9999px;
+    border: 1px solid rgba(196, 255, 13, 0.35);
+    background: rgba(18, 23, 13, 0.9);
+    color: #C4FF0D;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.75), 0 0 20px -6px rgba(196, 255, 13, 0.25);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(14px) scale(0.9);
+    transition: opacity 0.28s var(--ease-bento), transform 0.28s var(--ease-bento), visibility 0.28s, background-color 0.2s ease, color 0.2s ease;
+}
+
+#bento-scroll-top.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+#bento-scroll-top:hover {
+    background: #C4FF0D;
+    color: #111906;
+    transform: translateY(-2px) scale(1.04);
+}
+
+/* ── Sidebar Navigation Micro-Interactions ─────────── */
+#app-sidebar nav a {
+    position: relative;
+    transition: background-color 0.24s var(--ease-bento), color 0.2s ease, transform 0.24s var(--ease-bento), box-shadow 0.28s var(--ease-bento);
+}
+
+#app-sidebar nav a:hover {
+    transform: translateX(3px);
+}
+
+#app-sidebar nav a svg {
+    transition: transform 0.25s var(--ease-bento);
+}
+
+#app-sidebar nav a:hover svg {
+    transform: scale(1.12);
+}
+
+/* ── Web3Bento Tile Shell + Interactive Cursor Spotlight ─ */
 .bento-tile {
     position: relative;
     display: flex;
@@ -58,7 +131,27 @@ body.bento-body {
     background-color: var(--bg-card);
     padding: 1.35rem;
     color: var(--text-main);
-    transition: border-color 0.25s var(--ease-bento), transform 0.25s var(--ease-bento), box-shadow 0.25s var(--ease-bento);
+    transition: border-color 0.28s var(--ease-bento), transform 0.28s var(--ease-bento), box-shadow 0.3s var(--ease-bento);
+}
+
+.bento-tile::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(380px circle at var(--spot-x, 50%) var(--spot-y, 0%), rgba(196, 255, 13, 0.08), transparent 58%);
+    opacity: 0;
+    transition: opacity 0.32s ease;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.bento-tile:hover {
+    border-color: rgba(196, 255, 13, 0.22);
+}
+
+.bento-tile:hover::before {
+    opacity: 1;
 }
 
 @media (min-width: 640px) {
@@ -72,8 +165,8 @@ body.bento-body {
 
 .bento-tile-interactive:hover {
     border-color: var(--border-hover);
-    transform: translateY(-2px);
-    box-shadow: 0 16px 40px -16px rgba(0, 0, 0, 0.65), 0 0 24px -8px rgba(196, 255, 13, 0.12);
+    transform: translateY(-3px);
+    box-shadow: 0 18px 44px -16px rgba(0, 0, 0, 0.72), 0 0 28px -8px rgba(196, 255, 13, 0.16);
 }
 
 /* Solid Lime Accent Tile */
@@ -87,6 +180,12 @@ body.bento-body {
     background-color: var(--accent);
     padding: 1.35rem;
     color: var(--accent-ink);
+    transition: transform 0.28s var(--ease-bento), box-shadow 0.3s var(--ease-bento);
+}
+
+.bento-tile-accent:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 44px -16px rgba(196, 255, 13, 0.38);
 }
 
 @media (min-width: 640px) {
@@ -95,31 +194,95 @@ body.bento-body {
     }
 }
 
+/* ── Scroll Reveal & Staggered Bento Entrance ──────── */
+.bento-reveal {
+    opacity: 0;
+    transform: translateY(20px) scale(0.986);
+    transition: opacity 0.56s var(--ease-bento) var(--stagger-delay, 0ms),
+                transform 0.56s var(--ease-bento) var(--stagger-delay, 0ms);
+}
+
+.bento-reveal.bento-revealed {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* Staggered Table Rows */
+.bento-row-reveal {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.36s var(--ease-bento) var(--row-delay, 0ms),
+                transform 0.36s var(--ease-bento) var(--row-delay, 0ms),
+                background-color 0.15s ease;
+}
+
+.bento-row-reveal.bento-row-shown {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Dashboard PnL Bar Wave & Gauge Sweep */
+.pnl-bar-rise {
+    transform-origin: bottom;
+    animation: orbit-pop 0.55s var(--ease-bento) var(--bar-delay, 0ms) both;
+}
+
+#bento-gauge-arc {
+    transition: stroke-dashoffset 0.9s var(--ease-bento);
+}
+
+#bento-gauge-needle {
+    transition: transform 0.9s var(--ease-bento);
+}
+
+/* ── SPA Progress Shimmer & View Transitions ───────── */
+@keyframes spaShimmer {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+}
+
+#spa-progress-bar {
+    background: linear-gradient(90deg, #8BC34A 0%, #C4FF0D 45%, #f0ffb0 55%, #C4FF0D 75%, #8BC34A 100%) !important;
+    background-size: 200% 100% !important;
+    animation: spaShimmer 1.2s linear infinite;
+}
+
 /* Web3Bento Pill Switcher */
 .bento-pills {
     display: inline-flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    max-width: 100%;
+    overflow-x: auto;
     border-radius: 9999px;
     border: 1px solid var(--border-subtle);
     background: rgba(255, 255, 255, 0.03);
     padding: 3px;
     gap: 2px;
+    scrollbar-width: none;
+}
+.bento-pills::-webkit-scrollbar {
+    display: none;
 }
 
 .bento-pill {
     border-radius: 9999px;
-    padding: 0.35rem 0.85rem;
+    padding: 0.3rem 0.68rem;
     font-family: 'Poppins', ui-sans-serif, system-ui, sans-serif;
-    font-size: 0.78rem;
+    font-size: 0.74rem;
     font-weight: 500;
     color: var(--text-muted);
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition: background-color 0.22s ease, color 0.22s ease, transform 0.18s var(--ease-bento);
     cursor: pointer;
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .bento-pill:hover {
     color: var(--text-main);
+}
+
+.bento-pill:active {
+    transform: scale(0.96);
 }
 
 .bento-pill.active {
@@ -130,6 +293,8 @@ body.bento-body {
 
 /* Buttons */
 .btn-lime {
+    position: relative;
+    overflow: hidden;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -140,18 +305,39 @@ body.bento-body {
     font-weight: 600;
     font-size: 0.925rem;
     padding: 0.75rem 1.35rem;
-    transition: transform 0.18s var(--ease-bento), box-shadow 0.18s var(--ease-bento), filter 0.18s ease;
+    transition: transform 0.2s var(--ease-bento), box-shadow 0.22s var(--ease-bento), filter 0.18s ease;
     cursor: pointer;
+}
+
+.btn-lime::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 36%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+    transform: translateX(-140%) skewX(-18deg);
+    pointer-events: none;
 }
 
 .btn-lime:hover {
     filter: brightness(1.05);
-    box-shadow: 0 8px 24px -6px rgba(196, 255, 13, 0.35);
-    transform: translateY(-1px);
+    box-shadow: 0 10px 28px -6px rgba(196, 255, 13, 0.42);
+    transform: translateY(-2px);
+}
+
+.btn-lime:hover::after {
+    animation: btnSheen 0.65s ease;
+}
+
+@keyframes btnSheen {
+    0% { transform: translateX(-140%) skewX(-18deg); }
+    100% { transform: translateX(260%) skewX(-18deg); }
 }
 
 .btn-lime:active {
-    transform: scale(0.98);
+    transform: scale(0.97);
 }
 
 .btn-ghost-dark {
@@ -166,7 +352,7 @@ body.bento-body {
     font-weight: 500;
     font-size: 0.925rem;
     padding: 0.75rem 1.35rem;
-    transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+    transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease, transform 0.18s var(--ease-bento);
     cursor: pointer;
 }
 
@@ -174,6 +360,11 @@ body.bento-body {
     border-color: rgba(255, 255, 255, 0.22);
     color: var(--text-main);
     background-color: var(--bg-muted);
+    transform: translateY(-1px);
+}
+
+.btn-ghost-dark:active {
+    transform: scale(0.98);
 }
 
 /* Tables inside Bento Tiles */
@@ -207,7 +398,7 @@ body.bento-body {
 }
 
 .bento-table tbody tr:hover {
-    background-color: rgba(255, 255, 255, 0.035);
+    background-color: rgba(196, 255, 13, 0.035);
 }
 
 .bento-table td {
@@ -333,8 +524,8 @@ body.bento-body {
 }
 
 @keyframes orbit-pop {
-    0% { transform: scaleY(0); }
-    100% { transform: scaleY(1); }
+    0% { transform: scaleY(0); opacity: 0.25; }
+    100% { transform: scaleY(1); opacity: 1; }
 }
 
 @keyframes bentoTargetPulse {
@@ -394,4 +585,22 @@ textarea:focus {
 }
 ::-webkit-scrollbar-thumb:hover {
     background: #384728;
+}
+
+/* Reduced Motion Accessibility */
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .bento-reveal,
+    .bento-row-reveal,
+    .pnl-bar-rise,
+    main > div {
+        opacity: 1 !important;
+        transform: none !important;
+        animation: none !important;
+        transition: none !important;
+    }
+    #bento-gauge-arc,
+    #bento-gauge-needle {
+        transition: none !important;
+    }
 }

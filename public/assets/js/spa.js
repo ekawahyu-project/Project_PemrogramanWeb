@@ -1,25 +1,35 @@
 /**
- * spa.js — Single Page Application navigation for AlpetBizz (Vaultory × Web3Bento)
+ * spa.js — Fluid Single Page Application Navigation & View Transitions for AlpetBizz (Vaultory × Web3Bento)
  */
 
 (function () {
+    const prefersReducedMotion = () =>
+        window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     const progressBar = document.createElement('div');
     progressBar.id = 'spa-progress-bar';
-    progressBar.style.cssText = 'position:fixed;top:0;left:0;height:3px;width:0%;background:#C4FF0D;box-shadow:0 0 12px rgba(196,255,13,0.6);z-index:9999;transition:width 0.2s ease, opacity 0.3s ease;pointer-events:none;opacity:0;';
+    progressBar.style.cssText = 'position:fixed;top:0;left:0;height:3px;width:0%;background:#C4FF0D;box-shadow:0 0 14px rgba(196,255,13,0.75);z-index:9999;transition:width 0.22s cubic-bezier(0.22,1,0.36,1), opacity 0.28s ease;pointer-events:none;opacity:0;';
     document.body.appendChild(progressBar);
 
+    let progressTimer = null;
     function startProgress() {
+        if (progressTimer) clearTimeout(progressTimer);
         progressBar.style.opacity = '1';
-        progressBar.style.width = '35%';
-        setTimeout(() => { if (progressBar.style.width === '35%') progressBar.style.width = '75%'; }, 150);
+        progressBar.style.width = '38%';
+        progressTimer = setTimeout(() => {
+            if (progressBar.style.opacity === '1') {
+                progressBar.style.width = '78%';
+            }
+        }, 120);
     }
 
     function endProgress() {
+        if (progressTimer) clearTimeout(progressTimer);
         progressBar.style.width = '100%';
         setTimeout(() => {
             progressBar.style.opacity = '0';
-            setTimeout(() => { progressBar.style.width = '0%'; }, 300);
-        }, 150);
+            setTimeout(() => { progressBar.style.width = '0%'; }, 280);
+        }, 140);
     }
 
     function openSidebar() {
@@ -85,6 +95,7 @@
     }
 
     let currentPageKey = window.location.pathname + window.location.search;
+    let activeNavToken = 0;
 
     function getHashTarget(hash) {
         if (!hash || hash === '#') return null;
@@ -107,7 +118,7 @@
         const offset = (mobileHeader && mobileHeader.offsetHeight > 0 ? mobileHeader.offsetHeight : 0) + 20;
         const targetTop = Math.max(0, targetEl.getBoundingClientRect().top + window.scrollY - offset);
 
-        window.scrollTo({ top: targetTop, behavior: 'smooth' });
+        window.scrollTo({ top: targetTop, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
 
         targetEl.classList.remove('bento-target-flash');
         void targetEl.offsetWidth;
@@ -134,14 +145,40 @@
         return true;
     }
 
+    function clearMainTransition(mainEl) {
+        if (!mainEl) return;
+        mainEl.style.opacity = '';
+        mainEl.style.transform = '';
+        mainEl.style.filter = '';
+        mainEl.style.transition = '';
+    }
+
     async function loadPage(url, pushState = true) {
+        const navToken = ++activeNavToken;
+        const currentMain = document.querySelector('main');
+        const reduced = prefersReducedMotion();
+
         startProgress();
         closeSidebar();
+        // Immediate active pill feedback on sidebar
+        updateSidebarActive(url);
+
+        // Start subtle exit lift immediately in parallel with network fetch (zero extra latency!)
+        if (currentMain && !reduced) {
+            currentMain.style.transition = 'opacity 0.16s cubic-bezier(0.22, 1, 0.36, 1), transform 0.16s cubic-bezier(0.22, 1, 0.36, 1), filter 0.16s ease';
+            currentMain.style.opacity = '0.45';
+            currentMain.style.transform = 'translateY(-6px) scale(0.995)';
+            currentMain.style.filter = 'blur(2px)';
+        }
 
         try {
             const res = await fetch(url, {
                 headers: { 'X-Requested-With': 'SPA-Fetch' }
             });
+
+            if (navToken !== activeNavToken) {
+                return;
+            }
 
             if (res.redirected && (res.url.includes('/login') || res.url.includes('login.php'))) {
                 window.location.href = res.url;
@@ -149,36 +186,46 @@
             }
 
             const html = await res.text();
+            if (navToken !== activeNavToken) {
+                return;
+            }
+
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
 
             const newMain = doc.querySelector('main');
-            const currentMain = document.querySelector('main');
 
             if (newMain && currentMain) {
                 if (doc.title) document.title = doc.title;
 
-                currentMain.style.transition = 'opacity 0.05s ease, transform 0.05s ease';
-                currentMain.style.opacity = '0';
-                currentMain.style.transform = 'translateY(-4px)';
-                await new Promise(r => setTimeout(r, 45));
-
-                currentMain.innerHTML = newMain.innerHTML;
-
-                currentMain.style.opacity = '0';
-                currentMain.style.transform = 'translateY(10px)';
-                void currentMain.offsetHeight;
-                currentMain.style.transition = 'opacity 0.28s cubic-bezier(0.22, 1, 0.36, 1), transform 0.28s cubic-bezier(0.22, 1, 0.36, 1)';
-                currentMain.style.opacity = '1';
-                currentMain.style.transform = 'translateY(0)';
-                setTimeout(() => {
-                    currentMain.style.transform = '';
-                    currentMain.style.transition = '';
-                }, 300);
-
                 // Bersihkan modal portaled dari halaman sebelumnya jika ada
                 document.querySelectorAll('body > [data-bento-portal-modal]').forEach(el => el.remove());
                 document.body.classList.remove('overflow-hidden');
+
+                // Swap DOM content
+                currentMain.innerHTML = newMain.innerHTML;
+
+                // Fluid enter choreography (clear all inline styles post-animation to protect fixed/absolute children)
+                if (!reduced) {
+                    currentMain.style.transition = 'none';
+                    currentMain.style.opacity = '0';
+                    currentMain.style.transform = 'translateY(14px) scale(0.994)';
+                    currentMain.style.filter = 'blur(3px)';
+                    void currentMain.offsetHeight;
+
+                    currentMain.style.transition = 'opacity 0.34s cubic-bezier(0.22, 1, 0.36, 1), transform 0.34s cubic-bezier(0.22, 1, 0.36, 1), filter 0.3s ease';
+                    currentMain.style.opacity = '1';
+                    currentMain.style.transform = 'translateY(0) scale(1)';
+                    currentMain.style.filter = 'blur(0px)';
+
+                    setTimeout(() => {
+                        if (navToken === activeNavToken) {
+                            clearMainTransition(currentMain);
+                        }
+                    }, 360);
+                } else {
+                    clearMainTransition(currentMain);
+                }
 
                 const requestedUrlObj = new URL(url, window.location.href);
                 const resolvedUrlObj = res.redirected ? new URL(res.url, window.location.origin) : requestedUrlObj;
@@ -199,18 +246,22 @@
                 }
 
                 if (targetHash && getHashTarget(targetHash)) {
-                    setTimeout(() => scrollToHash(targetHash, true), 80);
+                    setTimeout(() => scrollToHash(targetHash, true), 90);
                 } else {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
                 }
             } else {
+                clearMainTransition(currentMain);
                 window.location.href = url;
             }
         } catch (err) {
+            clearMainTransition(currentMain);
             console.error('SPA load error, fallback to normal navigation:', err);
             window.location.href = url;
         } finally {
-            endProgress();
+            if (navToken === activeNavToken) {
+                endProgress();
+            }
         }
     }
 

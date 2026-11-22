@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AlpetBizz | Masuk & Daftar</title>
+    <title>AlpetBizz — Sistem Arus Kas, Stok &amp; Konsultan AI UMKM</title>
     <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}?v={{ filemtime(public_path('img/logo.png')) }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,179 +22,566 @@
             }
         };
     </script>
-    <link rel="stylesheet" href="{{ asset('assets/css/login.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/login.css') }}?v={{ filemtime(public_path('assets/css/login.css')) }}">
 </head>
 <body class="font-sans antialiased">
 
+<div id="landing-scroll-progress" aria-hidden="true"></div>
+
 <!-- ══════════════════════════════════════════════════════════════
-     VAULTORY HERO SECTION (Adapted for AlpetBizz UMKM Manager)
+     MINIMALIST HAIRLINE STICKY NAVIGATION
      ══════════════════════════════════════════════════════════════ -->
-<section class="vaultory-hero">
-    <!-- Radial Glow Effect -->
-    <div class="vaultory-glow" aria-hidden="true"></div>
+<nav id="landing-nav" class="landing-nav" aria-label="Navigasi Utama">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+        <a href="#hero" class="flex items-center gap-3 text-white no-underline group">
+            <img src="{{ asset('img/logo.png') }}?v={{ filemtime(public_path('img/logo.png')) }}"
+                 alt="Logo AlpetBizz"
+                 class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-contain shrink-0 drop-shadow-[0_0_14px_rgba(196,255,13,0.45)] transition-transform duration-200 group-hover:scale-105">
+            <span class="text-lg sm:text-xl font-bold tracking-tight text-white">AlpetBizz</span>
+        </a>
 
-    <!-- Top Navigation -->
-    <nav class="relative z-40 px-5 sm:px-8 py-5 sm:py-6" aria-label="Navigasi Utama">
-        <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
-            <!-- Logo -->
-            <a href="/login" class="flex items-center gap-3 text-white no-underline group">
-                <img src="{{ asset('img/logo.png') }}?v={{ filemtime(public_path('img/logo.png')) }}"
-                     alt="Logo AlpetBizz"
-                     class="w-10 h-10 rounded-full object-contain shrink-0 drop-shadow-[0_0_16px_rgba(196,255,13,0.5)] transition-transform duration-200 group-hover:scale-105">
-                <span class="text-xl sm:text-2xl font-bold tracking-tight text-white">AlpetBizz</span>
-            </a>
-
-            <!-- Nav Items -->
-            <div class="hidden md:flex items-center gap-8">
-                <button type="button" onclick="openLogin('login')" class="text-white/75 hover:text-white transition-colors text-sm font-medium bg-transparent border-0 cursor-pointer">
-                    Arus Kas
-                </button>
-                <button type="button" onclick="openLogin('login')" class="text-white/75 hover:text-white transition-colors text-sm font-medium bg-transparent border-0 cursor-pointer">
-                    Inventaris &amp; Stok
-                </button>
-                <button type="button" onclick="openLogin('login')" class="text-white/75 hover:text-white transition-colors text-sm font-medium bg-transparent border-0 cursor-pointer">
-                    Analitik Bento
-                </button>
-                <button type="button" onclick="openLogin('register')" class="text-white/75 hover:text-white transition-colors text-sm font-medium bg-transparent border-0 cursor-pointer">
-                    Daftar UMKM
-                </button>
-            </div>
-
-            <!-- Auth Buttons -->
-            <div class="flex items-center gap-3 sm:gap-4">
-                <button type="button" id="nav-login-btn" onclick="openLogin('login')"
-                    class="text-white/85 hover:text-white transition-colors text-sm font-medium bg-transparent border-0 cursor-pointer px-2 py-1.5">
-                    Masuk
-                </button>
-                <button type="button" onclick="openLogin('register')"
-                    class="px-4 sm:px-6 py-2.5 rounded-lg font-semibold text-xs sm:text-sm transition-all hover:scale-105 cursor-pointer border-0"
-                    style="background: #C4FF0D; color: #000000;">
-                    Daftar Akun
-                </button>
-            </div>
+        <div class="hidden md:flex items-center gap-8">
+            <a href="#produk" class="landing-nav-link">Produk</a>
+            <a href="#alpetbizz-ai" class="landing-nav-link">AlpetBizz AI</a>
+            <a href="#keamanan" class="landing-nav-link">Arsitektur</a>
+            <a href="#faq" class="landing-nav-link">FAQ</a>
         </div>
-    </nav>
 
-    <!-- Main Hero 2-Column Content -->
-    <div class="relative z-10 flex-1 flex items-center px-5 sm:px-8 py-8 sm:py-12">
-        <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
+        <div class="flex items-center gap-2 sm:gap-3">
+            <button type="button" id="nav-login-btn" onclick="openLogin('login')"
+                class="text-white/80 hover:text-white transition-colors text-xs sm:text-sm font-medium bg-transparent border-0 cursor-pointer px-3 py-2 rounded-lg hover:bg-white/[0.06]">
+                Masuk
+            </button>
+            <button type="button" onclick="openLogin('register')"
+                class="btn-editorial px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm">
+                Daftar Akun
+            </button>
+        </div>
+    </div>
+</nav>
 
-            <!-- Left Content -->
-            <div class="space-y-6 sm:space-y-8 anim-fade-left">
+<!-- ══════════════════════════════════════════════════════════════
+     ACT I — STICKY PARALLAX CURTAIN HERO
+     ══════════════════════════════════════════════════════════════ -->
+<div id="hero" class="hero-curtain-wrap">
+    <section id="hero-curtain" class="hero-curtain">
+        <div class="hero-hairlines" aria-hidden="true"></div>
+        <div class="hero-watermark" data-parallax="0.16" data-parallax-axis="x" aria-hidden="true">ALPETBIZZ</div>
 
-                <!-- Title -->
-                <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.08] tracking-[-0.03em] text-white">
-                    Masa depan<br>
-                    <span style="color: #C4FF0D;">finansial UMKM.</span>
-                </h1>
+        <div class="relative z-10 flex-1 flex items-center px-5 sm:px-8 py-6 sm:py-8">
+            <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
 
-                <!-- Description -->
-                <p class="text-base sm:text-lg md:text-xl max-w-xl leading-[1.7]" style="color: rgba(255, 255, 255, 0.72);">
-                    Catat transaksi, pantau pergerakan stok real-time, dan kembangkan profit bisnis Anda dalam satu brankas pintar yang responsif di semua perangkat.
-                </p>
+                <!-- Left: Balanced 3-Line Editorial Typography & Instant Entry -->
+                <div class="lg:col-span-6 space-y-5">
+                    <p class="anim-hero-1 text-[11px] sm:text-xs font-semibold uppercase tracking-[0.22em] text-[#9AA68E]">
+                        00 &mdash; Operasional &amp; Finansial UMKM
+                    </p>
 
-                <!-- Email / Username Input & CTA -->
-                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 max-w-md">
-                    <input
-                        id="hero-quick-email"
-                        type="text"
-                        placeholder="Masukkan username atau email..."
-                        aria-label="Username atau email"
-                        class="flex-1 px-4 sm:px-5 py-3.5 rounded-lg text-white placeholder:text-white/40 outline-none text-sm"
-                        style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2);"
-                    >
-                    <button
-                        type="button"
-                        onclick="startFromHeroCta()"
-                        class="px-7 py-3.5 rounded-lg font-semibold text-sm transition-transform hover:scale-105 active:scale-95 cursor-pointer border-0 shrink-0"
-                        style="background: #C4FF0D; color: #000000;"
-                    >
-                        Mulai Sekarang
-                    </button>
+                    <h1 class="anim-hero-2 font-extrabold tracking-[-0.035em] leading-[1.08] text-white"
+                        style="font-size: clamp(2.15rem, 3.75vw, 3.65rem);">
+                        Kendalikan Kas,<br>
+                        Stok, dan <span class="text-[#C4FF0D]">Laba</span><br>
+                        Tanpa Ribet.
+                    </h1>
+
+                    <p class="anim-hero-3 text-sm sm:text-[15px] max-w-[490px] leading-[1.7] text-[#9AA68E]">
+                        Ruang kerja privat untuk toko kelontong dan UMKM: pencatatan transaksi harian, mutasi stok atomik, buku kasbon, hingga konsultan bisnis berbasis data nyata.
+                    </p>
+
+                    <!-- Direct Login / Quick Start Input -->
+                    <div class="anim-hero-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 max-w-[460px] pt-1">
+                        <input
+                            id="hero-quick-email"
+                            type="text"
+                            placeholder="Username atau email usaha..."
+                            aria-label="Username atau email"
+                            class="flex-1 px-4 py-3.5 rounded-xl bg-white/[0.06] border border-white/15 text-white placeholder:text-white/35 outline-none text-sm transition focus:border-[#C4FF0D] focus:bg-white/[0.09]"
+                        >
+                        <button
+                            type="button"
+                            onclick="startFromHeroCta()"
+                            class="btn-editorial px-6 py-3.5 rounded-xl text-sm shrink-0"
+                        >
+                            Mulai Sekarang &rarr;
+                        </button>
+                    </div>
+
+                    <!-- Minimalist Hairline Spec Strip -->
+                    <div class="anim-hero-3 pt-4 border-t border-white/10 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-[#9AA68E]">
+                        <span><strong class="text-white font-semibold">Multi-Tenant</strong> Privat per Akun</span>
+                        <span class="text-white/20">/</span>
+                        <span><strong class="text-white font-semibold">Gemini AI</strong> Baca Data Live</span>
+                        <span class="text-white/20">/</span>
+                        <span><strong class="text-[#C4FF0D] font-semibold">100% Gratis</strong> untuk UMKM</span>
+                    </div>
                 </div>
 
-                <!-- Quick Metrics Strip -->
-                <div class="grid grid-cols-3 gap-4 max-w-md pt-2 border-t border-white/10">
-                    <div>
-                        <p class="font-mono text-lg sm:text-xl font-bold text-white">100%</p>
-                        <p class="text-xs text-white/55">Stok Terlacak</p>
-                    </div>
-                    <div>
-                        <p class="font-mono text-lg sm:text-xl font-bold text-[#C4FF0D]">Real-time</p>
-                        <p class="text-xs text-white/55">Laporan Laba</p>
-                    </div>
-                    <div>
-                        <p class="font-mono text-lg sm:text-xl font-bold text-white">24/7</p>
-                        <p class="text-xs text-white/55">Rekomendasi</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Content: Wallet Bento Card & Floating Coins -->
-            <div class="relative h-[400px] sm:h-[460px] flex items-center justify-center anim-fade-right">
-                <!-- Interactive Vault Preview Card -->
-                <div class="vault-wallet-card" onclick="openLogin('login')" style="cursor: pointer;" title="Klik untuk masuk ke Dashboard">
-                    <div class="flex items-center justify-between mb-5">
-                        <div class="flex items-center gap-2.5">
-                            <img src="{{ asset('img/logo.png') }}?v={{ filemtime(public_path('img/logo.png')) }}"
-                                 alt="Logo AlpetBizz"
-                                 class="w-9 h-9 rounded-full object-contain shrink-0 drop-shadow-[0_0_12px_rgba(196,255,13,0.45)]">
-                            <div>
-                                <p class="text-xs font-semibold text-white">AlpetBizz Vault</p>
-                                <p class="font-mono text-[10px] text-white/50">Kas &amp; Inventaris Aktif</p>
+                <!-- Right: Custom 3D Dark Matte & Acid-Lime Editorial Sculpture (Parallax + 3D Mouse Tilt) -->
+                <div class="lg:col-span-6 hero-stage flex items-center justify-center">
+                    <div class="hero-3d-wrap relative w-full max-w-[460px] lg:max-w-[520px] mx-auto" data-parallax="-0.1">
+                        <div class="hero-3d-aura" aria-hidden="true"></div>
+                        <div class="hero-3d-float">
+                            <div id="hero-3d-figure" class="hero-3d-figure">
+                                <img src="{{ asset('img/hero-3d.webp') }}?v={{ filemtime(public_path('img/hero-3d.webp')) }}"
+                                     alt="Visual 3D analitik keuangan, stok, dan pertumbuhan laba AlpetBizz"
+                                     width="880"
+                                     height="880"
+                                     loading="eager"
+                                     decoding="async"
+                                     class="w-full h-auto block select-none pointer-events-none">
                             </div>
                         </div>
-                        <span class="rounded-full bg-[#C4FF0D]/15 border border-[#C4FF0D]/30 px-2.5 py-0.5 font-mono text-[10px] font-semibold text-[#C4FF0D]">
-                            +28.4%
-                        </span>
-                    </div>
-
-                    <p class="text-[11px] text-white/50 font-medium">Estimasi Laba Bersih</p>
-                    <p class="font-mono text-2xl sm:text-3xl font-bold text-white tracking-tight mt-0.5">Rp 24.850.000</p>
-                    <p class="font-mono text-[11px] text-[#C4FF0D] mt-1">+Rp 5.420.000 bulan ini</p>
-
-                    <!-- Mini PnL Bars inside Hero Card -->
-                    <div class="mt-5 flex items-end gap-1.5 h-16 pt-2">
-                        @foreach ([38, 52, 44, 68, 60, 82, 74, 90, 65, 86, 94, 100] as $idx => $h)
-                        <span class="flex-1 rounded-[3px]"
-                              style="height: {{ $h }}%; background: {{ $idx % 4 === 2 ? '#C084FC' : '#C4FF0D' }}; opacity: {{ 0.4 + ($idx / 20) }};"></span>
-                        @endforeach
-                    </div>
-                    <div class="mt-2 flex justify-between font-mono text-[10px] text-white/45">
-                        <span>30 Hari Lalu</span>
-                        <span class="text-[#C4FF0D]">Arus Kas Positif</span>
-                        <span>Hari Ini</span>
-                    </div>
-
-                    <!-- Mini Activity Pill -->
-                    <div class="mt-5 pt-4 border-t border-white/10 flex items-center justify-between text-xs">
-                        <span class="text-white/70">Status Gudang &amp; Produk</span>
-                        <span class="font-mono text-[#C4FF0D] font-semibold"> Terkendali →</span>
                     </div>
                 </div>
 
-                <!-- Floating Coins (Exact VaultoryHero positions & gradient) -->
-                <div class="vault-coin vault-coin-1" style="width: 74px; height: 74px; left: 4%; top: 8%;">
-                    <span class="font-mono text-xl font-extrabold">Rp</span>
-                </div>
-                <div class="vault-coin vault-coin-2" style="width: 66px; height: 66px; right: 5%; top: 14%;">
-                    <span class="font-mono text-lg font-extrabold">₿</span>
-                </div>
-                <div class="vault-coin vault-coin-3" style="width: 58px; height: 58px; left: 7%; bottom: 10%;">
-                    <span class="font-mono text-lg font-extrabold">◎</span>
-                </div>
-                <div class="vault-coin vault-coin-4" style="width: 62px; height: 62px; right: 7%; bottom: 12%;">
-                    <span class="font-mono text-lg font-extrabold">Ξ</span>
-                </div>
             </div>
+        </div>
 
+        <!-- Bottom Minimal Scroll Hint -->
+        <div class="relative z-10 px-5 sm:px-8 pb-7 max-w-7xl w-full mx-auto flex items-center justify-between text-[11px] uppercase tracking-[0.18em] text-white/40">
+            <span>Scroll untuk jelajahi</span>
+            <a href="#produk" class="text-white/55 hover:text-[#C4FF0D] transition no-underline">01 / Produk &darr;</a>
+        </div>
+    </section>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     ACT II — OVERLAPPING RISING SHEET + VELOCITY KINETIC MARQUEE
+     ══════════════════════════════════════════════════════════════ -->
+<div class="overlapping-sheet">
+
+    <!-- Velocity-Driven Kinetic Typography Ribbon (Accelerates & Reverses with Scroll Velocity!) -->
+    <div class="velocity-marquee-wrap" aria-hidden="true">
+        <div id="velocity-marquee-track" class="velocity-marquee-track">
+            @php
+                $tickerWords = [
+                    ['text' => 'Arus Kas Real-Time', 'outline' => false],
+                    ['text' => 'Mutasi Stok Atomik', 'outline' => true],
+                    ['text' => 'Buku Kasbon & Piutang', 'outline' => false],
+                    ['text' => 'Konsultan Gemini AI', 'outline' => true],
+                    ['text' => 'Grafik Laba Bulanan', 'outline' => false],
+                    ['text' => 'Isolasi Multi-Tenant', 'outline' => true],
+                ];
+            @endphp
+            @foreach ([0, 1] as $loopCopy)
+                @foreach ($tickerWords as $tw)
+                    <span class="velocity-word {{ $tw['outline'] ? 'velocity-word-outline' : '' }}">{{ $tw['text'] }}</span>
+                    <span class="velocity-sep">/</span>
+                @endforeach
+            @endforeach
         </div>
     </div>
 
-    <!-- Bottom Brand / Module Strip -->
-    <div class="relative z-20 pb-6 sm:pb-8 px-6 anim-fade-up">
-    </div>
-</section>
+    <!-- ══════════════════════════════════════════════════════════════
+         ACT III — STICKY OVERLAPPING SCROLL STORY DECK (#produk)
+         ══════════════════════════════════════════════════════════════ -->
+    <section id="produk" class="px-5 sm:px-8 py-20 sm:py-28">
+        <div class="max-w-7xl mx-auto">
+
+            <!-- Editorial Intro Header -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-end mb-14 sm:mb-16" data-reveal="up">
+                <div class="lg:col-span-7">
+                    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-[#C4FF0D]">01 &mdash; Empat Pilar Operasional</p>
+                    <h2 class="mt-3 text-3xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] leading-[1.08] text-white">
+                        Dirancang untuk ritme nyata<br class="hidden sm:inline"> toko harian Anda.
+                    </h2>
+                </div>
+                <p class="lg:col-span-5 text-sm sm:text-base text-[#9AA68E] leading-relaxed">
+                    Setiap modul terhubung ke satu sumber data yang sama. Saat Anda mencatat transaksi, mutasi stok, atau cicilan kasbon, seluruh laporan dan rekomendasi AI ikut bergerak seketika.
+                </p>
+            </div>
+
+            <!-- 4 STICKY OVERLAPPING ARCHITECTURAL SLABS -->
+            <div class="overlap-deck">
+
+                <!-- SLAB 01: ARUS KAS & MARGIN -->
+                <article class="overlap-slab overlap-slab-dark p-6 sm:p-10 lg:p-12" style="--stack-idx: 0;">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                        <div class="lg:col-span-5 space-y-5">
+                            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-[#C4FF0D]">01 / Arus Kas &amp; Laba</p>
+                            <h3 class="text-2xl sm:text-3xl lg:text-[34px] font-bold tracking-[-0.03em] leading-[1.12] text-white">
+                                Setiap rupiah masuk dan keluar langsung terukur labanya.
+                            </h3>
+                            <p class="text-sm text-[#9AA68E] leading-relaxed">
+                                Pisahkan uang modal, biaya operasional, dan penjualan produk dalam satu buku kas digital. Margin keuntungan serta grafik tren bulanan terbentuk otomatis tanpa rumus manual.
+                            </p>
+                            <dl class="pt-4 border-t border-white/10 grid grid-cols-2 gap-4 text-xs">
+                                <div>
+                                    <dt class="text-[#8E9882]">Pencatatan</dt>
+                                    <dd class="mt-1 font-semibold text-white">Tautan langsung ke SKU</dd>
+                                </div>
+                                <div>
+                                    <dt class="text-[#8E9882]">Analitik</dt>
+                                    <dd class="mt-1 font-semibold text-[#C4FF0D]">Grafik Bar &amp; Line Bulanan</dd>
+                                </div>
+                            </dl>
+                        </div>
+
+                        <div class="lg:col-span-7">
+                            <div class="rounded-2xl bg-[#0A0E07] border border-white/10 overflow-hidden">
+                                <div class="px-5 py-3.5 border-b border-white/[0.07] flex items-center justify-between text-xs">
+                                    <span class="font-semibold text-white">Ringkasan Buku Kas</span>
+                                    <span class="font-semibold text-[#C4FF0D] tabular-nums">Surplus +Rp 7.620.000</span>
+                                </div>
+                                <div class="divide-y divide-white/[0.06] text-xs sm:text-sm">
+                                    <div class="px-5 py-3.5 flex items-center justify-between gap-3">
+                                        <div class="min-w-0">
+                                            <p class="font-medium text-white truncate">Penjualan Kopi Arabika 250g</p>
+                                            <p class="text-[11px] text-[#8E9882]">Pemasukan &middot; Produk Terkait</p>
+                                        </div>
+                                        <span class="font-bold text-[#C4FF0D] tabular-nums shrink-0">+Rp 440.000</span>
+                                    </div>
+                                    <div class="px-5 py-3.5 flex items-center justify-between gap-3">
+                                        <div class="min-w-0">
+                                            <p class="font-medium text-white truncate">Penjualan Tas Kanvas Polos</p>
+                                            <p class="text-[11px] text-[#8E9882]">Pemasukan &middot; Produk Terkait</p>
+                                        </div>
+                                        <span class="font-bold text-[#C4FF0D] tabular-nums shrink-0">+Rp 315.000</span>
+                                    </div>
+                                    <div class="px-5 py-3.5 flex items-center justify-between gap-3">
+                                        <div class="min-w-0">
+                                            <p class="font-medium text-white truncate">Belanja Bahan Baku &amp; Kemasan</p>
+                                            <p class="text-[11px] text-[#8E9882]">Pengeluaran &middot; Operasional</p>
+                                        </div>
+                                        <span class="font-bold text-[#C084FC] tabular-nums shrink-0">-Rp 200.000</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- SLAB 02: INVENTARIS & MUTASI STOK ATOMIK -->
+                <article class="overlap-slab overlap-slab-deep p-6 sm:p-10 lg:p-12" style="--stack-idx: 1;">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                        <div class="lg:col-span-5 space-y-5">
+                            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-[#C4FF0D]">02 / Inventaris &amp; Mutasi Stok</p>
+                            <h3 class="text-2xl sm:text-3xl lg:text-[34px] font-bold tracking-[-0.03em] leading-[1.12] text-white">
+                                Stok gudang dikunci atomik. Anti minus, anti selisih.
+                            </h3>
+                            <p class="text-sm text-[#9AA68E] leading-relaxed">
+                                Setiap barang masuk dan keluar diproses di dalam transaksi database terkunci. Jika catatan mutasi diedit atau dihapus, saldo stok otomatis dihitung ulang secara presisi.
+                            </p>
+                            <dl class="pt-4 border-t border-white/10 grid grid-cols-2 gap-4 text-xs">
+                                <div>
+                                    <dt class="text-[#8E9882]">Proteksi Harga</dt>
+                                    <dd class="mt-1 font-semibold text-white">Validasi harga jual &ge; modal</dd>
+                                </div>
+                                <div>
+                                    <dt class="text-[#8E9882]">Radar Gudang</dt>
+                                    <dd class="mt-1 font-semibold text-amber-300">Peringatan stok menipis</dd>
+                                </div>
+                            </dl>
+                        </div>
+
+                        <div class="lg:col-span-7 space-y-3">
+                            @php
+                                $stockDemo = [
+                                    ['nama' => 'Kopi Arabika 250g', 'stok' => '25 pack', 'min' => 'Min. 5', 'pct' => 92, 'status' => 'Normal', 'bar' => '#C4FF0D'],
+                                    ['nama' => 'Teh Hijau 100g', 'stok' => '8 pack', 'min' => 'Min. 10', 'pct' => 42, 'status' => 'Menipis', 'bar' => '#FBBF24'],
+                                    ['nama' => 'Gula Pasir 1kg', 'stok' => '3 kg', 'min' => 'Min. 5', 'pct' => 28, 'status' => 'Kritis', 'bar' => '#C084FC'],
+                                ];
+                            @endphp
+                            @foreach ($stockDemo as $sd)
+                            <div class="rounded-2xl bg-[#0A0E07] border border-white/[0.08] p-4 sm:p-5">
+                                <div class="flex items-center justify-between gap-3 text-xs sm:text-sm">
+                                    <span class="font-semibold text-white">{{ $sd['nama'] }}</span>
+                                    <span class="tabular-nums text-[#9AA68E]">
+                                        <strong class="text-white">{{ $sd['stok'] }}</strong> &middot; {{ $sd['min'] }}
+                                    </span>
+                                </div>
+                                <div class="mt-3 h-2 rounded-full bg-white/10 overflow-hidden">
+                                    <div class="h-full rounded-full" style="width: {{ $sd['pct'] }}%; background: {{ $sd['bar'] }};"></div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </article>
+
+                <!-- SLAB 03: HIGH-CONTRAST SIGNATURE LIME — KASBON & PIUTANG -->
+                <article class="overlap-slab overlap-slab-lime p-6 sm:p-10 lg:p-12" style="--stack-idx: 2;">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                        <div class="lg:col-span-5 space-y-5">
+                            <p class="text-xs font-bold uppercase tracking-[0.22em] opacity-70">03 / Buku Kasbon &amp; Hutang</p>
+                            <h3 class="text-2xl sm:text-3xl lg:text-[34px] font-extrabold tracking-[-0.03em] leading-[1.1] text-[#0E1605]">
+                                Catat kasbon pelanggan tanpa lagi lupa jatuh tempo.
+                            </h3>
+                            <p class="text-sm font-medium leading-relaxed text-[#0E1605]/80">
+                                Lacak piutang pelanggan maupun tagihan supplier dalam satu tempat. Catat pembayaran cicilan bertahap dan pantau rasio kolektibilitas kas usaha secara langsung.
+                            </p>
+                            <div class="pt-3 flex items-baseline gap-6 border-t border-[#0E1605]/15">
+                                <div>
+                                    <p class="text-3xl sm:text-4xl font-extrabold tracking-tight tabular-nums">82,5%</p>
+                                    <p class="text-xs font-semibold opacity-75">Rasio Piutang Tertagih</p>
+                                </div>
+                                <div>
+                                    <p class="text-3xl sm:text-4xl font-extrabold tracking-tight tabular-nums">3 Status</p>
+                                    <p class="text-xs font-semibold opacity-75">Belum &rarr; Cicilan &rarr; Lunas</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-7">
+                            <div class="rounded-2xl bg-[#0E1605] text-[#F4F7F0] p-5 sm:p-6 space-y-3.5 shadow-2xl">
+                                <div class="flex items-center justify-between text-xs border-b border-white/10 pb-3">
+                                    <span class="font-semibold text-white">Radar Jatuh Tempo Aktif</span>
+                                    <span class="text-[#C4FF0D] font-semibold">Auto-Status</span>
+                                </div>
+                                <div class="rounded-xl bg-white/[0.04] border border-white/[0.07] p-4 flex items-center justify-between gap-3">
+                                    <div class="min-w-0">
+                                        <p class="text-sm font-semibold text-white truncate">Warung Kopi Senja</p>
+                                        <p class="text-xs text-[#9AA68E]">Piutang &middot; Terbayar Rp 250.000 / Rp 550.000</p>
+                                    </div>
+                                    <span class="shrink-0 text-xs font-bold text-[#C4FF0D] tabular-nums">Cicilan</span>
+                                </div>
+                                <div class="rounded-xl bg-white/[0.04] border border-white/[0.07] p-4 flex items-center justify-between gap-3">
+                                    <div class="min-w-0">
+                                        <p class="text-sm font-semibold text-white truncate">PT Nusantara Gula Murni</p>
+                                        <p class="text-xs text-[#9AA68E]">Hutang Supplier &middot; Sisa Rp 350.000</p>
+                                    </div>
+                                    <span class="shrink-0 text-xs font-bold text-amber-300 tabular-nums">Jatuh Tempo</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- SLAB 04: ALPETBIZZ GEMINI AI INTERACTIVE CONSOLE (#alpetbizz-ai) -->
+                <article id="alpetbizz-ai" class="overlap-slab overlap-slab-ai p-6 sm:p-10 lg:p-12" style="--stack-idx: 3;">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+                        <div class="lg:col-span-5 space-y-5">
+                            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-[#C4FF0D]">04 / AlpetBizz Gemini AI</p>
+                            <h3 class="text-2xl sm:text-3xl lg:text-[34px] font-bold tracking-[-0.03em] leading-[1.12] text-white">
+                                Konsultan bisnis AI yang membaca data tokomu langsung.
+                            </h3>
+                            <p class="text-sm text-[#9AA68E] leading-relaxed">
+                                Pilih skenario di bawah untuk melihat bagaimana AlpetBizz AI menerjemahkan data omzet, stok kritis, dan kasbon menjadi langkah aksi nyata.
+                            </p>
+
+                            <div class="space-y-2.5 pt-1">
+                                <button type="button" data-ai-demo="laba" aria-pressed="true" class="ai-switch-btn active">
+                                    <div class="flex items-center justify-between gap-2 text-xs sm:text-sm font-semibold text-white">
+                                        <span>01. Evaluasi Laba &amp; Margin</span>
+                                        <span class="text-[#C4FF0D]">&rarr;</span>
+                                    </div>
+                                </button>
+                                <button type="button" data-ai-demo="restock" aria-pressed="false" class="ai-switch-btn">
+                                    <div class="flex items-center justify-between gap-2 text-xs sm:text-sm font-semibold text-white">
+                                        <span>02. Prioritas Restock Gudang</span>
+                                        <span class="text-[#C4FF0D]">&rarr;</span>
+                                    </div>
+                                </button>
+                                <button type="button" data-ai-demo="kasbon" aria-pressed="false" class="ai-switch-btn">
+                                    <div class="flex items-center justify-between gap-2 text-xs sm:text-sm font-semibold text-white">
+                                        <span>03. Strategi Penagihan Kasbon</span>
+                                        <span class="text-[#C4FF0D]">&rarr;</span>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-7">
+                            <div class="rounded-2xl bg-[#090D06] border border-white/10 p-5 sm:p-6">
+                                <div class="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-white/[0.08]">
+                                    <div class="flex items-center gap-2.5">
+                                        <img src="{{ asset('img/logo.png') }}?v={{ filemtime(public_path('img/logo.png')) }}"
+                                             alt="AlpetBizz AI"
+                                             class="w-8 h-8 rounded-full object-contain">
+                                        <div>
+                                            <p class="text-xs font-bold text-white">AlpetBizz AI Consultant</p>
+                                            <p id="ai-demo-context" class="text-[11px] text-[#C4FF0D]">Omzet Rp 19,8 jt &middot; Margin 38,4%</p>
+                                        </div>
+                                    </div>
+                                    <button type="button" onclick="openLogin('register')"
+                                            class="text-xs font-semibold text-[#C4FF0D] hover:underline bg-transparent border-0 cursor-pointer">
+                                        Coba dengan Data Sendiri &rarr;
+                                    </button>
+                                </div>
+
+                                <div class="py-5 space-y-4 min-h-[225px]">
+                                    <div class="flex justify-end">
+                                        <div class="max-w-[88%] rounded-2xl rounded-br-sm bg-[#C4FF0D] text-[#0E1605] px-4 py-2.5 text-xs sm:text-sm font-semibold">
+                                            <span id="ai-demo-question">Analisis laba bersih &amp; margin toko bulan ini. Apa 3 langkah prioritas?</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="rounded-2xl rounded-bl-sm bg-[#12180D] border border-white/[0.08] p-4 text-xs sm:text-sm text-[#dce5d3] leading-relaxed">
+                                        <div id="ai-demo-typing" class="hidden items-center gap-1.5 py-1.5">
+                                            <span class="ai-typing-dot"></span>
+                                            <span class="ai-typing-dot"></span>
+                                            <span class="ai-typing-dot"></span>
+                                            <span class="text-xs text-[#8E9882] ml-1.5">Menganalisis snapshot toko...</span>
+                                        </div>
+                                        <div id="ai-demo-response" class="space-y-2.5"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         ACT IV — VELOCITY-SKEW SWISS ARCHITECTURE SPEC SHEET (#keamanan)
+         ══════════════════════════════════════════════════════════════ -->
+    <section id="keamanan" class="px-5 sm:px-8 py-20 sm:py-28 border-t border-white/[0.08]">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+
+            <div class="lg:col-span-5 lg:sticky lg:top-28 space-y-4" data-reveal="left">
+                <p class="text-xs font-semibold uppercase tracking-[0.22em] text-[#C4FF0D]">02 &mdash; Standar Rekayasa &amp; Keamanan</p>
+                <h2 class="text-3xl sm:text-4xl font-bold tracking-[-0.03em] leading-[1.1] text-white">
+                    Cepat di jaringan lokal, ketat di lapisan data.
+                </h2>
+                <p class="text-sm sm:text-base text-[#9AA68E] leading-relaxed">
+                    Dibangun di atas Laravel 13, PostgreSQL region Singapura, dan arsitektur multi-tenant sehingga data keuangan setiap UMKM tetap privat dan responsif.
+                </p>
+            </div>
+
+            <div class="lg:col-span-7">
+                @php
+                    $specs = [
+                        [
+                            'no' => '01',
+                            'metric' => '100% Privat',
+                            'title' => 'Isolasi Multi-Tenant Anti-IDOR',
+                            'desc' => 'Seluruh tabel produk, mutasi stok, transaksi, kasbon, laporan, dan percakapan AI terikat pada user_id pemilik. Akun lain tidak dapat membaca atau memodifikasi data tokomu.',
+                        ],
+                        [
+                            'no' => '02',
+                            'metric' => '< 300ms',
+                            'title' => 'Server Region Singapura (sin1) & Query Terkonsolidasi',
+                            'desc' => 'Serverless PHP dan database Neon PostgreSQL berada di satu region Singapura dengan indeks komposit dan konsolidasi query (Dashboard hanya 3 query).',
+                        ],
+                        [
+                            'no' => '03',
+                            'metric' => '0 CVE',
+                            'title' => 'Proteksi Produksi Berlapis',
+                            'desc' => 'Dilengkapi rate limiting login & kuota AI, logout khusus POST ber-CSRF, hashing Bcrypt, HSTS, X-Frame-Options DENY, serta audit dependensi bersih tanpa celah.',
+                        ],
+                        [
+                            'no' => '04',
+                            'metric' => '36 Tests',
+                            'title' => 'Navigasi SPA Halus & Teruji Otomatis',
+                            'desc' => 'Pindah antar halaman berlangsung instan tanpa reload penuh, dilengkapi konfirmasi SweetAlert2 dan 36 automated feature tests PHPUnit.',
+                        ],
+                    ];
+                @endphp
+
+                @foreach ($specs as $sp)
+                <div class="spec-row grid grid-cols-1 sm:grid-cols-12 gap-3 sm:gap-6 items-start" data-velocity-skew>
+                    <div class="sm:col-span-3 flex sm:flex-col justify-between gap-1">
+                        <span class="text-xs font-mono text-[#8E9882]">{{ $sp['no'] }}</span>
+                        <span class="text-lg sm:text-xl font-extrabold text-[#C4FF0D] tabular-nums">{{ $sp['metric'] }}</span>
+                    </div>
+                    <div class="sm:col-span-9">
+                        <h3 class="text-base sm:text-lg font-bold text-white">{{ $sp['title'] }}</h3>
+                        <p class="mt-1.5 text-sm text-[#9AA68E] leading-relaxed">{{ $sp['desc'] }}</p>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         ACT V — HAIRLINE EDITORIAL FAQ (#faq) & CLOSING CALLOUT
+         ══════════════════════════════════════════════════════════════ -->
+    <section id="faq" class="px-5 sm:px-8 py-20 sm:py-24 border-t border-white/[0.08]">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
+            <div class="lg:col-span-4" data-reveal="up">
+                <p class="text-xs font-semibold uppercase tracking-[0.22em] text-[#C4FF0D]">03 &mdash; Tanya Jawab</p>
+                <h2 class="mt-3 text-3xl font-bold tracking-[-0.03em] text-white">Hal yang sering ditanyakan.</h2>
+            </div>
+
+            <div class="lg:col-span-8" data-reveal="up" data-reveal-delay="80">
+                @php
+                    $faqs = [
+                        [
+                            'q' => 'Apakah AlpetBizz gratis untuk UMKM dan toko kelontong?',
+                            'a' => 'Ya, seluruh fitur mulai dari pencatatan arus kas, katalog produk, mutasi stok atomik, buku kasbon, laporan grafik, hingga konsultasi AI bisnis dapat digunakan secara gratis.',
+                        ],
+                        [
+                            'q' => 'Apakah data keuangan toko saya aman dari akun pengguna lain?',
+                            'a' => 'Aman. Seluruh data diisolasi ketat per akun (multi-tenant) pada level query dan validasi, disertai proteksi CSRF, sesi HttpOnly Secure, dan rate limiting.',
+                        ],
+                        [
+                            'q' => 'Bagaimana AlpetBizz AI memberi saran yang relevan dengan toko saya?',
+                            'a' => 'Setiap pertanyaan yang dikirimkan otomatis disertai ringkasan data toko aktif Anda (omzet, margin, produk terlaris, stok kritis, dan kasbon jatuh tempo) sehingga saran Gemini AI selalu konkret.',
+                        ],
+                        [
+                            'q' => 'Bagaimana jika saya salah mencatat stok masuk atau keluar?',
+                            'a' => 'Anda cukup mengedit atau menghapus log mutasi di menu Stok. Sistem akan otomatis membalikkan (reversal) jumlah stok produk secara atomik agar tetap akurat.',
+                        ],
+                    ];
+                @endphp
+
+                @foreach ($faqs as $idx => $faq)
+                <div class="faq-row {{ $idx === 0 ? 'open' : '' }}">
+                    <button type="button" class="faq-trigger" aria-expanded="{{ $idx === 0 ? 'true' : 'false' }}">
+                        <span>{{ $faq['q'] }}</span>
+                        <span class="faq-plus" aria-hidden="true">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" d="M12 5v14M5 12h14"/>
+                            </svg>
+                        </span>
+                    </button>
+                    <div class="faq-panel">
+                        <div class="faq-panel-inner">
+                            <p class="pb-5 pr-8 text-sm text-[#9AA68E] leading-relaxed">{{ $faq['a'] }}</p>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+
+    <!-- FULL-BLEED ASYMMETRIC CLOSING BAND -->
+    <section class="px-5 sm:px-8 py-20 sm:py-24 border-t border-white/[0.08] bg-gradient-to-b from-[#0c1108] to-[#070a05]">
+        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-end justify-between gap-8" data-reveal="up">
+            <div class="max-w-2xl">
+                <p class="text-xs font-semibold uppercase tracking-[0.22em] text-[#C4FF0D]">Mulai Hari Ini</p>
+                <h2 class="mt-3 font-extrabold tracking-[-0.04em] leading-[1.02] text-white"
+                    style="font-size: clamp(2.1rem, 4.8vw, 3.9rem);">
+                    Rapikan kas &amp; stok tokomu dalam satu menit.
+                </h2>
+            </div>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+                <button type="button" onclick="openLogin('register')"
+                        class="btn-editorial px-7 py-4 rounded-xl text-sm">
+                    Daftar Akun Gratis &rarr;
+                </button>
+                <button type="button" onclick="openLogin('login')"
+                        class="px-7 py-4 rounded-xl text-sm font-semibold text-white bg-white/[0.05] hover:bg-white/[0.1] border border-white/15 transition cursor-pointer">
+                    Masuk ke Dashboard
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <footer class="border-t border-white/[0.08] bg-[#060804] px-5 sm:px-8 py-7">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#8E9882]">
+            <div class="flex items-center gap-2.5">
+                <img src="{{ asset('img/logo.png') }}?v={{ filemtime(public_path('img/logo.png')) }}"
+                     alt="Logo AlpetBizz"
+                     class="w-6 h-6 rounded-full object-contain">
+                <span class="font-bold text-white">AlpetBizz</span>
+            </div>
+            <div class="flex flex-wrap items-center justify-center gap-5">
+                <a href="#produk" class="hover:text-[#C4FF0D] transition no-underline text-[#8E9882]">Produk</a>
+                <a href="#alpetbizz-ai" class="hover:text-[#C4FF0D] transition no-underline text-[#8E9882]">AlpetBizz AI</a>
+                <a href="#keamanan" class="hover:text-[#C4FF0D] transition no-underline text-[#8E9882]">Arsitektur</a>
+                <a href="#faq" class="hover:text-[#C4FF0D] transition no-underline text-[#8E9882]">FAQ</a>
+            </div>
+            <p>&copy; {{ date('Y') }} AlpetBizz</p>
+        </div>
+    </footer>
+</div>
 
 <!-- ══════════════════════════════════════════════════════════════
      UNIFIED AUTH MODAL PANEL (Login & Register)
@@ -202,7 +589,6 @@
 <div id="login-panel" aria-modal="true" role="dialog" aria-label="Form Autentikasi">
     <div id="login-panel-card" class="{{ $activeTab === 'register' ? 'card-wide' : '' }}">
 
-        <!-- Global Alert Messages -->
         @if ($error)
         <div class="login-error">
             <svg fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
@@ -221,7 +607,7 @@
         </div>
         @endif
 
-        <!-- ════════ TAB 1: FORM LOGIN ════════ -->
+        <!-- TAB 1: LOGIN -->
         <div id="tab-login-content" style="{{ $activeTab === 'register' ? 'display:none;' : '' }}">
             <div class="panel-header">
                 <div>
@@ -274,7 +660,7 @@
             </div>
         </div>
 
-        <!-- ════════ TAB 2: FORM REGISTER ════════ -->
+        <!-- TAB 2: REGISTER -->
         <div id="tab-register-content" style="{{ $activeTab === 'register' ? '' : 'display:none;' }}">
             <div class="panel-header">
                 <div>
@@ -352,7 +738,6 @@
                         </div>
                     </div>
 
-                    <!-- Bagian 2: Usaha -->
                     <p class="section-label">Informasi Usaha UMKM</p>
 
                     <div>
@@ -398,7 +783,7 @@
     window.ACTIVE_TAB = @json($activeTab);
     window.AUTO_OPEN_PANEL = @json((bool) ($error || $success || request()->has('tab')));
 </script>
-<script src="{{ asset('assets/js/login.js') }}"></script>
+<script src="{{ asset('assets/js/login.js') }}?v={{ filemtime(public_path('assets/js/login.js')) }}"></script>
 
 </body>
 </html>

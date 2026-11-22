@@ -146,19 +146,17 @@
             @endif
 
             <!-- 12-COLUMN RESPONSIVE BENTO SPLIT -->
-            <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 items-stretch">
+            <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
 
-                <!-- LEFT: INTERACTIVE GEMINI CHAT WORKSPACE (8/12, tinggi terkunci selaras kolom kanan) -->
-                <div class="xl:col-span-8 xl:relative xl:min-h-[680px]">
-                    <section class="bento-tile !p-0 !overflow-hidden flex flex-col h-[620px] sm:h-[680px] xl:h-auto xl:!absolute xl:inset-0">
+                <!-- LEFT: INTERACTIVE GEMINI CHAT WORKSPACE (8/12, pas 1 layar & sticky agar langsung bisa ngetik tanpa scroll) -->
+                <div class="xl:col-span-8 xl:sticky xl:top-6 min-w-0">
+                    <section data-no-reveal class="bento-tile !p-0 !overflow-hidden flex flex-col h-[calc(100dvh-8.25rem)] sm:h-[calc(100dvh-7.5rem)] lg:h-[calc(100dvh-6.75rem)] min-h-[460px] max-h-[780px]">
                     <!-- Chat Header -->
-                    <header class="shrink-0 px-5 py-4 sm:px-6 border-b border-white/[0.08] flex flex-wrap items-center justify-between gap-3 bg-[#151B0F]/70">
+                    <header class="shrink-0 px-4 py-3.5 sm:px-6 border-b border-white/[0.08] flex items-center justify-between gap-3 bg-[#151B0F]/80">
                         <div class="flex items-center gap-3 min-w-0">
-                            <div class="size-10 shrink-0 rounded-2xl bg-[#C4FF0D] text-[#152208] grid place-items-center shadow-[0_0_24px_rgba(196,255,13,0.28)]">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z"/>
-                                </svg>
-                            </div>
+                            <img src="{{ asset('img/logo.png') }}?v={{ filemtime(public_path('img/logo.png')) }}"
+                                 alt="AlpetBizz AI"
+                                 class="size-9 sm:size-10 shrink-0 rounded-full object-contain drop-shadow-[0_0_12px_rgba(196,255,13,0.4)]">
                             <div class="min-w-0">
                                 <h3 class="text-sm sm:text-base font-bold text-white truncate">AlpetBizz AI Consultant</h3>
                                 <p class="text-xs text-[#9AA68E] truncate">
@@ -166,37 +164,37 @@
                                 </p>
                             </div>
                         </div>
-                        <span id="ai-message-count" class="rounded-full border border-white/10 bg-[#181F11] px-3 py-1 text-[11px] font-medium text-[#9AA68E]">
+                        <span id="ai-message-count" class="shrink-0 rounded-full border border-white/10 bg-[#181F11] px-3 py-1 text-[11px] font-medium text-[#9AA68E]">
                             {{ $messages->count() }} pesan
                         </span>
                     </header>
 
                     <!-- Scrollable Message Feed -->
-                    <div id="ai-chat-feed" class="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 py-5 space-y-4">
-                        <!-- Empty Welcome State -->
-                        <div id="ai-empty-state" class="{{ $messages->isNotEmpty() ? 'hidden' : '' }} h-full flex flex-col items-center justify-center text-center max-w-xl mx-auto py-4">
-                            <div class="size-14 rounded-[20px] bg-[#C4FF0D]/15 border border-[#C4FF0D]/30 text-[#C4FF0D] grid place-items-center mb-4">
-                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div id="ai-chat-feed" class="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 py-4 space-y-4">
+                        <!-- Empty Welcome State (kompak agar input langsung terlihat di bawah tanpa scroll) -->
+                        <div id="ai-empty-state" class="{{ $messages->isNotEmpty() ? 'hidden' : '' }} min-h-full flex flex-col items-center justify-center text-center max-w-xl mx-auto py-2">
+                            <div class="size-11 rounded-2xl bg-[#C4FF0D]/12 border border-[#C4FF0D]/28 text-[#C4FF0D] grid place-items-center mb-3">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
                                 </svg>
                             </div>
-                            <h4 class="text-base sm:text-lg font-bold text-white">
+                            <h4 class="text-sm sm:text-base font-bold text-white">
                                 Halo {{ $profil['nama_pemilik'] }}, ada yang ingin didiskusikan soal usaha?
                             </h4>
-                            <p class="text-xs sm:text-sm text-[#9AA68E] mt-1.5 leading-relaxed">
-                                AlpetBizz AI membaca ringkasan transaksi, stok produk, margin, dan kasbon tokomu secara langsung agar sarannya tepat sasaran.
+                            <p class="text-xs text-[#9AA68E] mt-1 leading-relaxed max-w-md">
+                                AlpetBizz AI membaca transaksi, stok, margin, dan kasbon tokomu secara langsung agar sarannya tepat sasaran.
                             </p>
 
-                            <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full text-left">
+                            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2 w-full text-left">
                                 @foreach ($quickPrompts as $qp)
                                     <button type="button"
                                             data-ai-quick-prompt="{{ $qp['prompt'] }}"
-                                            class="group rounded-2xl bg-[#181F11] border border-white/[0.07] hover:border-[#C4FF0D]/45 p-3.5 transition cursor-pointer">
+                                            class="group rounded-2xl bg-[#181F11] border border-white/[0.07] hover:border-[#C4FF0D]/45 p-3 transition cursor-pointer">
                                         <p class="text-xs font-semibold text-[#C4FF0D] flex items-center justify-between gap-2">
                                             <span>{{ $qp['label'] }}</span>
                                             <span class="group-hover:translate-x-0.5 transition-transform">→</span>
                                         </p>
-                                        <p class="text-xs text-[#9AA68E] mt-1 line-clamp-2">{{ $qp['prompt'] }}</p>
+                                        <p class="text-[11px] text-[#9AA68E] mt-0.5 line-clamp-2">{{ $qp['prompt'] }}</p>
                                     </button>
                                 @endforeach
                             </div>
@@ -236,30 +234,30 @@
                         </div>
                     </div>
 
-                    <!-- Composer Form -->
-                    <div class="shrink-0 p-4 sm:px-6 border-t border-white/[0.08] bg-[#151B0F]">
-                        <form id="ai-chat-form" method="POST" action="/konsultasi-ai/kirim" data-spa-ignore="true" class="space-y-2.5">
+                    <!-- Composer Form (selalu tampil di bagian bawah card tanpa perlu scroll) -->
+                    <div class="shrink-0 p-3.5 sm:px-5 sm:py-3.5 border-t border-white/[0.08] bg-[#151B0F]">
+                        <form id="ai-chat-form" method="POST" action="/konsultasi-ai/kirim" data-spa-ignore="true" class="space-y-2">
                             @csrf
-                            <div class="flex items-end gap-2.5">
+                            <div class="flex items-end gap-2">
                                 <textarea id="ai-prompt-input"
                                           name="pesan"
-                                          rows="2"
+                                          rows="1"
                                           maxlength="2000"
                                           required
-                                          placeholder="Tanyakan strategi bisnis, prioritas restock, ide promo, atau evaluasi kas toko Anda..."
-                                          class="flex-1 px-4 py-3 bg-[#181F11] border border-white/12 rounded-2xl text-xs sm:text-sm text-[#F4F7F0] placeholder:text-[#8E9882]/65 outline-none focus:border-[#C4FF0D] focus:ring-2 focus:ring-[#C4FF0D]/15 transition resize-none max-h-36"></textarea>
+                                          placeholder="Tanyakan strategi bisnis atau stok..."
+                                          class="flex-1 min-w-0 px-3.5 py-2.5 sm:px-4 sm:py-3 bg-[#181F11] border border-white/12 rounded-2xl text-xs sm:text-sm leading-snug text-[#F4F7F0] placeholder:text-[#8E9882]/65 outline-none focus:border-[#C4FF0D] focus:ring-2 focus:ring-[#C4FF0D]/15 transition resize-none min-h-[44px] max-h-32"></textarea>
                                 <button type="submit"
                                         id="ai-send-btn"
-                                        class="shrink-0 btn-lime !rounded-2xl !px-5 !py-3.5 text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                                        class="shrink-0 btn-lime !rounded-2xl !px-4 sm:!px-5 !py-2.5 sm:!py-3 text-xs sm:text-sm min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed">
                                     <span>Kirim</span>
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M5 12h14m-7-7l7 7-7 7"/>
                                     </svg>
                                 </button>
                             </div>
-                            <div class="flex items-center justify-between text-[11px] text-[#9AA68E]/80 px-1">
-                                <span>Enter untuk kirim · Shift+Enter untuk baris baru</span>
-                                <span id="ai-char-counter" class="tabular-nums">0/2000</span>
+                            <div class="flex items-center justify-between gap-2 text-[11px] text-[#9AA68E]/80 px-1">
+                                <span class="truncate">Enter untuk kirim · Shift+Enter baris baru</span>
+                                <span id="ai-char-counter" class="shrink-0 tabular-nums">0/2000</span>
                             </div>
                         </form>
                     </div>
@@ -573,6 +571,7 @@
                     if (emptyState) emptyState.classList.add('hidden');
                     const tempUserBubble = appendUserBubble(clean, nowTime);
                     input.value = '';
+                    input.style.height = '';
                     if (charCounter) charCounter.textContent = '0/2000';
                     setLoading(true);
 
@@ -624,6 +623,8 @@
 
                 input.addEventListener('input', function () {
                     if (charCounter) charCounter.textContent = input.value.length + '/2000';
+                    input.style.height = 'auto';
+                    input.style.height = Math.min(input.scrollHeight, 128) + 'px';
                 });
 
                 input.addEventListener('keydown', function (e) {

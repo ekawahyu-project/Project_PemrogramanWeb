@@ -186,7 +186,7 @@
             <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
 
                 <!-- 4. FORM MUTASI STOK (POST /stok) -->
-                <section id="form-stok" class="bento-tile xl:col-span-4 justify-between {{ $editLog ? 'border-[#C4FF0D]/60 ring-1 ring-[#C4FF0D]/25' : '' }}">
+                <section id="form-stok" class="bento-tile xl:col-span-4 xl:sticky xl:top-6 justify-between {{ $editLog ? 'border-[#C4FF0D]/60 ring-1 ring-[#C4FF0D]/25' : '' }}">
                     <div>
                         <header class="mb-5 flex items-center justify-between gap-2">
                             <h3 class="text-base font-bold text-white flex items-center gap-2">
@@ -265,8 +265,8 @@
                 <div class="xl:col-span-8 space-y-4">
 
                     <!-- Sub-tile A: Kondisi Stok Saat Ini -->
-                    <section class="bento-tile !p-0 overflow-hidden">
-                        <header class="p-5 sm:p-6 border-b border-white/[0.08] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <section class="bento-tile !p-0 !overflow-hidden">
+                        <header class="p-5 sm:p-6 border-b border-white/[0.08] flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                             <div>
                                 <h3 class="text-base sm:text-lg font-bold text-white">Kondisi Stok Saat Ini</h3>
                                 <p class="text-xs sm:text-sm text-[#9AA68E] mt-0.5">Indikator kapasitas real-time terhadap batas minimum.</p>
@@ -328,8 +328,8 @@
                     </section>
 
                     <!-- Sub-tile B: Riwayat Mutasi Stok -->
-                    <section class="bento-tile !p-0 overflow-hidden">
-                        <header class="p-5 sm:p-6 border-b border-white/[0.08] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <section class="bento-tile !p-0 !overflow-hidden">
+                        <header class="p-5 sm:p-6 border-b border-white/[0.08] flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                             <div>
                                 <h3 class="text-base sm:text-lg font-bold text-white">Riwayat Mutasi Stok</h3>
                                 <p class="text-xs sm:text-sm text-[#9AA68E] mt-0.5">Log masuk &amp; keluar barang beserta opsi reversal otomatis.</p>

@@ -226,8 +226,8 @@
                  ══════════════════════════════════════════════════════════ -->
             <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
 
-                <!-- 4. FORM COMPOSER TILE (Full width on mobile/tablet, 4/12 on desktop) -->
-                <section id="form-transaksi" class="bento-tile xl:col-span-4 justify-between {{ $editTrx ? 'border-[#C4FF0D]/60 ring-1 ring-[#C4FF0D]/25' : '' }}">
+                <!-- 4. FORM COMPOSER TILE (Full width on mobile/tablet, 4/12 sticky on desktop) -->
+                <section id="form-transaksi" class="bento-tile xl:col-span-4 xl:sticky xl:top-6 justify-between {{ $editTrx ? 'border-[#C4FF0D]/60 ring-1 ring-[#C4FF0D]/25' : '' }}">
                     <div>
                         <header class="mb-5 flex items-center justify-between gap-2">
                             <h3 class="text-base font-bold text-white flex items-center gap-2">
@@ -302,19 +302,19 @@
                 </section>
 
                 <!-- 5. ON-LEDGER STREAM & INTERACTIVE TABLE TILE (8/12 on desktop) -->
-                <section class="bento-tile xl:col-span-8 !p-0 overflow-hidden justify-between">
+                <section class="bento-tile xl:col-span-8 !p-0 !overflow-hidden justify-between">
                     <div>
-                        <header class="p-5 sm:p-6 border-b border-white/[0.08] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div>
+                        <header class="p-5 sm:p-6 border-b border-white/[0.08] flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                            <div class="min-w-0">
                                 <h3 class="text-base sm:text-lg font-bold text-white">Daftar Riwayat Transaksi</h3>
                                 <p class="text-xs sm:text-sm text-[#9AA68E] mt-0.5">Filter instan berdasarkan jenis arus kas atau kata kunci.</p>
                             </div>
-                            <div class="flex flex-wrap items-center gap-3">
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2.5 w-full lg:w-auto">
                                 <input type="text"
                                        data-bento-search="trx-table-body"
                                        placeholder="Cari keterangan / produk..."
-                                       class="px-4 py-2 rounded-full bg-[#181F11] border border-white/12 text-xs sm:text-sm text-white placeholder:text-[#9AA68E]/60 outline-none w-full sm:w-56">
-                                <div class="bento-pills" data-bento-filter-group="trx-table-body" role="radiogroup" aria-label="Filter Transaksi">
+                                       class="px-4 py-2 rounded-full bg-[#181F11] border border-white/12 text-xs sm:text-sm text-white placeholder:text-[#9AA68E]/60 outline-none w-full sm:flex-1 lg:w-52">
+                                <div class="bento-pills self-start sm:self-auto" data-bento-filter-group="trx-table-body" role="radiogroup" aria-label="Filter Transaksi">
                                     <button type="button" data-filter-val="all" class="bento-pill active">Semua</button>
                                     <button type="button" data-filter-val="Pemasukan" class="bento-pill">Masuk</button>
                                     <button type="button" data-filter-val="Pengeluaran" class="bento-pill">Keluar</button>
@@ -394,7 +394,7 @@
                         @endif
                     </div>
 
-                    <div class="px-6 py-4 border-t border-white/[0.06] bg-[#151B0F] flex items-center justify-between text-xs text-[#9AA68E]">
+                    <div class="px-5 sm:px-6 py-4 border-t border-white/[0.06] bg-[#151B0F] flex flex-wrap items-center justify-between gap-2 text-xs text-[#9AA68E]">
                         <span>Menampilkan {{ $transaksiList->count() }} transaksi tercatat</span>
                         <span class="text-[#C4FF0D] font-medium">Ledger Tersinkronisasi</span>
                     </div>
