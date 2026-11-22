@@ -380,13 +380,13 @@ Aplikasi ini telah di-deploy dan berjalan langsung di lingkungan produksi menggu
 
 Proyek ini dikembangkan bersama untuk memenuhi tugas mata kuliah **Pemrograman Web**:
 
-| Kontributor | Repository / Identitas |
+| Nama | GitHub |
 | :--- | :--- |
 | **Eka Wahyu Maulidan** | [@ekawahyu-project](https://github.com/ekawahyu-project) |
-| **Zacky Al Ghifari** | `Zackyalghfr` |
-| **Mochammad Alfan Rizqi Abdilah** | Kontributor |
-| **Ahmad Zaki Andika** | `Ahmadzaki15` |
-| **Aloyys** | `Aloyys` |
+| **Zacky Al Ghifari** | [@Zackyalghfr](https://github.com/Zackyalghfr) |
+| **Mochammad Alfan Rizqi Abdilah** | [@Ikyy-nafla](https://github.com/Ikyy-nafla) |
+| **Ahmad Zaki Andika** | [@Ahmadzaki15](https://github.com/Ahmadzaki15) |
+| **Aloyys** | [@Aloyys](https://github.com/Aloyys) |
 
 ---
 
