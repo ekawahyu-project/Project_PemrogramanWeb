@@ -43,7 +43,7 @@
         <div class="hidden md:flex items-center gap-8">
             <a href="#produk" class="landing-nav-link">Produk</a>
             <a href="#alpetbizz-ai" class="landing-nav-link">AlpetBizz AI</a>
-            <a href="#keamanan" class="landing-nav-link">Arsitektur</a>
+            <a href="#cara-kerja" class="landing-nav-link">Cara Kerja</a>
             <a href="#faq" class="landing-nav-link">FAQ</a>
         </div>
 
@@ -417,54 +417,60 @@
     </section>
 
     <!-- ══════════════════════════════════════════════════════════════
-         ACT IV — VELOCITY-SKEW SWISS ARCHITECTURE SPEC SHEET (#keamanan)
+         ACT IV — VELOCITY-SKEW ALUR CARA KERJA (#cara-kerja)
          ══════════════════════════════════════════════════════════════ -->
-    <section id="keamanan" class="px-5 sm:px-8 py-20 sm:py-28 border-t border-white/[0.08]">
+    <section id="cara-kerja" class="px-5 sm:px-8 py-20 sm:py-28 border-t border-white/[0.08]">
         <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
 
-            <div class="lg:col-span-5 lg:sticky lg:top-28 space-y-4" data-reveal="left">
+            <div class="lg:col-span-5 lg:sticky lg:top-28 space-y-5" data-reveal="left">
                 <h2 class="text-3xl sm:text-4xl font-bold tracking-[-0.03em] leading-[1.1] text-white">
-                    Cepat di jaringan lokal, ketat di lapisan data.
+                    Dari buka akun sampai pembukuan rapi dalam hitungan menit.
                 </h2>
                 <p class="text-sm sm:text-base text-[#9AA68E] leading-relaxed">
-                    Dibangun di atas Laravel 13, PostgreSQL region Singapura, dan arsitektur multi-tenant sehingga data keuangan setiap UMKM tetap privat dan responsif.
+                    Tidak perlu latar belakang akuntansi atau instalasi rumit. Ikuti empat langkah sederhana berikut untuk merapikan operasional toko Anda setiap hari.
                 </p>
+                <div class="pt-1">
+                    <button type="button" onclick="openLogin('register')"
+                            class="btn-editorial px-6 py-3.5 rounded-xl text-sm">
+                        Mulai Langkah Pertama &rarr;
+                    </button>
+                </div>
             </div>
 
             <div class="lg:col-span-7">
                 @php
-                    $specs = [
+                    $workflowSteps = [
                         [
-                            'metric' => '100% Privat',
-                            'title' => 'Isolasi Multi-Tenant Anti-IDOR',
-                            'desc' => 'Seluruh tabel produk, mutasi stok, transaksi, kasbon, laporan, dan percakapan AI terikat pada user_id pemilik. Akun lain tidak dapat membaca atau memodifikasi data tokomu.',
+                            'step' => 'Langkah 1',
+                            'title' => 'Buat Akun & Profil Usaha',
+                            'desc' => 'Daftar gratis dengan nama toko dan kategori usaha Anda. Dalam kurang dari satu menit, ruang kerja privat AlpetBizz langsung siap dipakai dari HP maupun laptop.',
                         ],
                         [
-                            'metric' => '< 300ms',
-                            'title' => 'Server Region Singapura (sin1) & Query Terkonsolidasi',
-                            'desc' => 'Serverless PHP dan database Neon PostgreSQL berada di satu region Singapura dengan indeks komposit dan konsolidasi query (Dashboard hanya 3 query).',
+                            'step' => 'Langkah 2',
+                            'title' => 'Masukkan Produk & Batas Stok',
+                            'desc' => 'Input katalog barang beserta harga modal, harga jual, dan batas stok minimum. Sistem otomatis menghitung margin per produk serta menyiapkan peringatan saat stok menipis.',
                         ],
                         [
-                            'metric' => '0 CVE',
-                            'title' => 'Proteksi Produksi Berlapis',
-                            'desc' => 'Dilengkapi rate limiting login & kuota AI, logout khusus POST ber-CSRF, hashing Bcrypt, HSTS, X-Frame-Options DENY, serta audit dependensi bersih tanpa celah.',
+                            'step' => 'Langkah 3',
+                            'title' => 'Catat Transaksi & Kasbon Harian',
+                            'desc' => 'Setiap penjualan, belanja bahan baku, mutasi stok masuk/keluar, hingga cicilan kasbon pelanggan tercatat rapi sambil berjualan—tanpa buku tulis atau rekap malam hari.',
                         ],
                         [
-                            'metric' => '36 Tests',
-                            'title' => 'Navigasi SPA Halus & Teruji Otomatis',
-                            'desc' => 'Pindah antar halaman berlangsung instan tanpa reload penuh, dilengkapi konfirmasi SweetAlert2 dan 36 automated feature tests PHPUnit.',
+                            'step' => 'Langkah 4',
+                            'title' => 'Pantau Laba & Tanya Konsultan AI',
+                            'desc' => 'Grafik arus kas bulanan, produk terlaris, dan daftar piutang tersusun otomatis. Kapan pun butuh saran promo atau prioritas restock, diskusikan langsung bersama AlpetBizz AI.',
                         ],
                     ];
                 @endphp
 
-                @foreach ($specs as $sp)
+                @foreach ($workflowSteps as $ws)
                 <div class="spec-row grid grid-cols-1 sm:grid-cols-12 gap-3 sm:gap-6 items-start" data-velocity-skew>
                     <div class="sm:col-span-3 pt-0.5">
-                        <span class="text-lg sm:text-xl font-extrabold text-[#C4FF0D] tabular-nums">{{ $sp['metric'] }}</span>
+                        <span class="text-lg sm:text-xl font-extrabold text-[#C4FF0D] tabular-nums">{{ $ws['step'] }}</span>
                     </div>
                     <div class="sm:col-span-9">
-                        <h3 class="text-base sm:text-lg font-bold text-white">{{ $sp['title'] }}</h3>
-                        <p class="mt-1.5 text-sm text-[#9AA68E] leading-relaxed">{{ $sp['desc'] }}</p>
+                        <h3 class="text-base sm:text-lg font-bold text-white">{{ $ws['title'] }}</h3>
+                        <p class="mt-1.5 text-sm text-[#9AA68E] leading-relaxed">{{ $ws['desc'] }}</p>
                     </div>
                 </div>
                 @endforeach
@@ -558,7 +564,7 @@
             <div class="flex flex-wrap items-center justify-center gap-5">
                 <a href="#produk" class="hover:text-[#C4FF0D] transition no-underline text-[#8E9882]">Produk</a>
                 <a href="#alpetbizz-ai" class="hover:text-[#C4FF0D] transition no-underline text-[#8E9882]">AlpetBizz AI</a>
-                <a href="#keamanan" class="hover:text-[#C4FF0D] transition no-underline text-[#8E9882]">Arsitektur</a>
+                <a href="#cara-kerja" class="hover:text-[#C4FF0D] transition no-underline text-[#8E9882]">Cara Kerja</a>
                 <a href="#faq" class="hover:text-[#C4FF0D] transition no-underline text-[#8E9882]">FAQ</a>
             </div>
             <p>&copy; {{ date('Y') }} AlpetBizz</p>
