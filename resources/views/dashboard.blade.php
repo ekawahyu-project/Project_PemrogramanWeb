@@ -1,28 +1,8 @@
-<!DOCTYPE html>
-<html lang="id" class="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | AlpetBizz</title>
-    <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}?v={{ filemtime(public_path('img/logo.png')) }}">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Poppins', 'sans-serif'],
-                        mono: ['Poppins', 'sans-serif']
-                    }
-                }
-            }
-        };
-    </script>
-</head>
-<body class="bento-body font-sans antialiased text-[#F4F7F0]">
-    @include('includes.sidebar')
+@extends('layouts.app')
 
+@section('title', 'Dashboard')
+
+@section('content')
     @php
         $netFormatted = 'Rp ' . number_format(abs($laba ?? 0), 0, ',', '.');
         $inFormatted = 'Rp ' . number_format($pemasukan ?? 0, 0, ',', '.');
@@ -50,8 +30,7 @@
         $pnlBars = [42, 58, 35, 66, 74, 48, 82, 64, 52, 78, 88, 45, 70, 92, 60, 76, 84, 54, 68, 90, 72, 86, 95, 100];
     @endphp
 
-    <main class="w-full min-h-screen lg:pl-64 flex flex-col transition-all duration-300">
-        <div class="p-4 sm:p-6 lg:p-8 flex-1 max-w-[1380px] w-full mx-auto space-y-5">
+    <div class="p-4 sm:p-6 lg:p-8 flex-1 max-w-[1380px] w-full mx-auto space-y-5">
 
             <!-- Web3Bento Top Status Bar -->
             <nav class="flex flex-wrap items-center justify-between gap-3 px-1" aria-label="Dashboard Header">
@@ -556,6 +535,4 @@
 
             </div>
         </div>
-    </main>
-</body>
-</html>
+@endsection

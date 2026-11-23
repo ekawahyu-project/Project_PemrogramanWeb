@@ -29,21 +29,12 @@ class ProfileController extends Controller
      */
     public function handle(Request $request): RedirectResponse
     {
-        $action = $request->input('action', 'save');
-
-        if ($action === 'save') {
-            return $this->handleSave($request);
-        }
-
-        if ($action === 'hapus_foto') {
-            return $this->handleDeletePhoto($request);
-        }
-
-        if ($action === 'hapus_akun') {
-            return $this->handleDeleteAccount($request);
-        }
-
-        return redirect('/profil');
+        return match ($request->input('action', 'save')) {
+            'save' => $this->handleSave($request),
+            'hapus_foto' => $this->handleDeletePhoto($request),
+            'hapus_akun' => $this->handleDeleteAccount($request),
+            default => redirect('/profil'),
+        };
     }
 
     /**

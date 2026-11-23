@@ -30,17 +30,17 @@ class DebtController extends Controller
         $flash = session('flash');
         $errorsList = session('errors_list', []);
         $notif = $this->buildNotification($flash, $errorsList);
-        $editId = $request->query('edit');
-        $editDebt = $editId ? $user->debts()->find($editId) : null;
-        if ($editDebt && $editDebt->isPaid()) {
-            $editDebt = null;
-        }
-
         $debtList = $user->debts()
             ->orderByRaw('CASE WHEN status = ? THEN 1 ELSE 0 END', [Debt::STATUS_PAID])
             ->orderBy('jatuh_tempo')
             ->orderByDesc('id')
             ->get();
+
+        $editId = $request->query('edit');
+        $editDebt = is_numeric($editId) ? $debtList->firstWhere('id', (int) $editId) : null;
+        if ($editDebt && $editDebt->isPaid()) {
+            $editDebt = null;
+        }
 
         $piutangList = $debtList->where('jenis', Debt::TYPE_RECEIVABLE);
         $hutangList = $debtList->where('jenis', Debt::TYPE_PAYABLE);
@@ -85,21 +85,12 @@ class DebtController extends Controller
      */
     public function handle(Request $request): RedirectResponse
     {
-        $action = (string) $request->input('action', '');
-
-        if ($action === 'tambah') {
-            return $this->store($request);
-        }
-
-        if ($action === 'update') {
-            return $this->update($request);
-        }
-
-        if ($action === 'hapus') {
-            return $this->destroy($request);
-        }
-
-        return redirect('/hutang-piutang');
+        return match ((string) $request->input('action', '')) {
+            'tambah' => $this->store($request),
+            'update' => $this->update($request),
+            'hapus' => $this->destroy($request),
+            default => redirect('/hutang-piutang'),
+        };
     }
 
     /**
@@ -109,7 +100,6 @@ class DebtController extends Controller
     {
         /** @var User $user */
         $user = $request->user();
-
         $validator = $this->makeValidator($request);
 
         if ($validator->fails()) {
@@ -123,20 +113,7 @@ class DebtController extends Controller
         }
 
         $validated = $validator->validated();
-        $jumlah = (int) $validated['jumlah'];
-        $dibayar = (int) ($validated['dibayar'] ?? 0);
-
-        $user->debts()->create([
-            'nama_pihak' => trim($validated['nama_pihak']),
-            'no_hp' => trim((string) ($validated['no_hp'] ?? '')) ?: null,
-            'jenis' => $validated['jenis'],
-            'jumlah' => $jumlah,
-            'dibayar' => $dibayar,
-            'tanggal' => $validated['tanggal'],
-            'jatuh_tempo' => ($validated['jatuh_tempo'] ?? null) ?: null,
-            'status' => Debt::resolveStatus($jumlah, $dibayar),
-            'keterangan' => trim((string) ($validated['keterangan'] ?? '')) ?: null,
-        ]);
+        $user->debts()->create($this->debtAttributes($validated));
 
         return redirect('/hutang-piutang')->with('flash', [
             'type' => 'success',
@@ -174,11 +151,26 @@ class DebtController extends Controller
                 ]);
         }
 
-        $validated = $validator->validated();
+        $debt->update($this->debtAttributes($validator->validated()));
+
+        return redirect('/hutang-piutang')->with('flash', [
+            'type' => 'success',
+            'msg' => 'Data catatan berhasil diperbarui.',
+        ]);
+    }
+
+    /**
+     * Normalisasi atribut catatan hutang / piutang untuk simpan dan ubah.
+     *
+     * @param  array<string, mixed>  $validated
+     * @return array<string, mixed>
+     */
+    protected function debtAttributes(array $validated): array
+    {
         $jumlah = (int) $validated['jumlah'];
         $dibayar = (int) ($validated['dibayar'] ?? 0);
 
-        $debt->update([
+        return [
             'nama_pihak' => trim($validated['nama_pihak']),
             'no_hp' => trim((string) ($validated['no_hp'] ?? '')) ?: null,
             'jenis' => $validated['jenis'],
@@ -188,12 +180,7 @@ class DebtController extends Controller
             'jatuh_tempo' => ($validated['jatuh_tempo'] ?? null) ?: null,
             'status' => Debt::resolveStatus($jumlah, $dibayar),
             'keterangan' => trim((string) ($validated['keterangan'] ?? '')) ?: null,
-        ]);
-
-        return redirect('/hutang-piutang')->with('flash', [
-            'type' => 'success',
-            'msg' => 'Data catatan berhasil diperbarui.',
-        ]);
+        ];
     }
 
     /**
@@ -277,17 +264,7 @@ class DebtController extends Controller
     protected function buildNotification(mixed $flash, array $errorsList): ?array
     {
         if (! empty($errorsList)) {
-            $daftar = implode('', array_map(
-                fn (string $e): string => '<li style="margin-bottom:4px">• '.e($e).'</li>',
-                $errorsList
-            ));
-
-            return [
-                'icon' => 'error',
-                'title' => 'Gagal!',
-                'html' => '<ul style="text-align:left;list-style:none;padding:0;font-size:14px">'.$daftar.'</ul>',
-                'confirmButtonText' => 'Coba lagi',
-            ];
+            return $this->buildValidationErrorNotif($errorsList);
         }
 
         if (is_array($flash) && ! empty($flash['msg'])) {

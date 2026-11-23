@@ -41,7 +41,7 @@ class StockController extends Controller
             });
 
         $editId = $request->query('edit');
-        $editLog = is_numeric($editId) ? $user->stockLogs()->find((int) $editId) : null;
+        $editLog = is_numeric($editId) ? $stokLogList->firstWhere('id', (int) $editId) : null;
 
         return view('stok', compact(
             'currentPage',
@@ -60,21 +60,12 @@ class StockController extends Controller
      */
     public function handle(Request $request): RedirectResponse
     {
-        $action = $request->input('action', '');
-
-        if ($action === 'catat') {
-            return $this->store($request);
-        }
-
-        if ($action === 'update_log') {
-            return $this->update($request);
-        }
-
-        if ($action === 'hapus_log') {
-            return $this->destroy($request);
-        }
-
-        return redirect('/stok');
+        return match ($request->input('action', '')) {
+            'catat' => $this->store($request),
+            'update_log' => $this->update($request),
+            'hapus_log' => $this->destroy($request),
+            default => redirect('/stok'),
+        };
     }
 
     /**
@@ -85,13 +76,7 @@ class StockController extends Controller
         /** @var User $user */
         $user = $request->user();
 
-        $validator = Validator::make($request->all(), [
-            'produk_id' => ['required', 'integer', Rule::exists('products', 'id')->where('user_id', $user->id)],
-            'jenis' => ['required', Rule::in(StockLog::TYPES)],
-            'jumlah' => ['required', 'integer', 'min:1', 'max:1000000000'],
-            'tanggal' => ['required', 'date'],
-            'keterangan' => ['nullable', 'string', 'max:255'],
-        ]);
+        $validator = Validator::make($request->all(), $this->stockRules($user));
 
         if ($validator->fails()) {
             return redirect('/stok')->with('error', 'Pilih produk dan masukkan jumlah lebih dari 0.');
@@ -129,14 +114,7 @@ class StockController extends Controller
 
         $id = $request->input('id');
         $stockLog = is_numeric($id) ? $user->stockLogs()->find((int) $id) : null;
-
-        $validator = Validator::make($request->all(), [
-            'produk_id' => ['required', 'integer', Rule::exists('products', 'id')->where('user_id', $user->id)],
-            'jenis' => ['required', Rule::in(StockLog::TYPES)],
-            'jumlah' => ['required', 'integer', 'min:1', 'max:1000000000'],
-            'tanggal' => ['required', 'date'],
-            'keterangan' => ['nullable', 'string', 'max:255'],
-        ]);
+        $validator = Validator::make($request->all(), $this->stockRules($user));
 
         if (! $stockLog || $validator->fails()) {
             return redirect('/stok')->with('error', 'Data mutasi tidak valid.');
@@ -163,6 +141,22 @@ class StockController extends Controller
             'title' => 'Sukses!',
             'text' => 'Catatan stok berhasil diperbarui.',
         ]);
+    }
+
+    /**
+     * Aturan validasi bersama untuk pencatatan & pembaruan mutasi stok.
+     *
+     * @return array<string, array<int, mixed>>
+     */
+    protected function stockRules(User $user): array
+    {
+        return [
+            'produk_id' => ['required', 'integer', Rule::exists('products', 'id')->where('user_id', $user->id)],
+            'jenis' => ['required', Rule::in(StockLog::TYPES)],
+            'jumlah' => ['required', 'integer', 'min:1', 'max:1000000000'],
+            'tanggal' => ['required', 'date'],
+            'keterangan' => ['nullable', 'string', 'max:255'],
+        ];
     }
 
     /**

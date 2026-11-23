@@ -1,8 +1,3 @@
-<!-- Fonts: Poppins -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
 <!-- Mobile Topbar (hanya tampil < lg) -->
 <header class="lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-[#0A0D07]/90 backdrop-blur-xl border-b border-white/[0.08]">
     <div class="flex items-center gap-2.5">
@@ -15,7 +10,7 @@
         <div class="flex items-center gap-2.5">
             <img src="{{ asset('img/logo.png') }}?v={{ filemtime(public_path('img/logo.png')) }}"
                  alt="Logo AlpetBizz"
-                 class="w-7 h-7 rounded-full object-contain shrink-0 drop-shadow-[0_0_10px_rgba(196,255,13,0.45)]">
+                 class="w-7 h-7 object-contain shrink-0 drop-shadow-[0_0_10px_rgba(196,255,13,0.45)]">
             <span class="font-bold text-white text-base tracking-tight">AlpetBizz</span>
         </div>
     </div>
@@ -45,7 +40,7 @@
             <div class="flex items-center gap-3">
                 <img src="{{ asset('img/logo.png') }}?v={{ filemtime(public_path('img/logo.png')) }}"
                      alt="Logo AlpetBizz"
-                     class="w-10 h-10 rounded-full object-contain shrink-0 drop-shadow-[0_0_14px_rgba(196,255,13,0.45)]">
+                     class="w-10 h-10 object-contain shrink-0 drop-shadow-[0_0_14px_rgba(196,255,13,0.45)]">
                 <div>
                     <h1 class="font-bold text-white text-base tracking-[-0.02em] leading-tight">AlpetBizz</h1>
                 </div>
@@ -100,50 +95,3 @@
         </div>
     </div>
 </aside>
-
-<!-- Global Assets -->
-<link rel="stylesheet" href="{{ asset('assets/css/animations.css') }}?v={{ filemtime(public_path('assets/css/animations.css')) }}">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
-<script src="{{ asset('assets/js/animations.js') }}?v={{ filemtime(public_path('assets/js/animations.js')) }}"></script>
-<script src="{{ asset('assets/js/profil.js') }}"></script>
-<script src="{{ asset('assets/js/spa.js') }}?v={{ filemtime(public_path('assets/js/spa.js')) }}"></script>
-<script>
-    window.konfirmasiLogout = function (btn) {
-        const form = btn.closest('form');
-        if (!form) return;
-
-        if (typeof Swal === 'undefined') {
-            if (confirm('Yakin ingin keluar dari akun AlpetBizz?')) {
-                form.submit();
-            }
-            return;
-        }
-
-        Swal.fire({
-            title: 'Keluar dari Akun?',
-            text: 'Sesi Anda saat ini akan diakhiri dan Anda akan kembali ke halaman login.',
-            icon: 'warning',
-            background: '#12170D',
-            color: '#F4F7F0',
-            showCancelButton: true,
-            confirmButtonText: 'Ya, keluar',
-            cancelButtonText: 'Batal',
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#252f1b',
-            reverseButtons: true
-        }).then(function (result) {
-            if (result.isConfirmed) {
-                form.submit();
-            }
-        });
-    };
-
-    // Jika halaman dipulihkan dari cache browser (tombol Back), muat ulang
-    // agar server mengecek sesi login kembali.
-    window.addEventListener('pageshow', function (event) {
-        if (event.persisted) {
-            window.location.reload();
-        }
-    });
-</script>

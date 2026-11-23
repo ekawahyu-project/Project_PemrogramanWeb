@@ -56,7 +56,7 @@ class RecommendationController extends Controller
 
         $catatanList = $user->recommendations()->orderByDesc('id')->get();
         $editId = $request->query('edit');
-        $editCat = is_numeric($editId) ? $user->recommendations()->find((int) $editId) : null;
+        $editCat = is_numeric($editId) ? $catatanList->firstWhere('id', (int) $editId) : null;
 
         return view('rekomendasi', compact(
             'currentPage',
@@ -75,21 +75,12 @@ class RecommendationController extends Controller
      */
     public function handle(Request $request): RedirectResponse
     {
-        $action = $request->input('action', '');
-
-        if ($action === 'tambah') {
-            return $this->store($request);
-        }
-
-        if ($action === 'update') {
-            return $this->update($request);
-        }
-
-        if ($action === 'hapus') {
-            return $this->destroy($request);
-        }
-
-        return redirect('/rekomendasi');
+        return match ($request->input('action', '')) {
+            'tambah' => $this->store($request),
+            'update' => $this->update($request),
+            'hapus' => $this->destroy($request),
+            default => redirect('/rekomendasi'),
+        };
     }
 
     /**
@@ -99,23 +90,13 @@ class RecommendationController extends Controller
     {
         /** @var User $user */
         $user = $request->user();
+        $attributes = $this->validatedRecommendationAttributes($request);
 
-        $validator = Validator::make($request->all(), [
-            'judul' => ['required', 'string', 'max:255'],
-            'isi' => ['required', 'string', 'max:2000'],
-            'prioritas' => ['required', Rule::in(Recommendation::PRIORITIES)],
-        ]);
-
-        if ($validator->fails()) {
+        if ($attributes === null) {
             return redirect('/rekomendasi');
         }
 
-        $validated = $validator->validated();
-
-        $user->recommendations()->create([
-            'judul' => trim($validated['judul']),
-            'isi' => trim($validated['isi']),
-            'prioritas' => $validated['prioritas'],
+        $user->recommendations()->create($attributes + [
             'dibuat' => now()->toDateString(),
         ]);
 
@@ -137,6 +118,24 @@ class RecommendationController extends Controller
             return redirect('/rekomendasi');
         }
 
+        $attributes = $this->validatedRecommendationAttributes($request);
+
+        if ($attributes === null) {
+            return redirect('/rekomendasi?edit='.$recommendation->id);
+        }
+
+        $recommendation->update($attributes);
+
+        return redirect('/rekomendasi');
+    }
+
+    /**
+     * Validasi dan normalisasi atribut catatan rekomendasi.
+     *
+     * @return array<string, mixed>|null
+     */
+    protected function validatedRecommendationAttributes(Request $request): ?array
+    {
         $validator = Validator::make($request->all(), [
             'judul' => ['required', 'string', 'max:255'],
             'isi' => ['required', 'string', 'max:2000'],
@@ -144,18 +143,16 @@ class RecommendationController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect('/rekomendasi?edit='.$recommendation->id);
+            return null;
         }
 
         $validated = $validator->validated();
 
-        $recommendation->update([
+        return [
             'judul' => trim($validated['judul']),
             'isi' => trim($validated['isi']),
             'prioritas' => $validated['prioritas'],
-        ]);
-
-        return redirect('/rekomendasi');
+        ];
     }
 
     /**

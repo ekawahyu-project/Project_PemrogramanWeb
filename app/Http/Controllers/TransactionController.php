@@ -28,7 +28,6 @@ class TransactionController extends Controller
         $currentPage = 'transaksi';
         $flash = session('flash');
         $editId = $request->query('edit');
-        $editTrx = is_numeric($editId) ? $user->transactions()->find((int) $editId) : null;
 
         $produkList = $user->products()->orderBy('nama')->get();
         $productsById = $produkList->keyBy('id');
@@ -40,6 +39,8 @@ class TransactionController extends Controller
             ->each(function (Transaction $trx) use ($productsById): void {
                 $trx->setRelation('product', $trx->product_id !== null ? $productsById->get($trx->product_id) : null);
             });
+
+        $editTrx = is_numeric($editId) ? $transaksiList->firstWhere('id', (int) $editId) : null;
 
         return view('transaksi', compact(
             'currentPage',
@@ -56,21 +57,12 @@ class TransactionController extends Controller
      */
     public function handle(Request $request): RedirectResponse
     {
-        $action = $request->input('action', '');
-
-        if ($action === 'tambah') {
-            return $this->store($request);
-        }
-
-        if ($action === 'update') {
-            return $this->update($request);
-        }
-
-        if ($action === 'hapus') {
-            return $this->destroy($request);
-        }
-
-        return redirect('/transaksi');
+        return match ($request->input('action', '')) {
+            'tambah' => $this->store($request),
+            'update' => $this->update($request),
+            'hapus' => $this->destroy($request),
+            default => redirect('/transaksi'),
+        };
     }
 
     /**
@@ -80,51 +72,13 @@ class TransactionController extends Controller
     {
         /** @var User $user */
         $user = $request->user();
+        [$payload, $error] = $this->parseAndValidate($request, $user, true);
 
-        $jumlahRaw = preg_replace('/\D/', '', (string) $request->input('jumlah', '0'));
-        $jumlah = $jumlahRaw !== '' ? (int) $jumlahRaw : 0;
-        $keterangan = trim((string) $request->input('keterangan', ''));
-        $tanggal = (string) $request->input('tanggal', date('Y-m-d'));
-        $jenis = (string) $request->input('jenis', Transaction::TYPE_INCOME);
-        $productId = $request->input('produk_id') ?: null;
-
-        if ($keterangan === '') {
-            return redirect('/transaksi')->with('flash', ['type' => 'danger', 'msg' => 'Keterangan tidak boleh kosong.']);
+        if ($error !== null) {
+            return redirect('/transaksi')->with('flash', ['type' => 'danger', 'msg' => $error]);
         }
 
-        if ($jumlah <= 0) {
-            return redirect('/transaksi')->with('flash', ['type' => 'danger', 'msg' => 'Jumlah nominal harus lebih dari 0.']);
-        }
-
-        $validator = Validator::make([
-            'keterangan' => $keterangan,
-            'jumlah' => $jumlah,
-            'tanggal' => $tanggal,
-            'jenis' => $jenis,
-            'product_id' => $productId,
-        ], [
-            'keterangan' => ['required', 'string', 'max:255'],
-            'jumlah' => ['required', 'integer', 'min:1', 'max:'.self::MAX_AMOUNT],
-            'tanggal' => ['required', 'date'],
-            'jenis' => ['required', Rule::in(Transaction::TYPES)],
-            'product_id' => ['nullable', 'integer', Rule::exists('products', 'id')->where('user_id', $user->id)],
-        ], [
-            'keterangan.max' => 'Keterangan maksimal 255 karakter.',
-            'jumlah.max' => 'Nominal transaksi melebihi batas maksimum (Rp 10.000.000.000).',
-            'product_id.exists' => 'Produk yang dipilih tidak valid.',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect('/transaksi')->with('flash', ['type' => 'danger', 'msg' => $validator->errors()->first()]);
-        }
-
-        $user->transactions()->create([
-            'tanggal' => $tanggal,
-            'keterangan' => $keterangan,
-            'jenis' => $jenis,
-            'jumlah' => $jumlah,
-            'product_id' => $productId ? (int) $productId : null,
-        ]);
+        $user->transactions()->create($payload);
 
         return redirect('/transaksi')->with('flash', ['type' => 'success', 'msg' => 'Transaksi berhasil ditambahkan.']);
     }
@@ -144,6 +98,24 @@ class TransactionController extends Controller
             return redirect('/transaksi')->with('flash', ['type' => 'danger', 'msg' => 'Transaksi tidak ditemukan.']);
         }
 
+        [$payload, $error] = $this->parseAndValidate($request, $user, false);
+
+        if ($error !== null) {
+            return redirect('/transaksi?edit='.$transaction->id)->with('flash', ['type' => 'danger', 'msg' => $error]);
+        }
+
+        $transaction->update($payload);
+
+        return redirect('/transaksi')->with('flash', ['type' => 'success', 'msg' => 'Transaksi berhasil diperbarui.']);
+    }
+
+    /**
+     * Normalisasi dan validasi input transaksi bersama untuk tambah dan ubah.
+     *
+     * @return array{0: array<string, mixed>, 1: ?string}
+     */
+    protected function parseAndValidate(Request $request, User $user, bool $checkEmptyDescriptionFirst): array
+    {
         $jumlahRaw = preg_replace('/\D/', '', (string) $request->input('jumlah', '0'));
         $jumlah = $jumlahRaw !== '' ? (int) $jumlahRaw : 0;
         $keterangan = trim((string) $request->input('keterangan', ''));
@@ -151,8 +123,12 @@ class TransactionController extends Controller
         $jenis = (string) $request->input('jenis', Transaction::TYPE_INCOME);
         $productId = $request->input('produk_id') ?: null;
 
+        if ($checkEmptyDescriptionFirst && $keterangan === '') {
+            return [[], 'Keterangan tidak boleh kosong.'];
+        }
+
         if ($jumlah <= 0) {
-            return redirect('/transaksi?edit='.$transaction->id)->with('flash', ['type' => 'danger', 'msg' => 'Jumlah nominal harus lebih dari 0.']);
+            return [[], 'Jumlah nominal harus lebih dari 0.'];
         }
 
         $validator = Validator::make([
@@ -174,18 +150,16 @@ class TransactionController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect('/transaksi?edit='.$transaction->id)->with('flash', ['type' => 'danger', 'msg' => $validator->errors()->first()]);
+            return [[], $validator->errors()->first()];
         }
 
-        $transaction->update([
+        return [[
             'tanggal' => $tanggal,
             'keterangan' => $keterangan,
             'jenis' => $jenis,
-            'product_id' => $productId ? (int) $productId : null,
             'jumlah' => $jumlah,
-        ]);
-
-        return redirect('/transaksi')->with('flash', ['type' => 'success', 'msg' => 'Transaksi berhasil diperbarui.']);
+            'product_id' => $productId ? (int) $productId : null,
+        ], null];
     }
 
     /**

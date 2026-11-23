@@ -1,41 +1,18 @@
-<!DOCTYPE html>
-<html lang="id" class="dark">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stok | AlpetBizz</title>
-    <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}?v={{ filemtime(public_path('img/logo.png')) }}">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Poppins', 'sans-serif'],
-                        mono: ['Poppins', 'sans-serif']
-                    }
-                }
-            }
-        };
-    </script>
-</head>
+@section('title', 'Stok')
 
-<body class="bento-body font-sans antialiased text-[#F4F7F0]">
-    @include('includes.sidebar')
-
+@section('content')
     @php
-    $totalUnits = (int) $produkList->sum('stok');
-    $totalIn = (int) $stokLogList->where('jenis', 'Masuk')->sum('jumlah');
-    $totalOut = (int) $stokLogList->where('jenis', 'Keluar')->sum('jumlah');
-    $skuCount = $produkList->count();
-    $lowCount = $lowStock->count();
-    $healthPct = $skuCount > 0 ? round((max(0, $skuCount - $lowCount) / $skuCount) * 100, 1) : 100.0;
+        $totalUnits = (int) $produkList->sum('stok');
+        $totalIn = (int) $stokLogList->where('jenis', 'Masuk')->sum('jumlah');
+        $totalOut = (int) $stokLogList->where('jenis', 'Keluar')->sum('jumlah');
+        $skuCount = $produkList->count();
+        $lowCount = $lowStock->count();
+        $healthPct = $skuCount > 0 ? round((max(0, $skuCount - $lowCount) / $skuCount) * 100, 1) : 100.0;
     @endphp
 
-    <main class="w-full min-h-screen lg:pl-64 flex flex-col transition-all duration-300">
-        <div class="p-4 sm:p-6 lg:p-8 flex-1 max-w-[1380px] w-full mx-auto space-y-5">
+    <div class="p-4 sm:p-6 lg:p-8 flex-1 max-w-[1380px] w-full mx-auto space-y-5">
 
             <!-- Top Status Bar -->
             <nav class="flex flex-wrap items-center justify-between gap-3 px-1" aria-label="Stok Header">
@@ -402,19 +379,7 @@
         @if ($flash)
         <div id="flash-data" data-flash="{{ json_encode($flash) }}" hidden></div>
         <script>
-            (function() {
-                const flashData = document.querySelector('#flash-data');
-                if (!flashData || typeof Swal === 'undefined') return;
-
-                const flash = Object.assign({
-                        background: '#12170D',
-                        color: '#F4F7F0',
-                        confirmButtonColor: '#252f1b'
-                    },
-                    JSON.parse(flashData.dataset.flash)
-                );
-                Swal.fire(flash);
-            })();
+            window.alpetbizzShowNotif(JSON.parse(document.querySelector('#flash-data').dataset.flash), { toastOnSuccess: false });
         </script>
         @endif
 
@@ -480,7 +445,4 @@
                 });
             })();
         </script>
-    </main>
-</body>
-
-</html>
+@endsection

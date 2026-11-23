@@ -652,4 +652,84 @@
     window.reinitPageAnimations = function () {
         requestAnimationFrame(bootAll);
     };
+
+    // 13. Shared SweetAlert2 Bento Helpers (Confirm, Toast, Logout, BFCache Guard)
+    const SWAL_DARK_DEFAULTS = {
+        background: '#12170D',
+        color: '#F4F7F0',
+        confirmButtonColor: '#252f1b'
+    };
+
+    window.alpetbizzConfirm = function (opts, onConfirm) {
+        if (typeof Swal === 'undefined') {
+            if (confirm(opts.text || opts.title || 'Lanjutkan?')) {
+                onConfirm();
+            }
+            return;
+        }
+
+        Swal.fire(Object.assign({
+            icon: 'warning',
+            background: SWAL_DARK_DEFAULTS.background,
+            color: SWAL_DARK_DEFAULTS.color,
+            showCancelButton: true,
+            confirmButtonText: 'Ya, lanjutkan',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#252f1b',
+            reverseButtons: true
+        }, opts)).then(function (result) {
+            if (result.isConfirmed) {
+                onConfirm();
+            }
+        });
+    };
+
+    window.alpetbizzShowNotif = function (rawNotif, options) {
+        if (!rawNotif || typeof Swal === 'undefined') return;
+        const notif = Object.assign({}, SWAL_DARK_DEFAULTS, rawNotif);
+        const toastOnSuccess = !options || options.toastOnSuccess !== false;
+
+        if (toastOnSuccess && notif.icon === 'success') {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                iconColor: '#C4FF0D',
+                title: notif.text || notif.title,
+                background: SWAL_DARK_DEFAULTS.background,
+                color: SWAL_DARK_DEFAULTS.color,
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                customClass: { popup: 'swal-toast-bento' },
+                didOpen: function (toast) {
+                    toast.addEventListener('mouseenter', Swal.stopTimer);
+                    toast.addEventListener('mouseleave', Swal.resumeTimer);
+                }
+            });
+            return;
+        }
+
+        Swal.fire(notif);
+    };
+
+    window.konfirmasiLogout = function (btn) {
+        const form = btn && btn.closest ? btn.closest('form') : null;
+        if (!form) return;
+
+        window.alpetbizzConfirm({
+            title: 'Keluar dari Akun?',
+            text: 'Sesi Anda saat ini akan diakhiri dan Anda akan kembali ke halaman login.',
+            confirmButtonText: 'Ya, keluar'
+        }, function () {
+            form.submit();
+        });
+    };
+
+    window.addEventListener('pageshow', function (event) {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    });
 })();

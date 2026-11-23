@@ -1,28 +1,8 @@
-<!DOCTYPE html>
-<html lang="id" class="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Konsultasi AI Bisnis | AlpetBizz</title>
-    <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}?v={{ filemtime(public_path('img/logo.png')) }}">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Poppins', 'sans-serif'],
-                        mono: ['Poppins', 'sans-serif']
-                    }
-                }
-            }
-        };
-    </script>
-</head>
-<body class="bento-body font-sans antialiased text-[#F4F7F0]">
-    @include('includes.sidebar')
+@extends('layouts.app')
 
+@section('title', 'Konsultasi AI Bisnis')
+
+@section('content')
     @php
         $keu = $snapshot['keuangan'];
         $inv = $snapshot['inventaris'];
@@ -30,26 +10,8 @@
         $profil = $snapshot['profil'];
     @endphp
 
-    <main class="w-full min-h-screen lg:pl-64 flex flex-col transition-all duration-300">
-        <!-- Gaya khusus halaman Konsultasi AI (di dalam main agar ikut termuat oleh spa.js) -->
-        <style>
-            .swal2-container {
-                z-index: 10050 !important;
-            }
-            .swal-toast-bento {
-                border: 1px solid rgba(196, 255, 13, 0.35) !important;
-                border-radius: 16px !important;
-                box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5) !important;
-            }
-            .swal2-timer-progress-bar {
-                background: #C4FF0D !important;
-            }
-            .swal2-icon.swal2-success [class^='swal2-success-line'] {
-                background-color: #C4FF0D !important;
-            }
-            .swal2-icon.swal2-success .swal2-success-ring {
-                border-color: rgba(196, 255, 13, 0.3) !important;
-            }
+    <!-- Gaya khusus halaman Konsultasi AI (di dalam main agar ikut termuat oleh spa.js) -->
+    <style>
             .ai-markdown p {
                 margin-bottom: 0.6rem;
                 line-height: 1.65;
@@ -156,7 +118,7 @@
                         <div class="flex items-center gap-3 min-w-0">
                             <img src="{{ asset('img/logo.png') }}?v={{ filemtime(public_path('img/logo.png')) }}"
                                  alt="AlpetBizz AI"
-                                 class="size-9 sm:size-10 shrink-0 rounded-full object-contain drop-shadow-[0_0_12px_rgba(196,255,13,0.4)]">
+                                 class="size-9 sm:size-10 shrink-0 object-contain drop-shadow-[0_0_12px_rgba(196,255,13,0.4)]">
                             <div class="min-w-0">
                                 <h3 class="text-sm sm:text-base font-bold text-white truncate">AlpetBizz AI Consultant</h3>
                                 <p class="text-xs text-[#9AA68E] truncate">
@@ -673,32 +635,13 @@
                             }
                         };
 
-                        if (typeof Swal === 'undefined') {
-                            if (confirm('Hapus seluruh riwayat konsultasi AI Anda?')) {
-                                doReset();
-                            }
-                            return;
-                        }
-
-                        Swal.fire({
+                        window.alpetbizzConfirm({
                             title: 'Reset Riwayat Chat?',
                             text: 'Seluruh percakapan konsultasi AI di akun ini akan dihapus untuk memulai sesi baru.',
-                            icon: 'warning',
-                            background: '#12170D',
-                            color: '#F4F7F0',
-                            showCancelButton: true,
-                            confirmButtonText: 'Ya, reset',
-                            cancelButtonText: 'Batal',
-                            confirmButtonColor: '#ef4444',
-                            cancelButtonColor: '#252f1b',
-                            reverseButtons: true
-                        }).then(function (result) {
-                            if (result.isConfirmed) doReset();
-                        });
+                            confirmButtonText: 'Ya, reset'
+                        }, doReset);
                     });
                 }
             })();
         </script>
-    </main>
-</body>
-</html>
+@endsection

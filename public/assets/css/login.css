@@ -204,15 +204,9 @@ html, body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes barGrow {
-    from { transform: scaleY(0); opacity: 0.2; }
-    to { transform: scaleY(1); opacity: 1; }
-}
-
 .anim-hero-1 { animation: heroRise 0.85s var(--ease-expo) 0.06s both; }
 .anim-hero-2 { animation: heroRise 0.9s var(--ease-expo) 0.16s both; }
 .anim-hero-3 { animation: heroRise 0.9s var(--ease-expo) 0.26s both; }
-.hero-bar { transform-origin: bottom; animation: barGrow 0.8s var(--ease-expo) both; }
 
 /* 3D Editorial Sculpture Stage */
 .hero-stage {
@@ -767,6 +761,6 @@ html.js-scroll-ready [data-reveal].is-visible {
 
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    .anim-hero-1, .anim-hero-2, .anim-hero-3, .hero-bar, .hero-3d-float { animation: none !important; }
+    .anim-hero-1, .anim-hero-2, .anim-hero-3, .hero-3d-float { animation: none !important; }
     html.js-scroll-ready [data-reveal] { opacity: 1 !important; transform: none !important; transition: none !important; }
 }

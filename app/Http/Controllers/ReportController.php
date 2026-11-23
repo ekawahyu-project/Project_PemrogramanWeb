@@ -78,7 +78,7 @@ class ReportController extends Controller
 
         $laporanTersimpan = $user->reports()->orderByDesc('id')->get();
         $editId = $request->query('edit');
-        $editLap = is_numeric($editId) ? $user->reports()->find((int) $editId) : null;
+        $editLap = is_numeric($editId) ? $laporanTersimpan->firstWhere('id', (int) $editId) : null;
 
         $kategoriOptions = Report::CATEGORIES;
         $statusOptions = Report::STATUSES;
@@ -106,21 +106,12 @@ class ReportController extends Controller
      */
     public function handle(Request $request): RedirectResponse
     {
-        $action = $request->input('action', '');
-
-        if ($action === 'simpan') {
-            return $this->store($request);
-        }
-
-        if ($action === 'update') {
-            return $this->update($request);
-        }
-
-        if ($action === 'hapus') {
-            return $this->destroy($request);
-        }
-
-        return redirect('/laporan');
+        return match ($request->input('action', '')) {
+            'simpan' => $this->store($request),
+            'update' => $this->update($request),
+            'hapus' => $this->destroy($request),
+            default => redirect('/laporan'),
+        };
     }
 
     /**
@@ -130,29 +121,13 @@ class ReportController extends Controller
     {
         /** @var User $user */
         $user = $request->user();
+        $attributes = $this->validatedReportAttributes($request);
 
-        $validator = Validator::make($request->all(), [
-            'judul' => ['required', 'string', 'max:255'],
-            'kategori' => ['required', Rule::in(Report::CATEGORIES)],
-            'tanggal_dari' => ['required', 'date'],
-            'tanggal_sampai' => ['required', 'date', 'after_or_equal:tanggal_dari'],
-            'status' => ['required', Rule::in(Report::STATUSES)],
-            'catatan' => ['nullable', 'string', 'max:2000'],
-        ]);
-
-        if ($validator->fails()) {
+        if ($attributes === null) {
             return redirect('/laporan');
         }
 
-        $validated = $validator->validated();
-
-        $user->reports()->create([
-            'judul' => trim($validated['judul']),
-            'kategori' => $validated['kategori'],
-            'tanggal_dari' => $validated['tanggal_dari'],
-            'tanggal_sampai' => $validated['tanggal_sampai'],
-            'status' => $validated['status'],
-            'catatan' => trim((string) ($validated['catatan'] ?? '')) ?: null,
+        $user->reports()->create($attributes + [
             'pembuat' => $user->nama ?: 'Admin',
         ]);
 
@@ -174,6 +149,24 @@ class ReportController extends Controller
             return redirect('/laporan');
         }
 
+        $attributes = $this->validatedReportAttributes($request);
+
+        if ($attributes === null) {
+            return redirect('/laporan?edit='.$report->id);
+        }
+
+        $report->update($attributes);
+
+        return redirect('/laporan');
+    }
+
+    /**
+     * Validasi dan normalisasi atribut laporan tersimpan.
+     *
+     * @return array<string, mixed>|null
+     */
+    protected function validatedReportAttributes(Request $request): ?array
+    {
         $validator = Validator::make($request->all(), [
             'judul' => ['required', 'string', 'max:255'],
             'kategori' => ['required', Rule::in(Report::CATEGORIES)],
@@ -184,21 +177,19 @@ class ReportController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect('/laporan?edit='.$report->id);
+            return null;
         }
 
         $validated = $validator->validated();
 
-        $report->update([
+        return [
             'judul' => trim($validated['judul']),
             'kategori' => $validated['kategori'],
             'tanggal_dari' => $validated['tanggal_dari'],
             'tanggal_sampai' => $validated['tanggal_sampai'],
             'status' => $validated['status'],
             'catatan' => trim((string) ($validated['catatan'] ?? '')) ?: null,
-        ]);
-
-        return redirect('/laporan');
+        ];
     }
 
     /**

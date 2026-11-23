@@ -566,9 +566,23 @@ textarea:focus {
     appearance: textfield;
 }
 
-/* SweetAlert2 Global Overlay Priority */
+/* SweetAlert2 Global Overlay & Bento Toast Theme */
 .swal2-container {
     z-index: 10050 !important;
+}
+.swal-toast-bento {
+    border: 1px solid rgba(196, 255, 13, 0.35) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5) !important;
+}
+.swal2-timer-progress-bar {
+    background: #C4FF0D !important;
+}
+.swal2-icon.swal2-success [class^='swal2-success-line'] {
+    background-color: #C4FF0D !important;
+}
+.swal2-icon.swal2-success .swal2-success-ring {
+    border-color: rgba(196, 255, 13, 0.3) !important;
 }
 
 /* Custom Scrollbar */

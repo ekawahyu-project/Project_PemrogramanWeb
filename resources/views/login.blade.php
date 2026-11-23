@@ -36,7 +36,7 @@
         <a href="#hero" class="flex items-center gap-3 text-white no-underline group">
             <img src="{{ asset('img/logo.png') }}?v={{ filemtime(public_path('img/logo.png')) }}"
                  alt="Logo AlpetBizz"
-                 class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-contain shrink-0 drop-shadow-[0_0_14px_rgba(196,255,13,0.45)] transition-transform duration-200 group-hover:scale-105">
+                 class="w-9 h-9 sm:w-10 sm:h-10 object-contain shrink-0 drop-shadow-[0_0_14px_rgba(196,255,13,0.45)] transition-transform duration-200 group-hover:scale-105">
             <span class="text-lg sm:text-xl font-bold tracking-tight text-white">AlpetBizz</span>
         </a>
 
@@ -106,7 +106,7 @@
                     <div class="anim-hero-3 pt-4 border-t border-white/10 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-[#9AA68E]">
                         <span><strong class="text-white font-semibold">Multi-Tenant</strong> Privat per Akun</span>
                         <span class="text-white/20">/</span>
-                        <span><strong class="text-white font-semibold">Gemini AI</strong> Baca Data Live</span>
+                        <span><strong class="text-white font-semibold">AI</strong> Baca Data Live</span>
                         <span class="text-white/20">/</span>
                         <span><strong class="text-[#C4FF0D] font-semibold">100% Gratis</strong> untuk UMKM</span>
                     </div>
@@ -154,7 +154,7 @@
                     ['text' => 'Arus Kas Real-Time', 'outline' => false],
                     ['text' => 'Mutasi Stok Atomik', 'outline' => true],
                     ['text' => 'Buku Kasbon & Piutang', 'outline' => false],
-                    ['text' => 'Konsultan Gemini AI', 'outline' => true],
+                    ['text' => 'Konsultan AI', 'outline' => true],
                     ['text' => 'Grafik Laba Bulanan', 'outline' => false],
                     ['text' => 'Isolasi Multi-Tenant', 'outline' => true],
                 ];
@@ -378,7 +378,7 @@
                                     <div class="flex items-center gap-2.5">
                                         <img src="{{ asset('img/logo.png') }}?v={{ filemtime(public_path('img/logo.png')) }}"
                                              alt="AlpetBizz AI"
-                                             class="w-8 h-8 rounded-full object-contain">
+                                             class="w-8 h-8 object-contain">
                                         <div>
                                             <p class="text-xs font-bold text-white">AlpetBizz AI Consultant</p>
                                             <p id="ai-demo-context" class="text-[11px] text-[#C4FF0D]">Omzet Rp 19,8 jt &middot; Margin 38,4%</p>
@@ -501,7 +501,7 @@
                         ],
                         [
                             'q' => 'Bagaimana AlpetBizz AI memberi saran yang relevan dengan toko saya?',
-                            'a' => 'Setiap pertanyaan yang dikirimkan otomatis disertai ringkasan data toko aktif Anda (omzet, margin, produk terlaris, stok kritis, dan kasbon jatuh tempo) sehingga saran Gemini AI selalu konkret.',
+                            'a' => 'Setiap pertanyaan yang dikirimkan otomatis disertai ringkasan data toko aktif Anda (omzet, margin, produk terlaris, stok kritis, dan kasbon jatuh tempo) sehingga saran AI selalu konkret.',
                         ],
                         [
                             'q' => 'Bagaimana jika saya salah mencatat stok masuk atau keluar?',
@@ -558,7 +558,7 @@
             <div class="flex items-center gap-2.5">
                 <img src="{{ asset('img/logo.png') }}?v={{ filemtime(public_path('img/logo.png')) }}"
                      alt="Logo AlpetBizz"
-                     class="w-6 h-6 rounded-full object-contain">
+                     class="w-6 h-6 object-contain">
                 <span class="font-bold text-white">AlpetBizz</span>
             </div>
             <div class="flex flex-wrap items-center justify-center gap-5">

@@ -1,28 +1,8 @@
-<!DOCTYPE html>
-<html lang="id" class="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Produk | AlpetBizz</title>
-    <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}?v={{ filemtime(public_path('img/logo.png')) }}">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Poppins', 'sans-serif'],
-                        mono: ['Poppins', 'sans-serif']
-                    }
-                }
-            }
-        };
-    </script>
-</head>
-<body class="bento-body font-sans antialiased text-[#F4F7F0]">
-    @include('includes.sidebar')
+@extends('layouts.app')
 
+@section('title', 'Produk')
+
+@section('content')
     @php
         $totalSku = $produkList->count();
         $nilaiJualTotal = (int) $produkList->sum(fn ($p) => $p->harga_jual * $p->stok);
@@ -43,26 +23,7 @@
         $katColors = ['#C4FF0D', '#C084FC', '#38BDF8', '#FBBF24'];
     @endphp
 
-    <main class="w-full min-h-screen lg:pl-64 flex flex-col transition-all duration-300">
-        <!-- Gaya toast notifikasi (di dalam main agar ikut termuat oleh spa.js) -->
-        <style>
-            .swal-toast-bento {
-                border: 1px solid rgba(196, 255, 13, 0.35) !important;
-                border-radius: 16px !important;
-                box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5) !important;
-            }
-            .swal2-timer-progress-bar {
-                background: #C4FF0D !important;
-            }
-            .swal2-icon.swal2-success [class^='swal2-success-line'] {
-                background-color: #C4FF0D !important;
-            }
-            .swal2-icon.swal2-success .swal2-success-ring {
-                border-color: rgba(196, 255, 13, 0.3) !important;
-            }
-        </style>
-
-        <div class="p-4 sm:p-6 lg:p-8 flex-1 max-w-[1380px] w-full mx-auto space-y-5">
+    <div class="p-4 sm:p-6 lg:p-8 flex-1 max-w-[1380px] w-full mx-auto space-y-5">
 
             <!-- Web3Bento Top Status Bar -->
             <nav class="flex flex-wrap items-center justify-between gap-3 px-1" aria-label="Produk Header">
@@ -431,21 +392,12 @@
         <script>
             window.konfirmasiHapus = function (btn) {
                 const form = btn.closest('form');
-                Swal.fire({
+                if (!form) return;
+                window.alpetbizzConfirm({
                     title: 'Hapus Produk?',
                     text: 'Hapus produk ' + btn.dataset.nama + '?',
-                    icon: 'warning',
-                    background: '#12170D',
-                    color: '#F4F7F0',
-                    showCancelButton: true,
-                    confirmButtonText: 'Ya, hapus',
-                    cancelButtonText: 'Batal',
-                    confirmButtonColor: '#ef4444',
-                    cancelButtonColor: '#252f1b',
-                    reverseButtons: true
-                }).then(function (result) {
-                    if (result.isConfirmed) form.submit();
-                });
+                    confirmButtonText: 'Ya, hapus'
+                }, function () { form.submit(); });
             };
         </script>
 
@@ -453,36 +405,7 @@
         @if ($notif)
             <div id="notif-data" data-notif="{{ json_encode($notif) }}" hidden></div>
             <script>
-                (function () {
-                    var notif = Object.assign(
-                        { background: '#12170D', color: '#F4F7F0', confirmButtonColor: '#252f1b' },
-                        JSON.parse(document.getElementById('notif-data').dataset.notif)
-                    );
-
-                    if (notif.icon === 'success') {
-                        Swal.fire({
-                            toast: true,
-                            position: 'top-end',
-                            icon: 'success',
-                            iconColor: '#C4FF0D',
-                            title: notif.text || notif.title,
-                            background: '#12170D',
-                            color: '#F4F7F0',
-                            showConfirmButton: false,
-                            timer: 3000,
-                            timerProgressBar: true,
-                            customClass: { popup: 'swal-toast-bento' },
-                            didOpen: function (toast) {
-                                toast.addEventListener('mouseenter', Swal.stopTimer);
-                                toast.addEventListener('mouseleave', Swal.resumeTimer);
-                            }
-                        });
-                    } else {
-                        Swal.fire(notif);
-                    }
-                })();
+                window.alpetbizzShowNotif(JSON.parse(document.getElementById('notif-data').dataset.notif));
             </script>
         @endif
-    </main>
-</body>
-</html>
+@endsection

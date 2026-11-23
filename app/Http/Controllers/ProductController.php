@@ -27,24 +27,10 @@ class ProductController extends Controller
         $produkList = $user->products()->orderBy('id')->get();
 
         $editId = $request->query('edit');
-        $editPrd = is_numeric($editId) ? $user->products()->find((int) $editId) : null;
+        $editPrd = is_numeric($editId) ? $produkList->firstWhere('id', (int) $editId) : null;
 
         $errorsList = session('errors_list', []);
-        $notif = session('flash');
-
-        if (! empty($errorsList)) {
-            $daftar = implode('', array_map(
-                fn (string $e): string => '<li style="margin-bottom:4px">• '.e($e).'</li>',
-                $errorsList
-            ));
-
-            $notif = [
-                'icon' => 'error',
-                'title' => 'Gagal!',
-                'html' => '<ul style="text-align:left;list-style:none;padding:0;font-size:14px">'.$daftar.'</ul>',
-                'confirmButtonText' => 'Coba lagi',
-            ];
-        }
+        $notif = ! empty($errorsList) ? $this->buildValidationErrorNotif($errorsList) : session('flash');
 
         return view('produk', compact(
             'currentPage',
@@ -63,17 +49,11 @@ class ProductController extends Controller
      */
     public function handle(Request $request): RedirectResponse
     {
-        $action = $request->input('action', '');
-
-        if ($action === 'tambah' || $action === 'update') {
-            return $this->storeOrUpdate($request);
-        }
-
-        if ($action === 'hapus') {
-            return $this->destroy($request);
-        }
-
-        return redirect('/produk');
+        return match ($request->input('action', '')) {
+            'tambah', 'update' => $this->storeOrUpdate($request),
+            'hapus' => $this->destroy($request),
+            default => redirect('/produk'),
+        };
     }
 
     /**

@@ -1,29 +1,8 @@
-<!DOCTYPE html>
-<html lang="id" class="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan | AlpetBizz</title>
-    <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}?v={{ filemtime(public_path('img/logo.png')) }}">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Poppins', 'sans-serif'],
-                        mono: ['Poppins', 'sans-serif']
-                    }
-                }
-            }
-        };
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body class="bento-body font-sans antialiased text-[#F4F7F0]">
-    @include('includes.sidebar')
+@extends('layouts.app')
 
+@section('title', 'Laporan')
+
+@section('content')
     @php
         $totalFlowLap = max($totalMasuk + $totalKeluar, 1);
         $pctMasukLap = $totalMasuk > 0 ? round(($totalMasuk / $totalFlowLap) * 100, 1) : 50.0;
@@ -33,8 +12,7 @@
         $cntDraft = $laporanTersimpan->where('status', 'Draft')->count();
     @endphp
 
-    <main class="w-full min-h-screen lg:pl-64 flex flex-col transition-all duration-300">
-        <div class="p-4 sm:p-6 lg:p-8 flex-1 max-w-[1380px] w-full mx-auto space-y-5">
+    <div class="p-4 sm:p-6 lg:p-8 flex-1 max-w-[1380px] w-full mx-auto space-y-5">
 
             <!-- Web3Bento Top Status Bar -->
             <nav class="flex flex-wrap items-center justify-between gap-3 px-1" aria-label="Laporan Header">
@@ -408,6 +386,4 @@
             renderBentoChart('bar');
         })();
         </script>
-    </main>
-</body>
-</html>
+@endsection
