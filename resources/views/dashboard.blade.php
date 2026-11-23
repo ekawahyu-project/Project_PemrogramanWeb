@@ -293,9 +293,6 @@
                                 {{ $outFormatted }}
                             </p>
                         </div>
-                        <span class="hidden sm:inline-flex ml-auto rounded-full bg-[#C4FF0D]/15 px-3 py-1 text-xs font-semibold tabular-nums text-[#C4FF0D]">
-                            Hover titik kurva
-                        </span>
                     </div>
 
                     <!-- Interactive Smooth SVG Curve -->
