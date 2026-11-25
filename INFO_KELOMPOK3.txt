@@ -1,0 +1,62 @@
+================================================================================
+INFORMASI PENGUMPULAN PROYEK AKHIR — KELOMPOK 3
+Mata Kuliah : Pemrograman Web - A
+Dosen       : Ir. Tri Afirianto, S.T., M.T.
+================================================================================
+
+1. IDENTITAS APLIKASI
+--------------------------------------------------------------------------------
+Nama Aplikasi    : AlpetBizz (Sistem Informasi Manajemen Toko Kelontong / UMKM)
+Arsitektur       : Model-View-Controller (MVC) — Laravel 13 & PHP 8.3
+URL Live Hosting : https://alpetbizz.vercel.app
+Repository Git   : https://github.com/ekawahyu-project/Project_PemrogramanWeb
+
+2. DAFTAR ANGGOTA KELOMPOK 3 & PEMBAGIAN FITUR CRUD
+--------------------------------------------------------------------------------
+No. | Nama Lengkap                      | NIM             | Inisial | Fitur CRUD yang Dikerjakan
+----+-----------------------------------+-----------------+---------+-----------------------------------------
+1   | Eka Wahyu Maulidan                | 255150600111029 | EWM     | Hutang & Piutang / Kasbon (CRUD)
+    |                                   |                 |         | & Konsultasi AI Bisnis (Gemini API)
+2   | Mochammad Alfan Rizqi Abdilah     | 255150600111017 | MARA    | Laporan & Grafik Bulanan (CRUD)
+3   | Ahmad Zaki Andika Pratama         | 255150601111018 | AZNP    | Manajemen Stok Atomik (CRUD)
+4   | Zacky AL Ghifari                  | 255150607111043 | ZAG     | Manajemen Katalog Produk (CRUD)
+5   | Aloysius Aris Budi Setiawan       | 255150600111018 | AABS    | Manajemen Transaksi Kas (CRUD)
+
+Catatan Fitur Wajib Kelompok (Dikerjakan Bersama / ALL):
+- Registrasi, Login, Logout (CSRF, Bcrypt, Rate Limiting, Session Regeneration)
+- Dashboard Ringkasan Bisnis (/dashboard)
+- Manajemen Profil Pemilik & Usaha (/profil)
+- Keamanan Halaman (auth.custom, no-store cache anti-Back setelah logout, anti-SQLi, anti-XSS, isolasi multi-tenant per user_id)
+
+3. INFORMASI DATABASE
+--------------------------------------------------------------------------------
+- Lokal (Default)    : SQLite (file: database/database.sqlite)
+- Produksi (Vercel)  : PostgreSQL (Neon Cloud Serverless PostgreSQL, region sin1)
+- Struktur & Seeder  : Tersedia lengkap di folder database/migrations/ (14 file)
+                       dan database/seeders/DatabaseSeeder.php
+- Koneksi Database   : Konfigurasi di config/database.php dan template .env.example
+
+4. AKUN TESTING (DEMO LOGIN)
+--------------------------------------------------------------------------------
+Username : admin
+Email    : admin@gmail.com
+Password : admin123
+
+5. CARA MENJALANKAN APLIKASI SECARA LOKAL
+--------------------------------------------------------------------------------
+1. Pastikan PHP >= 8.3 dan Composer sudah terpasang.
+2. Buka terminal di folder proyek hasil ekstrak ZIP:
+   composer install
+3. Salin konfigurasi environment:
+   cp .env.example .env
+   php artisan key:generate
+4. Buat file SQLite (jika belum ada) lalu jalankan migrasi & data awal:
+   php artisan migrate --seed
+5. Jalankan server pengembangan lokal:
+   php artisan serve
+6. Buka browser dan akses http://127.0.0.1:8000
+
+Untuk mengaktifkan respons live fitur Konsultasi AI di lokal, isi
+GEMINI_API_KEY pada file .env. Pada versi live hosting (alpetbizz.vercel.app),
+GEMINI_API_KEY sudah aktif dan siap diuji langsung.
+================================================================================
