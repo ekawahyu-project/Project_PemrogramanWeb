@@ -332,8 +332,8 @@
                                             @endphp
                                             <tr data-filter-item data-filter-tag="{{ $d->jenis }}"
                                                 class="{{ (string) $d->id === (string) $editId ? 'bg-[#C4FF0D]/[0.07]' : '' }}">
-                                                <td>
-                                                    <p class="font-semibold text-white">{{ $d->nama_pihak }}</p>
+                                                <td style="max-width:14rem;">
+                                                    <p class="font-semibold text-white truncate">{{ $d->nama_pihak }}</p>
                                                     <p class="text-xs text-[#9AA68E] truncate max-w-[220px] mt-0.5">
                                                         {{ $d->keterangan ?: 'Tanpa catatan' }}
                                                         @if ($d->no_hp)
@@ -343,7 +343,7 @@
                                                 </td>
                                                 <td>
                                                     <span class="px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap
-                                                        {{ $d->isReceivable() ? 'bg-[#C4FF0D]/15 text-[#C4FF0D] border border-[#C4FF0D]/30' : 'bg-[#C084FC]/15 text-[#C084FC] border border-[#C084FC]/30' }}">
+                                                        {{ $d->isReceivable() ? 'bg-[#C4FF0D] text-[#0E1308]' : 'bg-[#C084FC] text-[#0E1308]' }}">
                                                         {{ $d->jenis }}
                                                     </span>
                                                 </td>
@@ -442,7 +442,7 @@
                 <!-- Header Modal -->
                 <div class="px-5 py-4 border-b border-white/[0.08] flex items-start justify-between gap-4 shrink-0">
                     <div class="min-w-0">
-                        <span class="inline-flex items-center gap-1.5 rounded-full bg-[#C4FF0D]/15 border border-[#C4FF0D]/30 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#C4FF0D]">
+                        <span class="inline-flex items-center gap-1.5 rounded-full bg-[#C4FF0D] px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#0E1308]">
                             Update Catatan
                         </span>
                         <h3 id="edit-debt-modal-title" class="text-base sm:text-lg font-bold text-white mt-1.5">
@@ -483,7 +483,7 @@
                             <p id="edit-live-sisa" class="text-lg font-bold text-white mt-0.5 tabular-nums">Rp 0</p>
                         </div>
                         <div class="flex items-center gap-2.5">
-                            <span id="edit-live-status" class="px-3 py-1 rounded-full text-xs font-semibold bg-amber-400/15 text-amber-300 border border-amber-400/30">
+                            <span id="edit-live-status" class="px-3 py-1 rounded-full text-xs font-semibold bg-amber-400 text-[#0E1308]">
                                 Dicicil
                             </span>
                             <button type="button"
@@ -598,17 +598,17 @@
 
                     if (jumlah > 0 && dibayar > jumlah) {
                         statusEl.textContent = 'Melebihi Total!';
-                        statusEl.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/15 text-rose-300 border border-rose-500/35';
+                        statusEl.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-rose-400 text-[#0E1308]';
                     } else if (jumlah > 0 && dibayar >= jumlah) {
                         statusEl.textContent = 'Lunas (100%)';
-                        statusEl.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-[#C4FF0D]/15 text-[#C4FF0D] border border-[#C4FF0D]/35';
+                        statusEl.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-[#C4FF0D] text-[#0E1308]';
                     } else if (dibayar > 0) {
                         const pct = jumlah > 0 ? Math.round((dibayar / jumlah) * 100) : 0;
                         statusEl.textContent = 'Dicicil (' + pct + '%)';
-                        statusEl.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-amber-400/15 text-amber-300 border border-amber-400/30';
+                        statusEl.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-amber-400 text-[#0E1308]';
                     } else {
                         statusEl.textContent = 'Belum Lunas';
-                        statusEl.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/15 text-rose-300 border border-rose-500/30';
+                        statusEl.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-rose-400 text-[#0E1308]';
                     }
                 };
 

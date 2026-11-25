@@ -31,8 +31,8 @@
                 <section class="bento-tile xl:col-span-3 justify-between">
                     <header class="mb-5 flex flex-wrap items-center justify-between gap-3">
                         <div>
-                            <h3 class="text-base sm:text-lg font-bold text-white">Grafik Tren Bulanan Pemasukan vs Pengeluaran</h3>
-                            <p class="text-xs sm:text-sm text-[#9AA68E] mt-0.5">Perbandingan visual arus kas masuk &amp; keluar per bulan.</p>
+                            <h3 class="text-base sm:text-lg font-bold text-white">Grafik Tren Bulanan Pemasukan, Pengeluaran &amp; Laba Bersih</h3>
+                            <p class="text-xs sm:text-sm text-[#9AA68E] mt-0.5">Perbandingan visual arus kas masuk, keluar, dan laba bersih per bulan.</p>
                         </div>
                         <div class="bento-pills" role="radiogroup" aria-label="Tipe Grafik">
                             <button type="button" onclick="switchChartType('bar', this)" class="bento-pill active">Bar</button>
@@ -250,8 +250,8 @@
                                     @foreach ($laporanTersimpan as $l)
                                     <tr data-filter-item data-filter-tag="{{ $l->status }}"
                                         class="{{ (string) $l->id === (string) $editId ? 'bg-[#C4FF0D]/[0.07]' : '' }}">
-                                        <td>
-                                            <p class="font-semibold text-white">{{ $l->judul }}</p>
+                                        <td style="max-width:14rem;">
+                                            <p class="font-semibold text-white truncate">{{ $l->judul }}</p>
                                             <span class="inline-block mt-1 text-xs font-medium px-2.5 py-0.5 rounded-full bg-[#181F11] text-[#9AA68E] border border-white/10">
                                                 {{ $l->kategori }}
                                             </span>
@@ -262,15 +262,15 @@
                                         </td>
                                         <td class="text-center whitespace-nowrap">
                                             @if ($l->status === 'Selesai')
-                                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#C4FF0D]/15 text-[#C4FF0D] border border-[#C4FF0D]/30">
+                                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#C4FF0D] text-[#0E1308]">
                                                     Selesai
                                                 </span>
                                             @elseif ($l->status === 'Dalam Tinjauan')
-                                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-400/15 text-amber-300 border border-amber-400/30">
+                                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-400 text-[#0E1308]">
                                                     Dalam Tinjauan
                                                 </span>
                                             @else
-                                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-[#9AA68E]">
+                                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#9AA68E] text-[#0E1308]">
                                                     Draft
                                                 </span>
                                             @endif
@@ -313,6 +313,9 @@
             var chartLabels = @json($labels);
             var dataIn = @json($pemasukanData);
             var dataOut = @json($pengeluaranData);
+            var dataNet = dataIn.map(function(val, idx) {
+                return Number(val || 0) - Number(dataOut[idx] || 0);
+            });
 
             function renderBentoChart(type) {
                 var ctx = document.getElementById('chartBulanan');
@@ -340,6 +343,16 @@
                                 data: dataOut,
                                 backgroundColor: type === 'line' ? 'rgba(192, 132, 252, 0.15)' : '#C084FC',
                                 borderColor: '#C084FC',
+                                borderWidth: 2.5,
+                                tension: 0.35,
+                                fill: type === 'line',
+                                borderRadius: 6
+                            },
+                            {
+                                label: 'Laba Bersih',
+                                data: dataNet,
+                                backgroundColor: type === 'line' ? 'rgba(56, 189, 248, 0.18)' : '#38BDF8',
+                                borderColor: '#38BDF8',
                                 borderWidth: 2.5,
                                 tension: 0.35,
                                 fill: type === 'line',

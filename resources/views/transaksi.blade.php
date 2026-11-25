@@ -68,7 +68,7 @@
                             </p>
                         </div>
                         <span class="rounded-full px-3.5 py-1.5 text-xs sm:text-sm font-semibold"
-                              style="background: {{ $selisih >= 0 ? 'rgba(196,255,13,0.15)' : 'rgba(192,132,252,0.18)' }}; color: {{ $selisih >= 0 ? '#C4FF0D' : '#C084FC' }};">
+                              style="background: {{ $selisih >= 0 ? '#C4FF0D' : '#C084FC' }}; color: #0E1308;">
                             {{ $selisih >= 0 ? 'Surplus +' : 'Defisit ' }}{{ $marginTrx }}%
                         </span>
                     </div>
@@ -323,7 +323,7 @@
                                         class="{{ (string) $t->id === (string) $editId ? 'bg-[#C4FF0D]/[0.07]' : '' }}">
                                         <td>
                                             <div class="flex items-center gap-3.5">
-                                                <span class="grid size-10 shrink-0 place-items-center rounded-xl border border-white/10 {{ $t->isIncome() ? 'bg-[#C4FF0D]/15 text-[#C4FF0D]' : 'bg-[#C084FC]/15 text-[#C084FC]' }}">
+                                                <span class="grid size-10 shrink-0 place-items-center rounded-xl {{ $t->isIncome() ? 'bg-[#C4FF0D] text-[#0E1308]' : 'bg-[#C084FC] text-[#0E1308]' }}">
                                                     @if ($t->isIncome())
                                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14m0 0-6-6m6 6 6-6"/></svg>
                                                     @else
@@ -336,9 +336,9 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="text-[#9AA68E] text-xs sm:text-sm">
+                                        <td class="text-[#9AA68E] text-xs sm:text-sm" style="max-width:11rem;">
                                             @if ($t->product)
-                                                <span class="inline-flex items-center px-3 py-1 rounded-full bg-[#181F11] border border-white/10 text-white text-xs font-medium">
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full bg-[#181F11] border border-white/10 text-white text-xs font-medium max-w-full truncate">
                                                     {{ $t->product->nama }}
                                                 </span>
                                             @else
@@ -347,7 +347,7 @@
                                         </td>
                                         <td>
                                             <span class="px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap
-                                                {{ $t->isIncome() ? 'bg-[#C4FF0D]/15 text-[#C4FF0D] border border-[#C4FF0D]/30' : 'bg-[#C084FC]/15 text-[#C084FC] border border-[#C084FC]/30' }}">
+                                                {{ $t->isIncome() ? 'bg-[#C4FF0D] text-[#0E1308]' : 'bg-[#C084FC] text-[#0E1308]' }}">
                                                 {{ $t->jenis }}
                                             </span>
                                         </td>

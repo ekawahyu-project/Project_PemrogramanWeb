@@ -43,7 +43,7 @@
                             <h3 class="text-sm font-semibold text-white">Produk Terlaris &amp; Kontribusi</h3>
                             <p class="text-xs text-[#8E9882] mt-0.5">Peringkat otomatis berdasarkan frekuensi transaksi penjualan.</p>
                         </div>
-                        <span class="rounded-full bg-[#C4FF0D]/15 px-2.5 py-1 text-[11px] font-semibold text-[#C4FF0D]">
+                        <span class="rounded-full bg-[#C4FF0D] px-2.5 py-1 text-[11px] font-semibold text-[#0E1308]">
                             Top Sales
                         </span>
                     </header>

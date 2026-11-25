@@ -110,9 +110,8 @@
                 <section class="bento-tile !overflow-hidden xl:col-start-3 xl:row-start-1" data-card-glare-zone>
                     <header class="mb-3 flex items-center justify-between gap-3">
                         <h3 class="text-sm font-semibold text-[#9AA68E]">
-                            Aset Gudang <sup class="text-xs text-[#C4FF0D]">3</sup>
+                            Aset Gudang
                         </h3>
-                        <span class="text-xs text-[#9AA68E]">Klik kartu</span>
                     </header>
 
                     <div class="relative -mx-5 -mb-5 flex flex-1 flex-col justify-end overflow-hidden pt-2">
@@ -445,7 +444,7 @@
                     <header class="mb-2 flex items-center justify-between gap-3">
                         <h3 class="text-sm font-semibold text-[#9AA68E]">Target Omzet &amp; BEP</h3>
                         <span class="rounded-full px-2.5 py-0.5 text-xs font-semibold"
-                              style="background: {{ $isTargetMet ? 'rgba(196,255,13,0.16)' : 'rgba(192,132,252,0.18)' }}; color: {{ $isTargetMet ? '#C4FF0D' : '#C084FC' }};">
+                              style="background: {{ $isTargetMet ? '#C4FF0D' : '#C084FC' }}; color: #0E1308;">
                             {{ $isTargetMet ? 'Di Atas BEP' : 'Kejar BEP' }}
                         </span>
                     </header>
@@ -479,12 +478,12 @@
                         @foreach ($shortcuts as $s)
                         @php $isFeaturedShortcut = $s['href'] === '/konsultasi-ai'; @endphp
                         <a href="{{ $s['href'] }}"
-                           class="group rounded-2xl border p-4 transition flex flex-col justify-between {{ $isFeaturedShortcut ? 'sm:col-span-2 lg:col-span-3 bg-[#C4FF0D]/[0.08] border-[#C4FF0D]/30 hover:border-[#C4FF0D]/60' : 'bg-[#181F11] border-white/[0.07] hover:border-[#C4FF0D]/45' }}">
+                           class="group rounded-2xl border p-4 transition flex flex-col justify-between {{ $isFeaturedShortcut ? 'sm:col-span-2 lg:col-span-3 bg-[#C4FF0D] border-[#C4FF0D] hover:brightness-95' : 'bg-[#181F11] border-white/[0.07] hover:border-[#C4FF0D]/45' }}">
                             <div class="flex items-center justify-between gap-2">
-                                <span class="font-semibold text-sm {{ $isFeaturedShortcut ? 'text-[#C4FF0D]' : 'text-white group-hover:text-[#C4FF0D]' }} transition">{{ $s['label'] }}</span>
-                                <span class="text-sm {{ $isFeaturedShortcut ? 'text-[#C4FF0D]' : 'text-[#9AA68E] group-hover:text-[#C4FF0D]' }} group-hover:translate-x-0.5 transition-transform">→</span>
+                                <span class="font-semibold text-sm {{ $isFeaturedShortcut ? 'text-[#0E1308]' : 'text-white group-hover:text-[#C4FF0D]' }} transition">{{ $s['label'] }}</span>
+                                <span class="text-sm {{ $isFeaturedShortcut ? 'text-[#0E1308]' : 'text-[#9AA68E] group-hover:text-[#C4FF0D]' }} group-hover:translate-x-0.5 transition-transform">→</span>
                             </div>
-                            <p class="text-xs text-[#9AA68E] mt-1.5 leading-relaxed">{{ $s['desc'] }}</p>
+                            <p class="text-xs {{ $isFeaturedShortcut ? 'text-[#0E1308]/80 font-medium' : 'text-[#9AA68E]' }} mt-1.5 leading-relaxed">{{ $s['desc'] }}</p>
                         </a>
                         @endforeach
                     </div>
@@ -503,7 +502,7 @@
                         <ul class="-mx-2 -my-1 divide-y divide-white/[0.05]">
                             @foreach ($transaksiTerbaru as $t)
                             <li class="flex items-center gap-3.5 rounded-2xl px-2.5 py-3 transition-colors hover:bg-white/[0.03]">
-                                <span class="grid size-10 shrink-0 place-items-center rounded-xl border border-white/10 {{ $t->isIncome() ? 'bg-[#C4FF0D]/15 text-[#C4FF0D]' : 'bg-[#C084FC]/15 text-[#C084FC]' }}">
+                                <span class="grid size-10 shrink-0 place-items-center rounded-xl {{ $t->isIncome() ? 'bg-[#C4FF0D] text-[#0E1308]' : 'bg-[#C084FC] text-[#0E1308]' }}">
                                     @if ($t->isIncome())
                                         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14m0 0-6-6m6 6 6-6"/></svg>
                                     @else

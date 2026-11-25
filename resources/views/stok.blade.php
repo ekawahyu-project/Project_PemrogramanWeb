@@ -41,7 +41,7 @@
                                 Akumulasi stok fisik lintas {{ $skuCount }} SKU produk aktif.
                             </p>
                         </div>
-                        <span class="rounded-full bg-[#C4FF0D]/15 px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-[#C4FF0D]">
+                        <span class="rounded-full bg-[#C4FF0D] px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-[#0E1308]">
                             {{ $stokLogList->count() }} log mutasi
                         </span>
                     </div>
@@ -274,8 +274,8 @@
                                     $barColor = $p->isOutOfStock() ? 'bg-white/25' : ($p->isLowStock() ? 'bg-amber-400' : 'bg-[#C4FF0D]');
                                     @endphp
                                     <tr data-filter-item data-filter-tag="{{ $p->stockStatus() }}">
-                                        <td class="font-semibold text-white">
-                                            {{ $p->nama }}
+                                        <td class="font-semibold text-white" style="max-width:12rem;">
+                                            <p class="truncate">{{ $p->nama }}</p>
                                             <span class="text-[#9AA68E] text-xs font-normal">/{{ $p->satuan }}</span>
                                         </td>
                                         <td class="text-[#9AA68E] text-xs sm:text-sm">{{ $p->kategori }}</td>
@@ -290,11 +290,11 @@
                                         <td class="text-center text-[#9AA68E] tabular-nums">{{ $p->stok_min }}</td>
                                         <td class="text-center whitespace-nowrap">
                                             @if ($p->isOutOfStock())
-                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-[#9AA68E]">Habis</span>
+                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#9AA68E] text-[#0E1308]">Habis</span>
                                             @elseif ($p->isLowStock())
-                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-amber-400/15 text-amber-300 border border-amber-400/30">Menipis</span>
+                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-amber-400 text-[#0E1308]">Menipis</span>
                                             @else
-                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#C4FF0D]/15 text-[#C4FF0D] border border-[#C4FF0D]/30">Normal</span>
+                                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#C4FF0D] text-[#0E1308]">Normal</span>
                                             @endif
                                         </td>
                                     </tr>
@@ -341,7 +341,7 @@
                                         <td class="font-semibold text-white">{{ $log->product?->nama ?? 'Dihapus' }}</td>
                                         <td class="text-center whitespace-nowrap">
                                             <span class="px-3 py-1 rounded-full text-xs font-semibold
-                                                {{ $log->isIncoming() ? 'bg-[#C4FF0D]/15 text-[#C4FF0D] border border-[#C4FF0D]/30' : 'bg-[#C084FC]/15 text-[#C084FC] border border-[#C084FC]/30' }}">
+                                                {{ $log->isIncoming() ? 'bg-[#C4FF0D] text-[#0E1308]' : 'bg-[#C084FC] text-[#0E1308]' }}">
                                                 {{ $log->jenis }}
                                             </span>
                                         </td>

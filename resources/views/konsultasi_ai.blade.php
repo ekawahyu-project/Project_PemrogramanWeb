@@ -135,7 +135,7 @@
                     <div id="ai-chat-feed" class="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 py-4 space-y-4">
                         <!-- Empty Welcome State (kompak agar input langsung terlihat di bawah tanpa scroll) -->
                         <div id="ai-empty-state" class="{{ $messages->isNotEmpty() ? 'hidden' : '' }} min-h-full flex flex-col items-center justify-center text-center max-w-xl mx-auto py-2">
-                            <div class="size-11 rounded-2xl bg-[#C4FF0D]/12 border border-[#C4FF0D]/28 text-[#C4FF0D] grid place-items-center mb-3">
+                            <div class="size-11 rounded-2xl bg-[#C4FF0D] text-[#0E1308] grid place-items-center mb-3">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
                                 </svg>

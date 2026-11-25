@@ -61,7 +61,7 @@
                                 Estimasi nilai jual seluruh stok · Potensi laba <span class="text-[#C4FF0D] font-semibold">+Rp {{ number_format($potensiLaba, 0, ',', '.') }}</span>
                             </p>
                         </div>
-                        <span class="rounded-full bg-[#C4FF0D]/15 px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-[#C4FF0D]">
+                        <span class="rounded-full bg-[#C4FF0D] px-3.5 py-1.5 text-xs sm:text-sm font-semibold text-[#0E1308]">
                             {{ $totalSku }} item
                         </span>
                     </div>
@@ -324,14 +324,14 @@
                                             @endphp
                                             <tr data-filter-item data-filter-tag="{{ $statusLabel }}"
                                                 class="{{ (string) $p->id === (string) $editId ? 'bg-[#C4FF0D]/[0.07]' : '' }}">
-                                                <td>
+                                                <td style="max-width:14rem;">
                                                     <div class="flex items-center gap-3.5">
-                                                        <span class="grid size-9 shrink-0 place-items-center rounded-xl bg-[#181F11] border border-white/10 text-xs font-bold text-[#C4FF0D]">
+                                                        <span class="grid size-9 shrink-0 place-items-center rounded-xl bg-[#C4FF0D] text-xs font-bold text-[#0E1308]">
                                                             {{ strtoupper(mb_substr($p->nama, 0, 1)) }}
                                                         </span>
-                                                        <div>
-                                                            <p class="font-semibold text-white">{{ $p->nama }}</p>
-                                                            <p class="text-xs text-[#9AA68E] mt-0.5">Per {{ $p->satuan }} · Min: {{ $p->stok_min }}</p>
+                                                        <div class="min-w-0">
+                                                            <p class="font-semibold text-white truncate">{{ $p->nama }}</p>
+                                                            <p class="text-xs text-[#9AA68E] mt-0.5 whitespace-nowrap">Per {{ $p->satuan }} · Min: {{ $p->stok_min }}</p>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -350,11 +350,11 @@
                                                 <td class="text-center font-bold tabular-nums text-white">{{ $p->stok }}</td>
                                                 <td class="text-center whitespace-nowrap">
                                                     @if ($p->isOutOfStock())
-                                                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-[#9AA68E]">Habis</span>
+                                                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#9AA68E] text-[#0E1308]">Habis</span>
                                                     @elseif ($p->isLowStock())
-                                                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-amber-400/15 text-amber-300 border border-amber-400/30">Menipis</span>
+                                                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-amber-400 text-[#0E1308]">Menipis</span>
                                                     @else
-                                                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#C4FF0D]/15 text-[#C4FF0D] border border-[#C4FF0D]/30">Normal</span>
+                                                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#C4FF0D] text-[#0E1308]">Normal</span>
                                                     @endif
                                                 </td>
                                                 <td class="text-center whitespace-nowrap">

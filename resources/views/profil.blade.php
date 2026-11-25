@@ -66,7 +66,7 @@
                                 </p>
 
                                 <div class="flex flex-wrap items-center justify-center gap-2 mt-3.5">
-                                    <span class="px-3 py-1 bg-[#C4FF0D]/15 text-[#C4FF0D] border border-[#C4FF0D]/30 text-xs font-semibold rounded-full">
+                                    <span class="px-3 py-1 bg-[#C4FF0D] text-[#0E1308] text-xs font-semibold rounded-full">
                                         Pemilik Usaha UMKM
                                     </span>
                                     @if (! empty($namaUsaha))
@@ -75,7 +75,7 @@
                                         </span>
                                     @endif
                                     @if (! empty($kategori))
-                                        <span class="px-3 py-1 bg-[#C084FC]/15 text-[#C084FC] border border-[#C084FC]/30 text-xs font-medium rounded-full">
+                                        <span class="px-3 py-1 bg-[#C084FC] text-[#0E1308] text-xs font-semibold rounded-full">
                                             {{ $kategori }}
                                         </span>
                                     @endif

@@ -33,9 +33,9 @@ class Recommendation extends Model
      * @var array<string, string>
      */
     public const PRIORITY_BADGE_CLASSES = [
-        'Tinggi' => 'bg-rose-500/15 text-rose-300 border border-rose-500/30',
-        'Sedang' => 'bg-[#C4FF0D]/15 text-[#C4FF0D] border border-[#C4FF0D]/30',
-        'Rendah' => 'bg-white/10 text-[#8E9882] border border-white/10',
+        'Tinggi' => 'bg-rose-400 text-[#0E1308]',
+        'Sedang' => 'bg-[#C4FF0D] text-[#0E1308]',
+        'Rendah' => 'bg-[#9AA68E] text-[#0E1308]',
     ];
 
     /**

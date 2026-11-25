@@ -153,13 +153,13 @@ class Debt extends Model
     public function statusBadgeClass(): string
     {
         if ($this->isPaid()) {
-            return 'bg-[#C4FF0D]/15 text-[#C4FF0D] border border-[#C4FF0D]/30';
+            return 'bg-[#C4FF0D] text-[#0E1308]';
         }
 
         if ($this->status === self::STATUS_PARTIAL) {
-            return 'bg-amber-400/15 text-amber-300 border border-amber-400/30';
+            return 'bg-amber-400 text-[#0E1308]';
         }
 
-        return 'bg-rose-500/15 text-rose-300 border border-rose-500/30';
+        return 'bg-rose-400 text-[#0E1308]';
     }
 }

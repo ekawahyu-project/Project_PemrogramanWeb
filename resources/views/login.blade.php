@@ -101,15 +101,6 @@
                             Mulai Sekarang &rarr;
                         </button>
                     </div>
-
-                    <!-- Minimalist Hairline Spec Strip -->
-                    <div class="anim-hero-3 pt-4 border-t border-white/10 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-[#9AA68E]">
-                        <span><strong class="text-white font-semibold">Multi-Tenant</strong> Privat per Akun</span>
-                        <span class="text-white/20">/</span>
-                        <span><strong class="text-white font-semibold">AI</strong> Baca Data Live</span>
-                        <span class="text-white/20">/</span>
-                        <span><strong class="text-[#C4FF0D] font-semibold">100% Gratis</strong> untuk UMKM</span>
-                    </div>
                 </div>
 
                 <!-- Right: Custom 3D Dark Matte & Acid-Lime Editorial Sculpture (Parallax + 3D Mouse Tilt) -->
